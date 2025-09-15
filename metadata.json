@@ -1,0 +1,7 @@
+{
+  "name": "School Management System",
+  "description": "A comprehensive School Management System for staff and student administration, attendance tracking, and learning management. This is a frontend prototype demonstrating the UI/UX of the system.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

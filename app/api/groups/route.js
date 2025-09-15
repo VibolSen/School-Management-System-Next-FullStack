@@ -1,0 +1,148 @@
+// app/api/groups/route.js
+import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
+
+const prisma = new PrismaClient();
+
+// GET all groups, including their parent course and a count of students
+export async function GET() {
+  try {
+    const groups = await prisma.group.findMany({
+      orderBy: { name: "asc" },
+      // ✅ MODIFIED: Include related course and a count of students
+      include: {
+        course: true,
+        _count: {
+          select: { students: true },
+        },
+      },
+    });
+    return NextResponse.json(groups);
+  } catch (error) {
+    console.error("GET Groups Error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch groups" },
+      { status: 500 }
+    );
+  }
+}
+
+// CREATE a new group linked to a course
+export async function POST(req) {
+  try {
+    // ✅ MODIFIED: Expect 'name' and 'courseId'
+    const { name, courseId } = await req.json();
+    if (!name || !courseId) {
+      return NextResponse.json(
+        { error: "Group name and course ID are required" },
+        { status: 400 }
+      );
+    }
+    const newGroup = await prisma.group.create({
+      data: {
+        name,
+        course: {
+          connect: { id: courseId },
+        },
+      },
+    });
+    return NextResponse.json(newGroup, { status: 201 });
+  } catch (error) {
+    if (error.code === "P2002") {
+      return NextResponse.json(
+        { error: "A group with this name already exists." },
+        { status: 409 }
+      );
+    }
+    console.error("POST Group Error:", error);
+    return NextResponse.json(
+      { error: "Failed to create group" },
+      { status: 500 }
+    );
+  }
+}
+
+// UPDATE an existing group
+export async function PUT(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    const { name, courseId, studentIds } = await req.json(); // Can now accept studentIds
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Group ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const dataToUpdate = {};
+
+    // Update basic details if provided
+    if (name) dataToUpdate.name = name;
+    if (courseId) dataToUpdate.courseId = courseId;
+
+    // ✅ THIS IS THE KEY LOGIC
+    // If an array of studentIds is provided, update the relationship.
+    // The `set` command tells Prisma to make the members list EXACTLY match this array.
+    // It automatically handles adding new students and removing old ones.
+    if (Array.isArray(studentIds)) {
+      dataToUpdate.students = {
+        set: studentIds.map((studentId) => ({ id: studentId })),
+      };
+    }
+
+    const updatedGroup = await prisma.group.update({
+      where: { id },
+      data: dataToUpdate,
+    });
+    return NextResponse.json(updatedGroup);
+  } catch (error) {
+    if (error.code === "P2002") {
+      return NextResponse.json(
+        { error: "A group with this name already exists." },
+        { status: 409 }
+      );
+    }
+    console.error("PUT Group Error:", error);
+    return NextResponse.json(
+      { error: "Failed to update group" },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE a group, with a safety check for students
+export async function DELETE(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if (!id)
+      return NextResponse.json(
+        { error: "Group ID is required" },
+        { status: 400 }
+      );
+
+    // ✅ ADDED: Safety check to prevent deleting a group that has students
+    const studentCount = await prisma.user.count({
+      where: { groupIds: { has: id } },
+    });
+    if (studentCount > 0) {
+      return NextResponse.json(
+        {
+          error: `Cannot delete group because it has ${studentCount} student(s) assigned.`,
+        },
+        { status: 409 } // Conflict
+      );
+    }
+
+    await prisma.group.delete({ where: { id } });
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    console.error("DELETE Group Error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete group" },
+      { status: 500 }
+    );
+  }
+}

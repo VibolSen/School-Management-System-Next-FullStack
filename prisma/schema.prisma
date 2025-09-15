@@ -1,0 +1,60 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  HR
+  FACULTY
+  TEACHER
+  STUDENT
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstName String
+  lastName  String
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)
+
+  groups Group[] @relation(fields: [groupIds], references: [id])
+  groupIds String[] @db.ObjectId
+  ledCourses Course[] @relation("CourseLead")
+}
+
+model Department {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+
+  // ✅ ADDED: One-to-many relationship with Course
+  courses Course[]
+}
+
+model Course {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+  department   Department @relation(fields: [departmentId], references: [id])
+  departmentId String     @db.ObjectId
+  groups Group[]
+  teacher   User?   @relation("CourseLead", fields: [teacherId], references: [id])
+  teacherId String? @db.ObjectId
+}
+
+model Group {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+
+  // ✅ MODIFIED: Make the relationship optional by adding '?'
+  course   Course?  @relation(fields: [courseId], references: [id])
+  courseId String?  @db.ObjectId // The '?' makes this field optional
+
+  students   User[]   @relation(fields: [studentIds], references: [id])
+  studentIds String[] @db.ObjectId
+}
