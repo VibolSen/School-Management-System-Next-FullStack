@@ -1,28 +1,51 @@
-"use client";
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
+import { PrismaClient } from "@prisma/client";
+import FacultyDashboard from "@/components/dashboard/FacultyDashboard"; // Make sure this path is correct
 
-import React, { useState, useEffect } from "react";
-import FacultyDashboard from "@/components/dashboard/FacultyDashboard";
+const prisma = new PrismaClient();
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || "your-super-secret-key-that-is-long"
+);
 
-const FacultyDashboardPage = () => {
-  const [loggedInUser, setLoggedInUser] = useState(null);
+// This is an async Server Component that fetches data
+async function getLoggedInUser() {
+  // ✅ FIX IS HERE: `cookies()` is now awaited
+  const cookieStore = await cookies();
+  const tokenCookie = cookieStore.get("token");
 
-  useEffect(() => {
-    const token = sessionStorage.getItem("token"); 
-    if (!token) return;
+  if (!tokenCookie) return null;
 
-    fetch("/api/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data?.user) setLoggedInUser(data.user);
-      })
-      .catch(console.error);
-  }, []);
+  try {
+    const { payload } = await jwtVerify(tokenCookie.value, JWT_SECRET);
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+      },
+    });
+    return user;
+  } catch (error) {
+    console.error("Failed to verify token or fetch user:", error);
+    return null;
+  }
+}
 
-  if (!loggedInUser) return <p>Loading...</p>;
+export default async function FacultyDashboardPage() {
+  const loggedInUser = await getLoggedInUser();
 
+  if (!loggedInUser) {
+    return (
+      <div className="p-8">
+        Error: Could not authenticate user. Please log in again.
+      </div>
+    );
+  }
+
+  // Pass the fetched user data as a prop to the client component
   return <FacultyDashboard loggedInUser={loggedInUser} />;
-};
-
-export default FacultyDashboardPage;
+}

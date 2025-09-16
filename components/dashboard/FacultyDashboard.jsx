@@ -1,140 +1,130 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 import DashboardCard from "@/components/dashboard/DashboardCard";
-import UsersIcon from "@/components/icons/UsersIcon";
-import BookOpenIcon from "@/components/icons/BookOpenIcon";
-import ChartBarIcon from "@/components/icons/ChartBarIcon";
-import ClockIcon from "@/components/icons/ClockIcon";
 
-const FacultyDashboard = ({ loggedInUser }) => {
+// Using lucide-react for icons. Make sure it's installed: npm install lucide-react
+import {
+  Users,
+  Briefcase,
+  Building2,
+  Library,
+  Group,
+  UserCheck,
+} from "lucide-react";
+
+// This component will now show a system-wide overview, just like the admin dashboard.
+export default function FacultyDashboard({ loggedInUser }) {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // DATA FETCHING EFFECT
   useEffect(() => {
-    if (loggedInUser) {
-      const fetchFacultyDashboardData = async () => {
-        try {
-          const res = await fetch(
-            `/api/dashboard/faculty?facultyId=${loggedInUser.id}`
-          );
-          if (!res.ok) throw new Error("Failed to fetch dashboard data");
-          const data = await res.json();
-          setDashboardData(data);
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
+    // This function now fetches the same data as the admin dashboard.
+    const fetchSystemWideDashboardData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // ✅ CORRECTED: Fetching from the main, system-wide dashboard API.
+        const res = await fetch("/api/dashboard");
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || "Failed to fetch dashboard data");
         }
-      };
+        const data = await res.json();
+        setDashboardData(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      fetchFacultyDashboardData();
-    }
-  }, [loggedInUser]);
+    fetchSystemWideDashboardData();
+  }, []); // No dependency on loggedInUser needed as it fetches global data.
 
+  // RENDER LOGIC: Loading State
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="ml-4 text-slate-600">Loading dashboard...</p>
+      </div>
+    );
   }
 
+  // RENDER LOGIC: Error State
   if (error) {
-    return <p>Error: {error}</p>;
+    return <div className="p-8 text-center text-red-600">Error: {error}</div>;
   }
 
+  // RENDER LOGIC: No Data State
   if (!dashboardData) {
-    return <p>No data available.</p>;
+    return (
+      <p className="p-8 text-center text-slate-500">
+        No dashboard data available.
+      </p>
+    );
   }
 
-  const { totalCourses, totalStudents, todaysAttendanceRate, todaysSchedule, courseAttendanceData } = dashboardData;
+  // Construct the welcome message.
+  const welcomeName = loggedInUser
+    ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
+    : "User";
 
+  // RENDER LOGIC: Success State
   return (
-    <div className="space-y-6 animate-fade-in">
-      <h1 className="text-3xl font-bold text-slate-800">
-        Welcome back, {loggedInUser?.name}!
-      </h1>
-      <p className="text-slate-500">Here's your teaching summary for today.</p>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <DashboardCard
-          title="My Courses"
-          value={totalCourses.toString()}
-          icon={<BookOpenIcon />}
-        />
-        <DashboardCard
-          title="Total Students"
-          value={totalStudents.toString()}
-          icon={<UsersIcon />}
-        />
-        <DashboardCard
-          title="Today's Attendance"
-          value={todaysAttendanceRate}
-          icon={<ChartBarIcon />}
-        />
+    <div className="space-y-6 animate-fade-in p-6 md:p-8">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-700 p-6 rounded-2xl shadow-lg text-white">
+        <h1 className="text-3xl font-bold mb-2">
+          Welcome back, {welcomeName}!
+        </h1>
+        <p className="text-indigo-100">
+          Here is a complete overview of the school system.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3 bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-slate-800">
-            Today's Attendance by Course
-          </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={courseAttendanceData}
-              margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" fontSize={12} />
-              <YAxis unit="%" />
-              <Tooltip />
-              <Bar
-                dataKey="Attendance Rate"
-                fill="#3b82f6"
-                name="Attendance Rate"
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <h2 className="text-xl font-semibold mb-4 text-slate-800">
-              Today's Schedule
-            </h2>
-            {todaysSchedule.length > 0 ? (
-              <ul className="space-y-3">
-                {todaysSchedule.map((course) => (
-                  <li key={course.id} className="flex items-center space-x-3">
-                    <div className="flex-shrink-0 bg-slate-100 p-2 rounded-full text-slate-500">
-                      <ClockIcon />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-slate-700">
-                        {course.name}
-                      </p>
-                      <p className="text-sm text-slate-500">{course.time}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-slate-500 text-center py-4">
-                No classes scheduled for today.
-              </p>
-            )}
-          </div>
-        </div>
+      {/* ✅ CORRECTED: Dashboard Cards now show the total system counts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <DashboardCard
+          title="Total Students"
+          value={dashboardData.studentCount}
+          icon={<Users className="text-blue-600" />}
+          gradient="from-blue-500 to-blue-700"
+        />
+        <DashboardCard
+          title="Total Teachers"
+          value={dashboardData.teacherCount}
+          icon={<UserCheck className="text-green-600" />}
+          gradient="from-green-500 to-green-700"
+        />
+        <DashboardCard
+          title="Total Staff"
+          value={dashboardData.staffCount}
+          icon={<Briefcase className="text-purple-600" />}
+          gradient="from-purple-500 to-purple-700"
+        />
+        <DashboardCard
+          title="Total Departments"
+          value={dashboardData.departmentCount}
+          icon={<Building2 className="text-amber-600" />}
+          gradient="from-amber-500 to-amber-700"
+        />
+        <DashboardCard
+          title="Total Courses"
+          value={dashboardData.courseCount}
+          icon={<Library className="text-sky-600" />}
+          gradient="from-sky-500 to-sky-700"
+        />
+        <DashboardCard
+          title="Total Groups"
+          value={dashboardData.groupCount}
+          icon={<Group className="text-pink-600" />}
+          gradient="from-pink-500 to-pink-700"
+        />
       </div>
     </div>
   );
-};
-
-export default FacultyDashboard;
+}

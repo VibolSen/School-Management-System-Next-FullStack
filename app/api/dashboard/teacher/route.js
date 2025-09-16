@@ -1,84 +1,63 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
 
-export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const teacherId = searchParams.get('teacherId');
+const prisma = new PrismaClient();
 
-  if (!teacherId) {
-    return NextResponse.json({ error: 'Teacher ID is required' }, { status: 400 });
-  }
-
+export async function GET(req) {
   try {
-    const courses = await prisma.course.findMany({
-      where: {
-        instructorId: teacherId,
-      },
-    });
+    const { searchParams } = new URL(req.url);
+    const teacherId = searchParams.get("teacherId");
 
-    const courseIds = courses.map((course) => course.id);
+    if (!teacherId) {
+      return NextResponse.json(
+        { error: "Teacher ID is required" },
+        { status: 400 }
+      );
+    }
 
-    const assignments = await prisma.assignment.findMany({
-      where: {
-        courseId: {
-          in: courseIds,
-        },
-      },
-    });
-
-    const assignmentIds = assignments.map((assignment) => assignment.id);
-
-    const submissions = await prisma.studentAssignment.findMany({
-      where: {
-        assignmentId: {
-          in: assignmentIds,
-        },
-      },
+    // 1. Find all courses led by this teacher
+    const ledCourses = await prisma.course.findMany({
+      where: { teacherId: teacherId },
       include: {
-        status: true,
+        groups: {
+          include: {
+            _count: {
+              select: { students: true },
+            },
+          },
+        },
       },
     });
 
-    const assignmentsToGrade = submissions.filter(
-      (s) =>
-        s.status.name === 'Submitted' ||
-        s.status.name === 'Late'
-    ).length;
+    // 2. Calculate metrics from the fetched data
+    const totalCourses = ledCourses.length;
+    let totalGroups = 0;
+    let totalStudents = 0;
 
-    const upcomingDueDate = assignments
-      .filter((a) => new Date(a.dueDate) >= new Date())
-      .sort(
-        (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-      )[0];
+    ledCourses.forEach((course) => {
+      totalGroups += course.groups.length;
+      course.groups.forEach((group) => {
+        totalStudents += group._count.students;
+      });
+    });
 
-    const submissionsPerAssignment = assignments
-      .map((assignment) => {
-        const assignmentSubmissions = submissions.filter(
-          (s) => s.assignmentId === assignment.id
-        );
-        return {
-          name:
-            assignment.title.length > 15
-              ? assignment.title.substring(0, 15) + "..."
-              : assignment.title,
-          Submissions: assignmentSubmissions.length,
-        };
-      })
-      .slice(0, 5);
-
-    // Mock data for classes today and student questions
-    const classesToday = courses.length > 1 ? 2 : courses.length;
-    const studentQuestionCount = 3;
+    // Extract the names of the courses for display
+    const courseList = ledCourses.map((course) => ({
+      id: course.id,
+      name: course.name,
+    }));
 
     return NextResponse.json({
-      classesToday,
-      assignmentsToGrade,
-      upcomingDueDate,
-      studentQuestionCount,
-      submissionsPerAssignment,
+      totalCourses,
+      totalGroups,
+      totalStudents,
+      courseList,
     });
   } catch (error) {
-    console.error('Failed to fetch teacher dashboard data:', error);
-    return NextResponse.json({ error: 'Failed to fetch dashboard data' }, { status: 500 });
+    console.error("Teacher Dashboard API Error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch teacher dashboard data" },
+      { status: 500 }
+    );
   }
 }

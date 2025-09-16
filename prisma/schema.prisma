@@ -27,6 +27,7 @@ model User {
   groups Group[] @relation(fields: [groupIds], references: [id])
   groupIds String[] @db.ObjectId
   ledCourses Course[] @relation("CourseLead")
+   headedDepartment Department? @relation("DepartmentHead")
 }
 
 model Department {
@@ -35,6 +36,8 @@ model Department {
 
   // ✅ ADDED: One-to-many relationship with Course
   courses Course[]
+  head      User?   @relation("DepartmentHead", fields: [headId], references: [id])
+  headId    String? @db.ObjectId @unique //
 }
 
 model Course {

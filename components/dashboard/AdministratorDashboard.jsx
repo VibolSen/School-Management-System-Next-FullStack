@@ -4,14 +4,22 @@ import React, { useEffect, useState } from "react";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import Cookies from "js-cookie";
 
-// ✅ MODIFIED: Import real icons from the lucide-react library
-import { Users, Briefcase, Building2, Library } from "lucide-react";
+// ✅ ADDED: More icons from lucide-react for our new cards
+import {
+  Users,
+  Briefcase,
+  Building2,
+  Library,
+  Group,
+  UserCheck,
+} from "lucide-react";
 
 export default function AdministratorDashboard() {
   const [dashboardData, setDashboardData] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // This fetch logic is now correct and will receive the new counts
   async function fetchDashboardData() {
     try {
       const res = await fetch("/api/dashboard");
@@ -69,20 +77,26 @@ export default function AdministratorDashboard() {
             Welcome back, {welcomeName}!
           </h1>
           <p className="text-blue-100">
-            Here's a snapshot of your school's key metrics.
+            Here's a complete overview of your school's system.
           </p>
         </div>
 
-        {/* ✅ MODIFIED: Use the new icons in the DashboardCard components */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* ✅ MODIFIED: Grid layout updated to better fit more cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <DashboardCard
-            title="Total Enrolled Students"
+            title="Total Students"
             value={dashboardData.studentCount}
             icon={<Users className="text-blue-600" />}
             gradient="from-blue-500 to-blue-700"
           />
           <DashboardCard
-            title="Total Staff Members"
+            title="Total Teachers" // ✅ CHANGED: More specific than "Staff"
+            value={dashboardData.teacherCount}
+            icon={<UserCheck className="text-green-600" />} // New icon and color
+            gradient="from-green-500 to-green-700"
+          />
+          <DashboardCard
+            title="Total Staff"
             value={dashboardData.staffCount}
             icon={<Briefcase className="text-purple-600" />}
             gradient="from-purple-500 to-purple-700"
@@ -96,8 +110,14 @@ export default function AdministratorDashboard() {
           <DashboardCard
             title="Total Courses"
             value={dashboardData.courseCount}
-            icon={<Library className="text-green-600" />}
-            gradient="from-green-500 to-green-700"
+            icon={<Library className="text-sky-600" />} // Changed color
+            gradient="from-sky-500 to-sky-700"
+          />
+          <DashboardCard
+            title="Total Groups" // ✅ ADDED: New card for Groups
+            value={dashboardData.groupCount}
+            icon={<Group className="text-pink-600" />} // New icon and color
+            gradient="from-pink-500 to-pink-700"
           />
         </div>
       </div>

@@ -2,29 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import DashboardCard from "@/components/dashboard/DashboardCard";
-import ClipboardListIcon from "@/components/icons/ClipboardListIcon";
-import CalendarIcon from "@/components/icons/CalendarIcon";
-import BellIcon from "@/components/icons/BellIcon";
-import UsersIcon from "@/components/icons/UsersIcon";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+// Using lucide-react for icons. Replace with your actual icon components if different.
+import { Library, Group, Users } from "lucide-react";
 
-const TeacherDashboard = ({ loggedInUser }) => {
+export default function TeacherDashboard({ loggedInUser }) {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (loggedInUser) {
+    if (loggedInUser?.id) {
       const fetchTeacherDashboardData = async () => {
+        setLoading(true);
+        setError(null);
         try {
+          // ✅ CORRECT: Fetching from the new, specific teacher dashboard API
           const res = await fetch(
             `/api/dashboard/teacher?teacherId=${loggedInUser.id}`
           );
@@ -43,106 +35,64 @@ const TeacherDashboard = ({ loggedInUser }) => {
   }, [loggedInUser]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="p-8 text-center">Loading...</div>;
   }
-
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="p-8 text-center text-red-500">Error: {error}</div>;
   }
-
   if (!dashboardData) {
-    return <div>No data available.</div>;
+    return <div className="p-8 text-center">No data available.</div>;
   }
 
-  const { classesToday, assignmentsToGrade, upcomingDueDate, studentQuestionCount, submissionsPerAssignment } = dashboardData;
+  const welcomeName = loggedInUser
+    ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
+    : "Teacher";
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <h1 className="text-3xl font-bold text-slate-800">
-        Welcome back, {loggedInUser?.name}!
-      </h1>
-      <p className="text-slate-500">Your teaching dashboard for today.</p>
+    <div className="space-y-6 animate-fade-in p-6">
+      <div className="bg-gradient-to-r from-green-600 to-teal-700 p-6 rounded-2xl shadow-lg text-white">
+        <h1 className="text-3xl font-bold mb-2">
+          Welcome back, {welcomeName}!
+        </h1>
+        <p className="text-green-100">Here is your daily teaching summary.</p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <DashboardCard
-          title="Classes Today"
-          value={classesToday.toString()}
-          icon={<CalendarIcon />}
+          title="Courses I Lead"
+          value={dashboardData.totalCourses}
+          icon={<Library className="text-green-600" />}
         />
         <DashboardCard
-          title="Assignments to Grade"
-          value={assignmentsToGrade.toString()}
-          icon={<ClipboardListIcon />}
+          title="Total Groups"
+          value={dashboardData.totalGroups}
+          icon={<Group className="text-teal-600" />}
         />
         <DashboardCard
-          title="Next Due Date"
-          value={
-            upcomingDueDate
-              ? new Date(upcomingDueDate.dueDate).toLocaleDateString()
-              : "N/A"
-          }
-          icon={<BellIcon />}
-        />
-        <DashboardCard
-          title="New Student Questions"
-          value={studentQuestionCount.toString()}
-          icon={<UsersIcon />}
+          title="Total Students"
+          value={dashboardData.totalStudents}
+          icon={<Users className="text-cyan-600" />}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-slate-800">
-            Recent Assignment Submissions
-          </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={submissionsPerAssignment}
-              margin={{ top: 5, right: 20, left: -10, bottom: 50 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" interval={0} />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Bar
-                dataKey="Submissions"
-                fill="#3b82f6"
-                name="Total Submissions"
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-slate-800">
-            Quick Actions
-          </h2>
-          <div className="space-y-3">
-            <button className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition">
-              <p className="font-semibold text-slate-700">Post Announcement</p>
-              <p className="text-sm text-slate-500">
-                Share updates with your classes.
-              </p>
-            </button>
-            <button className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition">
-              <p className="font-semibold text-slate-700">Schedule a Meeting</p>
-              <p className="text-sm text-slate-500">
-                Set up a video call with a student.
-              </p>
-            </button>
-            <button className="w-full text-left p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition">
-              <p className="font-semibold text-slate-700">
-                View Weekly Schedule
-              </p>
-              <p className="text-sm text-slate-500">
-                See your upcoming classes and events.
-              </p>
-            </button>
-          </div>
-        </div>
+      <div className="bg-white p-6 rounded-xl shadow-md">
+        <h2 className="text-xl font-semibold mb-4 text-slate-800">
+          My Assigned Courses
+        </h2>
+        {dashboardData.courseList && dashboardData.courseList.length > 0 ? (
+          <ul className="space-y-2">
+            {dashboardData.courseList.map((course) => (
+              <li key={course.id} className="p-3 bg-slate-50 rounded-lg">
+                <p className="font-medium text-slate-700">{course.name}</p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-center text-slate-500 py-4">
+            You are not currently assigned to lead any courses.
+          </p>
+        )}
       </div>
     </div>
   );
-};
-
-export default TeacherDashboard;
+}

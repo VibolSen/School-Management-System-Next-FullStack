@@ -65,7 +65,7 @@ const FACULTY_NAV_ITEMS = [
   {
     label: "Groups",
     icon: <FiHash className="w-5 h-5" />,
-    href: "/faculty/group",
+    href: "/faculty/groups",
   },
   {
     label: "Teachers",
