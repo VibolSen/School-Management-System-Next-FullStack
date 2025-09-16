@@ -49,52 +49,52 @@ const TEACHER_NAV_ITEMS = [
   {
     label: "Dashboard",
     icon: <FiHome className="w-5 h-5" />,
-    href: "/teachers/dashboard",
+    href: "/teacher/dashboard",
   },
   {
     label: "My Students",
     icon: <FiUsers className="w-5 h-5" />,
-    href: "/teachers/students",
+    href: "/teacher/students",
   },
   {
     label: "My Courses",
     icon: <FiBook className="w-5 h-5" />,
-    href: "/teachers/courses",
+    href: "/teacher/courses",
   },
   {
     label: "Assignments",
     icon: <FiClipboard className="w-5 h-5" />,
-    href: "/teachers/assignment",
+    href: "/teacher/assignment",
   },
   {
     label: "Exams",
     icon: <FiFileText className="w-5 h-5" />, // Differentiated from Assignments
-    href: "/teachers/exam",
+    href: "/teacher/exam",
   },
   {
     label: "Course Analytics",
     icon: <FiBarChart2 className="w-5 h-5" />,
-    href: "/teachers/course-analytics",
+    href: "/teacher/course-analytics",
   },
   {
     label: "Student Performance",
     icon: <FiTrendingUp className="w-5 h-5" />,
-    href: "/teachers/student-performance",
+    href: "/teacher/student-performance",
   },
   {
     label: "Attendance",
     icon: <FiCheckSquare className="w-5 h-5" />, // More specific for tracking
-    href: "/teachers/attendance",
+    href: "/teacher/attendance",
   },
   {
     label: "E-Library",
     icon: <FiBookOpen className="w-5 h-5" />,
-    href: "/teachers/e-library",
+    href: "/teacher/e-library",
   },
   {
     label: "Settings",
     icon: <FiSettings className="w-5 h-5" />,
-    href: "/teachers/settings",
+    href: "/teacher/settings",
   },
 ];
 

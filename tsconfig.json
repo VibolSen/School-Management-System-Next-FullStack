@@ -65,7 +65,7 @@
     "app/student/scan-qr/page.jsx",
     "app/student/attendance/page.jsx",
     "components/dashboard/TeacherDashboard.jsx",
-    "app/teachers/assignment/page.jsx",
+    "app/teacher/assignment/page.jsx",
     "app/faculty/e-library/page.jsx",
     "app/student/e-library/page.jsx",
     "components/dashboard/StudentDashboard.jsx",

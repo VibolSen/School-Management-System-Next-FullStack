@@ -51,7 +51,7 @@ export default function LoginPage() {
       if (roleName === "admin") router.push("/admin/dashboard");
       else if (roleName === "hr") router.push("/hr/dashboard");
       else if (roleName === "faculty") router.push("/faculty/dashboard");
-      else if (roleName === "teacher") router.push("/teachers/dashboard");
+      else if (roleName === "teacher") router.push("/teacher/dashboard");
       else if (roleName === "student") router.push("/student/dashboard");
       else router.push("/"); // Fallback to a default page
     } catch (err) {

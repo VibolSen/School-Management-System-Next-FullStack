@@ -114,7 +114,7 @@ export default function AssignmentsView({ loggedInUser }) {
             assignments.map((assignment) => (
               <Link
                 key={assignment.id}
-                href={`/teacher/assignments/${assignment.id}`}
+                href={`/teacher/assignment/${assignment.id}`}
                 className="block p-4 border rounded-lg hover:bg-slate-50 transition-colors"
               >
                 <div className="flex justify-between items-center">

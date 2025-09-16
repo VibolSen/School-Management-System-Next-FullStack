@@ -35,7 +35,7 @@ export async function middleware(request) {
         admin: "/admin",
         hr: "/hr",
         faculty: "/faculty",
-        teacher: "/teachers",
+        teacher: "/teacher",
         student: "/student",
       };
 

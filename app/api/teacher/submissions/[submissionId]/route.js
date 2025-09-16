@@ -9,16 +9,16 @@ export async function PUT(req, { params }) {
     const { submissionId } = params;
     const { grade, feedback } = await req.json();
 
-    if (grade === undefined || grade === null) {
+    if (grade === undefined || grade === null || grade === "") {
       return NextResponse.json({ error: "Grade is required" }, { status: 400 });
     }
 
     const updatedSubmission = await prisma.submission.update({
       where: { id: submissionId },
       data: {
-        grade: parseInt(grade, 10), // Ensure grade is an integer
+        grade: parseInt(grade, 10),
         feedback,
-        status: "GRADED", // Update the status automatically
+        status: "GRADED",
       },
     });
 
