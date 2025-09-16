@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import DashboardCard from "@/components/dashboard/DashboardCard";
-// Using lucide-react for icons. Replace with your actual icon components if different.
-import { Library, Group, Users } from "lucide-react";
+import DashboardCard from "@/components/dashboard/DashboardCard"; // Assuming this is the correct path
+import { Library, Users } from "lucide-react"; // Using lucide-react for icons
 
 export default function TeacherDashboard({ loggedInUser }) {
   const [dashboardData, setDashboardData] = useState(null);
@@ -16,7 +15,7 @@ export default function TeacherDashboard({ loggedInUser }) {
         setLoading(true);
         setError(null);
         try {
-          // ✅ CORRECT: Fetching from the new, specific teacher dashboard API
+          // Fetch from our dedicated teacher dashboard API
           const res = await fetch(
             `/api/dashboard/teacher?teacherId=${loggedInUser.id}`
           );
@@ -29,13 +28,12 @@ export default function TeacherDashboard({ loggedInUser }) {
           setLoading(false);
         }
       };
-
       fetchTeacherDashboardData();
     }
   }, [loggedInUser]);
 
   if (loading) {
-    return <div className="p-8 text-center">Loading...</div>;
+    return <div className="p-8 text-center">Loading your dashboard...</div>;
   }
   if (error) {
     return <div className="p-8 text-center text-red-500">Error: {error}</div>;
@@ -57,41 +55,29 @@ export default function TeacherDashboard({ loggedInUser }) {
         <p className="text-green-100">Here is your daily teaching summary.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <DashboardCard
-          title="Courses I Lead"
+          title="My Courses"
           value={dashboardData.totalCourses}
           icon={<Library className="text-green-600" />}
+          colorClass="bg-green-100"
         />
         <DashboardCard
-          title="Total Groups"
-          value={dashboardData.totalGroups}
-          icon={<Group className="text-teal-600" />}
-        />
-        <DashboardCard
-          title="Total Students"
+          title="My Students"
           value={dashboardData.totalStudents}
-          icon={<Users className="text-cyan-600" />}
+          icon={<Users className="text-teal-600" />}
+          colorClass="bg-teal-100"
         />
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-md">
-        <h2 className="text-xl font-semibold mb-4 text-slate-800">
-          My Assigned Courses
+      <div className="bg-white p-6 rounded-xl shadow-md text-center">
+        <h2 className="text-xl font-semibold mb-2 text-slate-800">
+          Next Steps
         </h2>
-        {dashboardData.courseList && dashboardData.courseList.length > 0 ? (
-          <ul className="space-y-2">
-            {dashboardData.courseList.map((course) => (
-              <li key={course.id} className="p-3 bg-slate-50 rounded-lg">
-                <p className="font-medium text-slate-700">{course.name}</p>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-center text-slate-500 py-4">
-            You are not currently assigned to lead any courses.
-          </p>
-        )}
+        <p className="text-slate-500">
+          Navigate to the "Groups" section to manage your student rosters for
+          each course.
+        </p>
       </div>
     </div>
   );

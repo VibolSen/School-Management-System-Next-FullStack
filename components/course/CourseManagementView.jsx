@@ -30,7 +30,7 @@ export default function CourseManagementView() {
     );
   };
 
-  // DATA FETCHING: Fetches all required data in parallel for efficiency
+  // DATA FETCHING: Fetches courses, departments, and teachers in parallel
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -96,12 +96,10 @@ export default function CourseManagementView() {
         method: "DELETE",
       });
       if (res.status !== 204) {
-        // 204 means success with no content
         const errData = await res.json();
         throw new Error(errData.error || "Failed to delete the course.");
       }
       showMessage("Course deleted successfully!");
-      // Update state locally for a faster UI response
       setCourses((courses) => courses.filter((c) => c.id !== itemToDelete.id));
     } catch (err) {
       showMessage(err.message, "error");
@@ -131,7 +129,6 @@ export default function CourseManagementView() {
     setEditingCourse(null);
   };
 
-  // RENDER LOGIC
   return (
     <div className="space-y-6">
       <Notification
@@ -145,9 +142,8 @@ export default function CourseManagementView() {
         <h1 className="text-3xl font-bold text-slate-800">Course Management</h1>
         <button
           onClick={handleAddClick}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          // Good UX: Disable the button if no departments exist to assign a course to
-          disabled={departments.length === 0 || isLoading}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 disabled:opacity-50"
+          disabled={departments.length === 0}
           title={
             departments.length === 0
               ? "Please add a department first"

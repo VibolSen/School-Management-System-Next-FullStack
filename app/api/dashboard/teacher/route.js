@@ -21,37 +21,32 @@ export async function GET(req) {
       include: {
         groups: {
           include: {
-            _count: {
-              select: { students: true },
+            students: {
+              // Go deep to find the students in each group
+              select: { id: true }, // We only need the ID for counting
             },
           },
         },
       },
     });
 
-    // 2. Calculate metrics from the fetched data
+    // 2. Calculate the metrics
     const totalCourses = ledCourses.length;
-    let totalGroups = 0;
-    let totalStudents = 0;
+    const studentIdSet = new Set(); // Use a Set to count unique students
 
     ledCourses.forEach((course) => {
-      totalGroups += course.groups.length;
       course.groups.forEach((group) => {
-        totalStudents += group._count.students;
+        group.students.forEach((student) => {
+          studentIdSet.add(student.id);
+        });
       });
     });
 
-    // Extract the names of the courses for display
-    const courseList = ledCourses.map((course) => ({
-      id: course.id,
-      name: course.name,
-    }));
+    const totalStudents = studentIdSet.size;
 
     return NextResponse.json({
       totalCourses,
-      totalGroups,
       totalStudents,
-      courseList,
     });
   } catch (error) {
     console.error("Teacher Dashboard API Error:", error);

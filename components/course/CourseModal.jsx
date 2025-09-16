@@ -14,21 +14,19 @@ export default function CourseModal({
   const [formData, setFormData] = useState({
     name: "",
     departmentId: "",
-    teacherId: "", // Teacher is optional, so it can be an empty string
+    teacherId: "", // Teacher is optional
   });
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (isOpen) {
       if (courseToEdit) {
-        // Populate form for editing
         setFormData({
           name: courseToEdit.name || "",
           departmentId: courseToEdit.departmentId || "",
           teacherId: courseToEdit.teacherId || "",
         });
       } else {
-        // Reset form for adding a new course
         setFormData({
           name: "",
           departmentId: departments.length > 0 ? departments[0].id : "",
@@ -89,7 +87,6 @@ export default function CourseModal({
         </div>
         <form onSubmit={handleSubmit}>
           <div className="p-6 space-y-4">
-            {/* Course Name Input */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Course Name *
@@ -100,11 +97,9 @@ export default function CourseModal({
                 value={formData.name}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 border-slate-300"
-                placeholder="e.g., Introduction to Computer Science"
+                placeholder="e.g., Introduction to Programming"
               />
             </div>
-
-            {/* Department Selector Dropdown */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Department *
@@ -130,8 +125,6 @@ export default function CourseModal({
                 )}
               </select>
             </div>
-
-            {/* Lead Teacher Selector Dropdown */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Lead Teacher (Optional)

@@ -1,12 +1,41 @@
-// import StudentDashboardView from "@/components/assignment/StudentDashboardView";
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
+import { PrismaClient } from "@prisma/client";
+import MyAssignmentsView from "@/components/MyAssignmentsView";
 
-// export default function StudentDashboardViewPage() {
-//   return <StudentDashboardView />;
-// }
+const prisma = new PrismaClient();
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || "your-super-secret-key-that-is-long"
+);
 
+// Server-side function to get the currently logged-in user
+async function getLoggedInUser() {
+  const cookieStore = await cookies();
+  const tokenCookie = cookieStore.get("token");
+  if (!tokenCookie) return null;
+  try {
+    const { payload } = await jwtVerify(tokenCookie.value, JWT_SECRET);
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+    });
+    return user;
+  } catch (error) {
+    return null;
+  }
+}
 
-import NotFoundPage from "../../not-found";
+// The main page for the /student/assignments route
+export default async function StudentAssignmentsPage() {
+  const loggedInUser = await getLoggedInUser();
 
-export default function SettingsPage() {
-  return <NotFoundPage />;
+  if (!loggedInUser) {
+    return (
+      <div className="p-8">
+        Error: Could not authenticate user. Please log in again.
+      </div>
+    );
+  }
+
+  // Render the client component and pass the user data to it as a prop
+  return <MyAssignmentsView loggedInUser={loggedInUser} />;
 }
