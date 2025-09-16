@@ -84,16 +84,21 @@ export async function POST(req) {
         title,
         description,
         dueDate: dueDate ? new Date(dueDate) : null,
-        teacherId,
-        groupId,
-        submissions: {
-          create: group.studentIds.map((studentId) => ({
-            studentId: studentId,
-            status: "PENDING",
-          })),
-        },
+        teacher: { connect: { id: teacherId } },
+        group: { connect: { id: groupId } },
       },
     });
+
+    // Now, create the submissions for each student in the group
+    if (newAssignment && group.studentIds.length > 0) {
+      await prisma.submission.createMany({
+        data: group.studentIds.map((studentId) => ({
+          assignmentId: newAssignment.id,
+          studentId: studentId,
+          status: "PENDING",
+        })),
+      });
+    }
 
     return NextResponse.json(newAssignment, { status: 201 });
   } catch (error) {
