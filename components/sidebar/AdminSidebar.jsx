@@ -89,11 +89,6 @@ const ADMIN_NAV_ITEMS = [
     href: "/admin/e-library",
   },
   {
-    label: "Types",
-    icon: <FiTag className="w-5 h-5" />, // Icon for categorization/types
-    href: "/admin/types",
-  },
-  {
     label: "Attendance",
     icon: <FiCheckSquare className="w-5 h-5" />, // Icon for checking/tracking
     href: "/admin/attendance",
