@@ -1,7 +1,8 @@
+
+import { PrismaClient } from "@prisma/client";
+import EditAssignmentView from "./EditAssignmentView";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
-import { PrismaClient } from "@prisma/client";
-import ExamsView from "@/components/exam/ExamsView";
 
 const prisma = new PrismaClient();
 const JWT_SECRET = new TextEncoder().encode(
@@ -23,12 +24,27 @@ async function getLoggedInUser() {
   }
 }
 
-export default async function ExamsPage() {
+async function getAssignmentData(assignmentId) {
+  return await prisma.assignment.findUnique({
+    where: { id: assignmentId },
+    include: {
+      group: true,
+    },
+  });
+}
+
+export default async function EditAssignmentPage({ params }) {
+  const { assignmentId } = params;
+  const assignment = await getAssignmentData(assignmentId);
   const loggedInUser = await getLoggedInUser();
 
   if (!loggedInUser) {
     return <div className="p-8">Error: Could not authenticate user.</div>;
   }
 
-  return <ExamsView loggedInUser={loggedInUser} />;
+  if (!assignment) {
+    return <div className="p-8">Error: Assignment not found.</div>;
+  }
+
+  return <EditAssignmentView assignment={assignment} loggedInUser={loggedInUser} />;
 }

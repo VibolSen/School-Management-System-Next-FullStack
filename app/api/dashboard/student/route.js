@@ -16,7 +16,7 @@ export async function GET(request) {
   try {
     const studentProfile = await prisma.user.findUnique({
       where: { id: studentId },
-      include: { courses: true },
+      include: { courses: { include: { department: true, teacher: true, groups: true } } },
     });
 
     if (!studentProfile) {
@@ -31,7 +31,7 @@ export async function GET(request) {
 
     const borrowedBooks = await prisma.libraryResource.findMany({
       where: {
-        uploadedById: studentId, // ✅ this is "uploaded", not "borrowed"
+        borrowedById: studentId,
       },
     });
 
@@ -46,10 +46,26 @@ export async function GET(request) {
         ? `${Math.round((presentCount / attendance.length) * 100)}%`
         : "100%";
 
+    const pendingAssignmentsCount = await prisma.submission.count({
+      where: {
+        studentId: studentId,
+        status: 'PENDING',
+      },
+    });
+
+    const pendingExamsCount = await prisma.examSubmission.count({
+      where: {
+        studentId: studentId,
+        status: 'PENDING',
+      },
+    });
+
     return NextResponse.json({
       myProfile: studentProfile,
       overallAttendance,
       borrowedBooks,
+      pendingAssignmentsCount,
+      pendingExamsCount,
     });
   } catch (error) {
     console.error("Failed to fetch student dashboard data:", error);

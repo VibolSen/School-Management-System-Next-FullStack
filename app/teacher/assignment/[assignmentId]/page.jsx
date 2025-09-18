@@ -4,7 +4,11 @@ import Link from "next/link";
 
 const prisma = new PrismaClient();
 
-async function getAssignmentData(assignmentId) {
+// ✅ FIX #1: The function now accepts the whole `params` object
+async function getAssignmentData(params) {
+  // Destructuring happens safely inside the function
+  const { assignmentId } = params;
+
   return await prisma.assignment.findUnique({
     where: { id: assignmentId },
     include: {
@@ -20,15 +24,15 @@ async function getAssignmentData(assignmentId) {
 }
 
 export default async function GradingPage({ params }) {
-  const { assignmentId } = params;
-  const assignment = await getAssignmentData(assignmentId);
+  // ✅ FIX #2: Call the async data fetching function first, passing `params` directly.
+  const assignment = await getAssignmentData(params);
 
   if (!assignment) {
     return (
       <div className="text-center p-8">
         <h1 className="text-2xl font-bold">Assignment Not Found</h1>
         <Link
-          href="/teacher/assignment"
+          href="/teacher/assignments"
           className="text-blue-600 hover:underline mt-4 inline-block"
         >
           &larr; Back to Assignments
@@ -37,5 +41,6 @@ export default async function GradingPage({ params }) {
     );
   }
 
+  // Pass the fully loaded data to the client component
   return <GradingView initialAssignment={assignment} />;
 }

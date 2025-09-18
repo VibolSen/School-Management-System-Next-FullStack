@@ -26,14 +26,14 @@ const AssignmentCard = ({ assignment, onClick }) => {
       className="bg-white shadow-md rounded-lg p-5 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-transform duration-200 flex flex-col justify-between border border-slate-100"
     >
       <div>
-        {/* Course Title */}
+        {/* Group Name */}
         <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-1">
-          {assignment.assignment?.course?.title || "No Course"}
+          {assignment.group?.name || "No Group"}
         </p>
 
         {/* Assignment Title */}
         <h3 className="text-lg font-bold text-slate-800 leading-tight">
-          {assignment.assignment?.title || "Untitled Assignment"}
+          {assignment.title || "Untitled Assignment"}
         </h3>
       </div>
 
@@ -41,8 +41,8 @@ const AssignmentCard = ({ assignment, onClick }) => {
         {/* Due Date */}
         <p className="text-sm text-slate-500 mb-3">
           <strong>Due:</strong>{" "}
-          {assignment.assignment?.dueDate
-            ? new Date(assignment.assignment.dueDate).toLocaleDateString()
+          {assignment.dueDate
+            ? new Date(assignment.dueDate).toLocaleDateString()
             : "No due date"}
         </p>
 

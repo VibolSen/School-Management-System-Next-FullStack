@@ -1,34 +1,37 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AddAssignmentModal from "./AddAssignmentModal";
-import Notification from "@/components/Notification"; // Assuming you have this component
+import Notification from "@/components/Notification";
+import AssignmentCard from "./assignment/AssignmentCard"; // This component should be in the same folder
 
 export default function AssignmentsView({ loggedInUser }) {
+  // STATE MANAGEMENT
   const [assignments, setAssignments] = useState([]);
   const [teacherGroups, setTeacherGroups] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState(null);
   const [notification, setNotification] = useState({
     show: false,
     message: "",
     type: "",
   });
-
-  // ✅ FIX #1: Extract the user ID into a stable primitive variable.
+  const router = useRouter();
   const teacherId = loggedInUser?.id;
 
-  // This function will be stable and only recreated if teacherId changes.
+  // HELPER FUNCTIONS
   const showMessage = useCallback((message, type = "success") => {
     setNotification({ show: true, message, type });
     setTimeout(
       () => setNotification({ show: false, message: "", type: "" }),
       3000
     );
-  }, []); // Empty dependency array means this function is created only once.
+  }, []);
 
-  // ✅ FIX #2: Wrap the data fetching logic in useCallback with its stable dependency.
+  // DATA FETCHING LOGIC
   const fetchData = useCallback(async () => {
     if (!teacherId) return;
     setIsLoading(true);
@@ -39,7 +42,6 @@ export default function AssignmentsView({ loggedInUser }) {
       ]);
       if (!assignmentsRes.ok) throw new Error("Failed to fetch assignments");
       if (!groupsRes.ok) throw new Error("Failed to fetch your groups");
-
       setAssignments(await assignmentsRes.json());
       setTeacherGroups(await groupsRes.json());
     } catch (err) {
@@ -47,13 +49,13 @@ export default function AssignmentsView({ loggedInUser }) {
     } finally {
       setIsLoading(false);
     }
-  }, [teacherId, showMessage]); // Dependencies are stable.
+  }, [teacherId, showMessage]);
 
-  // ✅ FIX #3: The main useEffect hook now depends on the stable fetchData function.
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
+  // CRUD HANDLERS
   const handleSaveAssignment = async (formData) => {
     setIsLoading(true);
     try {
@@ -68,7 +70,7 @@ export default function AssignmentsView({ loggedInUser }) {
       }
       showMessage("Assignment created successfully!");
       setIsModalOpen(false);
-      await fetchData(); // Re-fetch data after a successful save
+      await fetchData();
     } catch (err) {
       showMessage(err.message, "error");
     } finally {
@@ -76,7 +78,37 @@ export default function AssignmentsView({ loggedInUser }) {
     }
   };
 
-  // The rest of your JSX remains the same
+  const handleDelete = (assignmentId) => {
+    setAssignmentToDelete(assignmentId);
+    setShowConfirmation(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!assignmentToDelete) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `/api/teacher/assignments/${assignmentToDelete}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Failed to delete assignment");
+      }
+      showMessage("Assignment deleted successfully!");
+      await fetchData();
+    } catch (err) {
+      showMessage(err.message, "error");
+    } finally {
+      setIsLoading(false);
+      setShowConfirmation(false);
+      setAssignmentToDelete(null);
+    }
+  };
+
+  // MAIN RENDER
   return (
     <div className="space-y-6">
       <Notification
@@ -87,7 +119,7 @@ export default function AssignmentsView({ loggedInUser }) {
         <h1 className="text-3xl font-bold text-slate-800">Assignments</h1>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold"
           disabled={teacherGroups.length === 0}
           title={
             teacherGroups.length === 0
@@ -99,57 +131,30 @@ export default function AssignmentsView({ loggedInUser }) {
         </button>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-md">
-        <h2 className="text-xl font-semibold text-slate-800 mb-4">
-          My Assignments List
-        </h2>
-        <div className="space-y-4">
-          {isLoading ? (
-            <p>Loading assignments...</p>
-          ) : assignments.length === 0 ? (
-            <p className="text-center text-slate-500 py-8">
-              You have not created any assignments yet.
+      <div className="space-y-4">
+        {isLoading ? (
+          <p className="text-center py-8 text-slate-500">
+            Loading assignments...
+          </p>
+        ) : assignments.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-xl shadow-sm">
+            <p className="font-semibold text-slate-700">No Assignments Found</p>
+            <p className="text-slate-500 mt-2">
+              Click "Add Assignment" to get started.
             </p>
-          ) : (
-            assignments.map((assignment) => (
-              <Link
-                key={assignment.id}
-                href={`/teacher/assignment/${assignment.id}`}
-                className="block p-4 border rounded-lg hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-semibold text-slate-800">
-                      {assignment.title}
-                    </p>
-                    <p className="text-sm text-slate-500">
-                      Assigned to:{" "}
-                      <span className="font-medium">
-                        {assignment.group.name}
-                      </span>
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-slate-500">
-                      Submissions:
-                      <span className="font-bold text-slate-700">
-                        {" "}
-                        {assignment._count.submissions} /{" "}
-                        {assignment.totalStudents}
-                      </span>
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      Due:{" "}
-                      {assignment.dueDate
-                        ? new Date(assignment.dueDate).toLocaleDateString()
-                        : "N/A"}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))
-          )}
-        </div>
+          </div>
+        ) : (
+          assignments.map((assignment) => (
+            <AssignmentCard
+              key={assignment.id}
+              assignment={assignment}
+              onNavigate={() =>
+                router.push(`/teacher/assignment/${assignment.id}`)
+              }
+              onDelete={() => handleDelete(assignment.id)}
+            />
+          ))
+        )}
       </div>
 
       <AddAssignmentModal
@@ -159,6 +164,38 @@ export default function AssignmentsView({ loggedInUser }) {
         teacherGroups={teacherGroups}
         isLoading={isLoading}
       />
+
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="p-6">
+              <h2 className="text-xl font-bold text-slate-800">
+                Confirm Deletion
+              </h2>
+              <p className="text-slate-500 mt-2">
+                Are you sure you want to delete this assignment? This will also
+                remove all student submissions. This action cannot be undone.
+              </p>
+            </div>
+            <div className="p-6 bg-slate-50 border-t flex justify-end gap-4">
+              <button
+                onClick={() => setShowConfirmation(false)}
+                disabled={isLoading}
+                className="px-4 py-2 bg-white border rounded-md text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={isLoading}
+                className="px-4 py-2 bg-red-600 text-white rounded-md text-sm"
+              >
+                {isLoading ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

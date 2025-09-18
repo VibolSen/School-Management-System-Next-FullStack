@@ -2,9 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import DashboardCard from "@/components/dashboard/DashboardCard";
+import { ClipboardList, FileText } from 'lucide-react';
 import UsersIcon from "@/components/icons/UsersIcon";
 import BookOpenIcon from "@/components/icons/BookOpenIcon";
 import ChartBarIcon from "@/components/icons/ChartBarIcon";
+
+import Link from "next/link";
 
 const StudentDashboard = ({ loggedInUser }) => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -49,7 +52,7 @@ const StudentDashboard = ({ loggedInUser }) => {
   return (
     <div className="space-y-6 animate-fade-in">
       <h1 className="text-3xl font-bold text-slate-800">
-        Welcome back, {myProfile.name}!
+        Welcome back, {myProfile.firstName}!
       </h1>
       <p className="text-slate-500">
         Here's your personal dashboard and academic summary.
@@ -86,11 +89,15 @@ const StudentDashboard = ({ loggedInUser }) => {
               >
                 <div>
                   <p className="font-semibold text-slate-800">{course.name}</p>
-                  <p className="text-sm text-slate-500">{course.department}</p>
+                  <p className="text-sm text-slate-500">{course.department.name}</p>
+                  <p className="text-sm text-slate-500">{course.teacher.firstName} {course.teacher.lastName}</p>
+                  <p className="text-sm text-slate-500">{course.groups.map(group => group.name).join(', ')}</p>
                 </div>
-                <span className="px-2 py-1 text-xs font-semibold text-sky-800 bg-sky-100 rounded-full">
-                  {course.id}
-                </span>
+                                <Link href={`/student/courses/${course.id}`}>
+                  <a className="px-2 py-1 text-xs font-semibold text-sky-800 bg-sky-100 rounded-full">
+                    {course.id}
+                  </a>
+                </Link>
               </li>
             ))}
           </ul>

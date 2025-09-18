@@ -3,7 +3,41 @@ import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-// UPDATE (Grade) a single submission
+export async function GET(req, { params }) {
+  try {
+    const { submissionId } = params;
+
+    const submission = await prisma.submission.findUnique({
+      where: { id: submissionId },
+      include: {
+        assignment: {
+          include: {
+            course: true,
+            teacher: true,
+          },
+        },
+        student: true,
+        status: true,
+      },
+    });
+
+    if (!submission) {
+      return NextResponse.json(
+        { error: "Submission not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(submission);
+  } catch (error) {
+    console.error("Submission Fetch Error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch submission" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(req, { params }) {
   try {
     const { submissionId } = params;

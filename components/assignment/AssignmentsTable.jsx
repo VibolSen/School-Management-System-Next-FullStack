@@ -23,6 +23,7 @@ export default function AssignmentsTable({
   onAddClick,
   onEditClick,
   onDeleteClick,
+  onViewClick,
   isLoading = false,
 }) {
   const [searchTerm, setSearchTerm] = useState("");

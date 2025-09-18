@@ -8,6 +8,7 @@ import {
   FiClipboard,
   FiTrendingUp,
   FiBookOpen,
+  FiFileText, // Added for Exams
   FiCode,
   FiSettings,
   FiChevronLeft,
@@ -58,6 +59,11 @@ const STUDENT_NAV_ITEMS = [
     label: "Assignments",
     icon: <FiClipboard className="w-5 h-5" />,
     href: "/student/assignments",
+  },
+  {
+    label: "Exams",
+    icon: <FiFileText className="w-5 h-5" />,
+    href: "/student/exams",
   },
   {
     label: "E-Library",

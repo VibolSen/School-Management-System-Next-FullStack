@@ -5,6 +5,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import { Library, Users } from "lucide-react";
 
+import Link from "next/link";
+
 export default function TeacherDashboard({ loggedInUser }) {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -64,19 +66,31 @@ export default function TeacherDashboard({ loggedInUser }) {
         </h1>
         <p className="text-green-100">Here is your daily teaching summary.</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <DashboardCard
-          title="My Courses"
-          value={dashboardData.totalCourses}
-          icon={<Library className="text-green-600" />}
-          colorClass="bg-green-100"
-        />
-        <DashboardCard
-          title="My Students"
-          value={dashboardData.totalStudents}
-          icon={<Users className="text-teal-600" />}
-          colorClass="bg-teal-100"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Link href="/teacher/courses">
+          <DashboardCard
+            title="My Courses"
+            value={dashboardData.totalCourses}
+            icon={<Library className="text-green-600" />}
+            colorClass="bg-green-100"
+          />
+        </Link>
+        <Link href="/teacher/students">
+          <DashboardCard
+            title="My Students"
+            value={dashboardData.totalStudents}
+            icon={<Users className="text-teal-600" />}
+            colorClass="bg-teal-100"
+          />
+        </Link>
+        <Link href="/teacher/groups">
+          <DashboardCard
+            title="My Groups"
+            value={dashboardData.totalGroups}
+            icon={<Users className="text-purple-600" />}
+            colorClass="bg-purple-100"
+          />
+        </Link>
       </div>
       <div className="bg-white p-6 rounded-xl shadow-md text-center">
         <h2 className="text-xl font-semibold mb-2 text-slate-800">

@@ -15,38 +15,37 @@ export async function GET(req) {
       );
     }
 
-    // 1. Find all courses led by this teacher
-    const ledCourses = await prisma.course.findMany({
-      where: { teacherId: teacherId },
-      include: {
+    // 2. Calculate the metrics
+    const totalCourses = await prisma.course.count({
+      where: {
+        teacherId: teacherId,
+      },
+    });
+    const totalStudents = await prisma.user.count({
+      where: {
+        role: 'STUDENT',
         groups: {
-          include: {
-            students: {
-              // Go deep to find the students in each group
-              select: { id: true }, // We only need the ID for counting
+          some: {
+            course: {
+              teacherId: teacherId,
             },
           },
         },
       },
     });
 
-    // 2. Calculate the metrics
-    const totalCourses = ledCourses.length;
-    const studentIdSet = new Set(); // Use a Set to count unique students
-
-    ledCourses.forEach((course) => {
-      course.groups.forEach((group) => {
-        group.students.forEach((student) => {
-          studentIdSet.add(student.id);
-        });
-      });
+    const totalGroups = await prisma.group.count({
+      where: {
+        course: {
+          teacherId: teacherId,
+        },
+      },
     });
-
-    const totalStudents = studentIdSet.size;
 
     return NextResponse.json({
       totalCourses,
       totalStudents,
+      totalGroups,
     });
   } catch (error) {
     console.error("Teacher Dashboard API Error:", error);

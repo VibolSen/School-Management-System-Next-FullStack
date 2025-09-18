@@ -15,11 +15,16 @@ enum Role {
   STUDENT
 }
 
-// ✅ NEW: Added an Enum to track the status of a student's submission
 enum SubmissionStatus {
-  PENDING   // Student has not submitted yet
-  SUBMITTED // Student has submitted, awaiting grading
-  GRADED    // Teacher has graded the submission
+  PENDING
+  SUBMITTED
+  GRADED
+}
+
+enum ExamSubmissionStatus {
+  PENDING
+  SUBMITTED
+  GRADED
 }
 
 model User {
@@ -30,15 +35,30 @@ model User {
   password  String
   role      Role     @default(STUDENT)
 
-  // --- Existing Relationships ---
   groups           Group[]      @relation(fields: [groupIds], references: [id])
   groupIds         String[]     @db.ObjectId
   ledCourses       Course[]     @relation("CourseLead")
   headedDepartment Department?  @relation("DepartmentHead")
 
-  // ✅ NEW: Added relationships for assignments and submissions
-  createdAssignments Assignment[] @relation("AssignmentsCreated") // A teacher can create many assignments
-  submissions        Submission[] @relation("SubmissionsMade")    // A student can make many submissions
+  createdAssignments Assignment[] @relation("AssignmentsCreated")
+  submissions        Submission[] @relation("SubmissionsMade")
+
+  createdExams   Exam[]           @relation("ExamsCreated")
+  examSubmissions ExamSubmission[] @relation("ExamSubmissionsMade")
+
+  uploadedResources LibraryResource[] @relation("UploadedResources")
+  borrowedResources LibraryResource[] @relation("BorrowedResources")
+}
+
+model LibraryResource {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  author       String
+  coverImage   String
+  uploadedBy   User    @relation("UploadedResources", fields: [uploadedById], references: [id])
+  uploadedById String  @db.ObjectId
+  borrowedBy   User?   @relation("BorrowedResources", fields: [borrowedById], references: [id])
+  borrowedById String? @db.ObjectId
 }
 
 model Department {
@@ -68,18 +88,16 @@ model Group {
   students   User[]     @relation(fields: [studentIds], references: [id])
   studentIds String[]   @db.ObjectId
 
-  // ✅ NEW: A group can have many assignments
   assignments Assignment[]
+  exams       Exam[]
 }
 
-// ✅ NEW: Model for Assignments
 model Assignment {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String?
   dueDate     DateTime?
 
-  // --- Relationships ---
   teacher      User         @relation("AssignmentsCreated", fields: [teacherId], references: [id])
   teacherId    String       @db.ObjectId
   group        Group        @relation(fields: [groupId], references: [id])
@@ -87,23 +105,51 @@ model Assignment {
   submissions  Submission[]
 }
 
-// ✅ NEW: Model for Student Submissions
 model Submission {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  content     String? // Where the student's work or a link is stored
+  content     String?
   submittedAt DateTime?
-  grade       Int?    // The score given by the teacher
-  feedback    String? // Comments from the teacher
+  grade       Int?
+  feedback    String?
 
   status SubmissionStatus @default(PENDING)
 
-  // --- Relationships ---
   assignment   Assignment @relation(fields: [assignmentId], references: [id])
   assignmentId String     @db.ObjectId
   student      User       @relation("SubmissionsMade", fields: [studentId], references: [id])
   studentId    String     @db.ObjectId
 
-  // Ensures a student can only submit once per assignment
   @@unique([assignmentId, studentId])
+}
+
+model Exam {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  examDate    DateTime?
+
+  teacher   User           @relation("ExamsCreated", fields: [teacherId], references: [id])
+  teacherId String         @db.ObjectId
+  group     Group          @relation(fields: [groupId], references: [id])
+  groupId   String         @db.ObjectId
+  submissions ExamSubmission[]
+}
+
+model ExamSubmission {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  content     String?
+  submittedAt DateTime?
+  grade       Int?
+  feedback    String?
+
+  status ExamSubmissionStatus @default(PENDING)
+
+  exam      Exam   @relation(fields: [examId], references: [id])
+  examId    String @db.ObjectId
+  student   User   @relation("ExamSubmissionsMade", fields: [studentId], references: [id])
+  studentId String @db.ObjectId
+
+  @@unique([examId, studentId])
 }

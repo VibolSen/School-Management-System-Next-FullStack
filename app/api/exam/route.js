@@ -1,132 +1,97 @@
 import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
+
 const prisma = new PrismaClient();
 
-// =================================================================
-// =====                  GET /api/exam (Read Exams)             =====
-// =================================================================
-/**
- * Fetches exams. This function does not require authentication.
- */
+// GET all exams or a single exam by id
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    const courseId = searchParams.get("courseId");
 
-    // --- Scenario 1: Fetch a SINGLE exam by its ID ---
     if (id) {
       const exam = await prisma.exam.findUnique({
         where: { id },
         include: {
-          course: { select: { title: true } }, // Include the title of the related course
-          instructor: { select: { name: true } }, // Include the name of the related instructor
+          group: { select: { name: true } },
+          teacher: { select: { firstName: true, lastName: true } },
         },
       });
 
-      // If no exam is found with that ID, return a 404 error
       if (!exam) {
-        return new Response(JSON.stringify({ error: "Exam not found" }), {
-          status: 404,
-        });
+        return NextResponse.json({ error: "Exam not found" }, { status: 404 });
       }
 
-      // If found, return the exam data
-      return new Response(JSON.stringify(exam), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    // --- Scenario 2: Fetch a LIST of all exams ---
-    const whereClause = {};
-    if (courseId) {
-      whereClause.courseId = courseId; // Add a filter if a courseId is provided
+      return NextResponse.json(exam);
     }
 
     const exams = await prisma.exam.findMany({
-      where: whereClause,
       include: {
-        course: { select: { title: true } }, // Also include related data for the list
-        instructor: { select: { name: true } },
+        group: { select: { name: true } },
+        teacher: { select: { firstName: true, lastName: true } },
       },
       orderBy: {
-        startDate: "desc", // Order the exams with the newest first
+        examDate: "desc",
       },
     });
 
-    // Return the list of exams (will be an empty array [] if none are found)
-    return new Response(JSON.stringify(exams), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json(exams);
   } catch (error) {
-    // --- ADVANCED ERROR HANDLING ---
-    // This block will catch any crash that happens in the `try` block above.
-    // The full, detailed error will be printed ONLY in your server terminal.
-    console.error("--- GET /api/exam CRASHED ---");
-    console.error("The full error object from Prisma is:", error);
-    // --- END ADVANCED ERROR HANDLING ---
-
-    // Send a generic, user-friendly error message to the frontend.
-    return new Response(
-      JSON.stringify({
-        error:
-          "An internal server error occurred. Check the server terminal for the full error details.",
-      }),
-      { status: 500 } // 500 Internal Server Error
+    console.error("GET Exams Error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch exams" },
+      { status: 500 }
     );
   }
 }
 
-// =================================================================
-// =====               POST /api/exam (Create Exam)              =====
-// =================================================================
-/**
- * Creates a new exam.
- * WARNING: This is INSECURE. It trusts the `instructorId` sent from the client.
- */
+// CREATE a new exam and generate pending submissions for all students in the group
 export async function POST(req) {
   try {
-    const data = await req.json();
-
-    // Validation
-    if (!data.instructorId) {
-      return new Response(
-        JSON.stringify({ error: "Instructor ID is required." }),
+    const { title, description, examDate, groupId, teacherId } =
+      await req.json();
+    if (!title || !groupId || !teacherId) {
+      return NextResponse.json(
+        { error: "Title, Group ID, and Teacher ID are required" },
         { status: 400 }
       );
     }
-    if (!data.title?.trim())
-      return new Response(JSON.stringify({ error: "Title is required." }), {
-        status: 400,
-      });
-    if (!data.courseId)
-      return new Response(JSON.stringify({ error: "Course is required." }), {
-        status: 400,
-      });
 
-    // The database will automatically add `type: "ANYTIME"` because of the schema default.
+    const group = await prisma.group.findUnique({
+      where: { id: groupId },
+      select: { studentIds: true },
+    });
+
+    if (!group) {
+      return NextResponse.json({ error: "Group not found" }, { status: 404 });
+    }
+
     const newExam = await prisma.exam.create({
       data: {
-        title: data.title,
-        description: data.description,
-        startDate: new Date(data.startDate),
-        duration: data.duration,
-        courseId: data.courseId,
-        instructorId: data.instructorId,
+        title,
+        description,
+        examDate: examDate ? new Date(examDate) : null,
+        teacher: { connect: { id: teacherId } },
+        group: { connect: { id: groupId } },
       },
     });
 
-    return new Response(JSON.stringify(newExam), { status: 201 });
+    // Now, create the exam submissions for each student in the group
+    if (newExam && group.studentIds.length > 0) {
+      await prisma.examSubmission.createMany({
+        data: group.studentIds.map((studentId) => ({
+          examId: newExam.id,
+          studentId: studentId,
+          status: "PENDING",
+        })),
+      });
+    }
+
+    return NextResponse.json(newExam, { status: 201 });
   } catch (error) {
-    console.error("FULL PRISMA ERROR:", error); // Keep this for debugging
-    if (error.code === "P2003")
-      return new Response(
-        JSON.stringify({ error: "Invalid course or instructor ID." }),
-        { status: 400 }
-      );
-    return new Response(
-      JSON.stringify({ error: "An internal server error occurred." }),
+    console.error("POST Exam Error:", error);
+    return NextResponse.json(
+      { error: "Failed to create exam" },
       { status: 500 }
     );
   }
@@ -158,9 +123,7 @@ export async function PUT(req) {
       data: {
         title: data.title,
         description: data.description,
-        startDate: data.startDate ? new Date(data.startDate) : undefined,
-        duration: data.duration,
-        courseId: data.courseId,
+        examDate: data.examDate ? new Date(data.examDate) : undefined,
       },
     });
 
@@ -195,6 +158,11 @@ export async function DELETE(req) {
         JSON.stringify({ error: "Exam ID is required for deletion." }),
         { status: 400 }
       );
+
+    // Before deleting the exam, delete all related exam submissions
+    await prisma.examSubmission.deleteMany({
+      where: { examId: id },
+    });
 
     // REMOVED: All security checks. Anyone who knows an exam ID can delete it.
     await prisma.exam.delete({

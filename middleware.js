@@ -5,66 +5,68 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "your-super-secret-key-that-is-long"
 );
 
-// This function can be marked `async` if using `await` inside
+// Define all the valid paths for each role
+const roleProtectedPaths = {
+  admin: ["/admin"],
+  hr: ["/hr"],
+  faculty: ["/faculty"],
+  teacher: ["/teacher"],
+  student: ["/student"],
+};
+
 export async function middleware(request) {
   const path = request.nextUrl.pathname;
   const isAuthPath = path === "/login" || path === "/register";
-
   const token = request.cookies.get("token")?.value;
 
-  // If there's no token and the user is trying to access a protected route
+  // 1. If no token and trying to access a protected route, redirect to login
   if (!token && !isAuthPath) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // If there is a token, verify it
+  // 2. If there is a token, verify it
   if (token) {
+    let payload;
     try {
-      const { payload } = await jwtVerify(token, JWT_SECRET);
-      const userRole = payload.role?.toLowerCase();
-
-      // If user is authenticated, they should not access login/register pages
-      if (isAuthPath) {
-        return NextResponse.redirect(
-          new URL(`/${userRole}/dashboard`, request.url)
-        );
-      }
-
-      // Define role-based access rules
-      const roleAccess = {
-        admin: "/admin",
-        hr: "/hr",
-        faculty: "/faculty",
-        teacher: "/teacher",
-        student: "/student",
-      };
-
-      const requiredBasePath = roleAccess[userRole];
-
-      // If the user's role does not match the path, redirect them
-      if (requiredBasePath && !path.startsWith(requiredBasePath)) {
-        // Redirect to their own dashboard
-        return NextResponse.redirect(
-          new URL(`${requiredBasePath}/dashboard`, request.url)
-        );
-      }
+      ({ payload } = await jwtVerify(token, JWT_SECRET));
     } catch (err) {
-      // If token verification fails, clear the cookie and redirect to login
+      // If token is invalid, clear it and redirect to login
       console.error("Token verification failed:", err);
       const response = NextResponse.redirect(new URL("/login", request.url));
       response.cookies.set("token", "", { expires: new Date(0) });
       return response;
     }
+
+    const userRole = payload.role?.toLowerCase();
+
+    // 3. If authenticated user tries to access login/register, redirect to their dashboard
+    if (isAuthPath) {
+      const dashboardUrl = `/${userRole}/dashboard`;
+      return NextResponse.redirect(new URL(dashboardUrl, request.url));
+    }
+
+    // ✅ IMPROVED LOGIC: Check if the user is in an area they are allowed to be in
+    const allowedPaths = roleProtectedPaths[userRole];
+    const isAccessingAllowedPath =
+      allowedPaths && allowedPaths.some((p) => path.startsWith(p));
+
+    // 4. If the user is trying to access a path that doesn't belong to their role, redirect them
+    if (!isAccessingAllowedPath) {
+      const dashboardUrl = `/${userRole}/dashboard`;
+      console.warn(
+        `Redirecting user with role '${userRole}' from '${path}' to '${dashboardUrl}'`
+      );
+      return NextResponse.redirect(new URL(dashboardUrl, request.url));
+    }
   }
 
-  // Allow the request to continue
+  // 5. If all checks pass, allow the request to continue
   return NextResponse.next();
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
   matcher: [
-    // Match all routes except for static files and API routes
+    // This matcher remains the same
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

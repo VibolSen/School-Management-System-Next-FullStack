@@ -4,6 +4,7 @@ import React, { useState, useCallback } from "react";
 import Link from "next/link";
 import Notification from "@/components/Notification";
 
+// Helper component for status badges
 const StatusBadge = ({ status }) => {
   const styles = {
     PENDING: "bg-gray-200 text-gray-800",
@@ -19,6 +20,7 @@ const StatusBadge = ({ status }) => {
   );
 };
 
+// Component for a single row in the grading table
 const SubmissionRow = ({ submission, onGrade }) => {
   const [grade, setGrade] = useState(submission.grade ?? "");
   const [feedback, setFeedback] = useState(submission.feedback ?? "");
@@ -72,6 +74,7 @@ const SubmissionRow = ({ submission, onGrade }) => {
   );
 };
 
+// The main view component for the entire page
 export default function GradingView({ initialAssignment }) {
   const [assignment, setAssignment] = useState(initialAssignment);
   const [notification, setNotification] = useState({
@@ -100,6 +103,7 @@ export default function GradingView({ initialAssignment }) {
         throw new Error(errData.error || "Failed to save grade");
       }
       const updatedSubmission = await res.json();
+      // Update the local state to show the change immediately without a page reload
       setAssignment((prev) => ({
         ...prev,
         submissions: prev.submissions.map((sub) =>
@@ -120,7 +124,7 @@ export default function GradingView({ initialAssignment }) {
       />
       <div>
         <Link
-          href="/teacher/assignment"
+          href="/teacher/assignments"
           className="text-blue-600 hover:underline text-sm"
         >
           &larr; Back to All Assignments
@@ -135,6 +139,9 @@ export default function GradingView({ initialAssignment }) {
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow-md">
+        <h2 className="text-xl font-semibold mb-4 text-slate-800">
+          Student Submissions
+        </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left text-slate-500">
             <thead className="text-xs text-slate-700 uppercase bg-slate-100">
