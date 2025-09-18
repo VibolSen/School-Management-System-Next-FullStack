@@ -20,28 +20,12 @@ export default function AdministratorDashboard() {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Mock data for demonstration
-  const mockData = {
-    studentCount: 1245,
-    teacherCount: 78,
-    staffCount: 42,
-    departmentCount: 8,
-    courseCount: 56,
-    groupCount: 32,
-  };
-
-  // This fetch logic is now correct and will receive the new counts
   async function fetchDashboardData() {
     try {
-      // For demo purposes, we'll use mock data
-      // In a real app, you would fetch from your API
-      setDashboardData(mockData);
-
-      // Example of real implementation:
-      // const res = await fetch("/api/dashboard");
-      // if (!res.ok) throw new Error(`Dashboard API error: ${res.status}`);
-      // const data = await res.json();
-      // setDashboardData(data);
+      const res = await fetch("/api/dashboard");
+      if (!res.ok) throw new Error(`Dashboard API error: ${res.status}`);
+      const data = await res.json();
+      setDashboardData(data);
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
     }
@@ -49,18 +33,10 @@ export default function AdministratorDashboard() {
 
   async function fetchCurrentUser() {
     try {
-      // Mock user data for demonstration
-      const mockUser = {
-        firstName: "Alex",
-        lastName: "Johnson",
-      };
-      setCurrentUser(mockUser);
-
-      // Example of real implementation:
-      // const res = await fetch("/api/me");
-      // if (!res.ok) throw new Error("Failed to fetch current user");
-      // const data = await res.json();
-      // setCurrentUser(data.user);
+      const res = await fetch("/api/me");
+      if (!res.ok) throw new Error("Failed to fetch current user");
+      const data = await res.json();
+      setCurrentUser(data.user);
     } catch (error) {
       console.error(error);
     }
@@ -171,8 +147,6 @@ export default function AdministratorDashboard() {
                 value={dashboardData.studentCount}
                 icon={<Users className="w-6 h-6" />}
                 gradient="from-blue-600/20 via-blue-500/15 to-cyan-600/20"
-                change="+12%"
-                changeType="increase"
               />
             </div>
 
@@ -182,8 +156,6 @@ export default function AdministratorDashboard() {
                 value={dashboardData.teacherCount}
                 icon={<UserCheck className="w-6 h-6" />}
                 gradient="from-emerald-600/20 via-green-500/15 to-teal-600/20"
-                change="+5%"
-                changeType="increase"
               />
             </div>
 
@@ -193,8 +165,6 @@ export default function AdministratorDashboard() {
                 value={dashboardData.staffCount}
                 icon={<Briefcase className="w-6 h-6" />}
                 gradient="from-purple-600/20 via-violet-500/15 to-indigo-600/20"
-                change="Stable"
-                changeType="neutral"
               />
             </div>
 
@@ -204,8 +174,6 @@ export default function AdministratorDashboard() {
                 value={dashboardData.departmentCount}
                 icon={<Building2 className="w-6 h-6" />}
                 gradient="from-amber-600/20 via-yellow-500/15 to-orange-600/20"
-                change="+2"
-                changeType="increase"
               />
             </div>
 
@@ -215,8 +183,6 @@ export default function AdministratorDashboard() {
                 value={dashboardData.courseCount}
                 icon={<Library className="w-6 h-6" />}
                 gradient="from-sky-600/20 via-blue-500/15 to-indigo-600/20"
-                change="+8%"
-                changeType="increase"
               />
             </div>
 
@@ -226,8 +192,6 @@ export default function AdministratorDashboard() {
                 value={dashboardData.groupCount}
                 icon={<Group className="w-6 h-6" />}
                 gradient="from-pink-600/20 via-rose-500/15 to-red-600/20"
-                change="+15%"
-                changeType="increase"
               />
             </div>
           </div>
