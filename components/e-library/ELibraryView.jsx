@@ -12,13 +12,12 @@ const ELibraryView = ({ loggedInUser }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("All");
   const [departments, setDepartments] = useState([]);
-  const [typeFilter, setTypeFilter] = useState("All"); // ✅ NEW state
 
   const [selectedResource, setSelectedResource] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingResource, setEditingResource] = useState(null);
   const [resourceToDelete, setResourceToDelete] = useState(null);
-  const [types, setTypes] = useState([]);
+
   const [notification, setNotification] = useState({
     show: false,
     message: "",
@@ -34,32 +33,25 @@ const ELibraryView = ({ loggedInUser }) => {
 
   // Safe fetch resources
   const fetchResources = async () => {
+    console.log("Fetching resources...");
     try {
-      const res = await fetch("/api/library");
-      if (!res.ok) throw new Error(res.statusText);
+      const res = await fetch("/api/library", { cache: 'no-store' });
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Failed to fetch resources, response not OK:", res.status, errorText);
+        throw new Error(res.statusText);
+      }
       const text = await res.text();
       const data = text ? JSON.parse(text) : [];
+      console.log("Resources fetched successfully:", data);
       setResources(data);
     } catch (e) {
-      console.error("Failed to fetch resources:", e);
+      console.error("Failed to fetch resources in catch block:", e);
       setResources([]);
       showMessage("Failed to fetch resources", "error");
     }
   };
 
-  const fetchTypes = async () => {
-    try {
-      const res = await fetch("/api/types"); // your types API
-      if (!res.ok) throw new Error(res.statusText);
-      const text = await res.text();
-      const data = text ? JSON.parse(text) : [];
-      setTypes(data); // store array of {id, name}
-    } catch (e) {
-      console.error("Failed to fetch types:", e);
-      setTypes([]);
-      showMessage("Failed to fetch types", "error");
-    }
-  };
 
   // Safe fetch departments
   const fetchDepartments = async () => {
@@ -79,7 +71,6 @@ const ELibraryView = ({ loggedInUser }) => {
   useEffect(() => {
     fetchResources();
     fetchDepartments();
-    fetchTypes();
   }, []);
 
   const handleAddClick = () => {
@@ -122,17 +113,10 @@ const ELibraryView = ({ loggedInUser }) => {
       return;
     }
 
-    if (!resourceData.typeId) {
-      console.error("Material type is required!");
-      showMessage("Material type is required.", "error");
-      return;
-    }
-
     try {
       const formData = new FormData();
       formData.append("title", resourceData.title);
       formData.append("uploadedById", loggedInUser.id);
-      formData.append("typeId", resourceData.typeId);
 
       // ✅ FIX: include author
       if (resourceData.author) formData.append("author", resourceData.author);
@@ -182,10 +166,9 @@ const ELibraryView = ({ loggedInUser }) => {
       (r) =>
         (r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
           r.description?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (departmentFilter === "All" || r.department === departmentFilter) &&
-        (typeFilter === "All" || r.type?.id === typeFilter)
+        (departmentFilter === "All" || r.department === departmentFilter)
     );
-  }, [resources, searchTerm, departmentFilter, typeFilter]);
+  }, [resources, searchTerm, departmentFilter]);
 
   return (
     <div className="space-y-6">
@@ -213,19 +196,6 @@ const ELibraryView = ({ loggedInUser }) => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border px-3 py-2 rounded"
         />
-        {/* ✅ Type Filter */}
-        <select
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value)}
-          className="border px-3 py-2 rounded"
-        >
-          <option value="All">All Types</option>
-          {types.map((type) => (
-            <option key={type.id} value={type.id}>
-              {type.name}
-            </option>
-          ))}
-        </select>
 
         {/* Department Filter */}
         <select
@@ -255,14 +225,12 @@ const ELibraryView = ({ loggedInUser }) => {
         onSaveResource={handleSaveResource}
         resourceToEdit={editingResource}
         departments={departments}
-        types={types}
       />
 
       <ConfirmationDialog
         isOpen={!!resourceToDelete}
-        onClose={() => setResourceToDelete(null)}
+        onCancel={() => setResourceToDelete(null)}
         onConfirm={() => handleDelete(resourceToDelete)}
-        onCancel={handleCancelDelete}
         title="Delete Resource"
         message={`Are you sure you want to delete "${resourceToDelete?.title}"?`}
       />

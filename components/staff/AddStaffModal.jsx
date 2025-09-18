@@ -78,27 +78,40 @@ export default function AddStaffModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-full overflow-y-auto">
-        <div className="p-6 border-b flex justify-between items-center">
-          <h2 className="text-xl font-bold text-slate-800">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-full overflow-y-auto">
+        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-xl font-bold text-gray-800">
             {staffToEdit ? "Edit Staff Member" : "Add New Staff Member"}
           </h2>
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="text-slate-500 hover:text-slate-800"
+            className="text-gray-500 hover:text-gray-800 p-1 rounded-full hover:bg-gray-100 transition-colors duration-150"
           >
-            {/* Close Icon SVG */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
           </button>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4"
+          className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5"
         >
           {/* ✅ MODIFIED: Split name into two fields */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               First Name *
             </label>
             <input
@@ -107,8 +120,8 @@ export default function AddStaffModal({
               placeholder="Jane"
               value={formData.firstName}
               onChange={handleChange}
-              className={`w-full ... ${
-                errors.firstName ? "border-red-500" : "border-slate-300"
+              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
+                errors.firstName ? "border-red-500" : "border-gray-300"
               }`}
               required
             />
@@ -117,7 +130,7 @@ export default function AddStaffModal({
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Last Name *
             </label>
             <input
@@ -126,8 +139,8 @@ export default function AddStaffModal({
               placeholder="Smith"
               value={formData.lastName}
               onChange={handleChange}
-              className={`w-full ... ${
-                errors.lastName ? "border-red-500" : "border-slate-300"
+              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
+                errors.lastName ? "border-red-500" : "border-gray-300"
               }`}
               required
             />
@@ -137,7 +150,7 @@ export default function AddStaffModal({
           </div>
           {/* Email */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Email Address *
             </label>
             <input
@@ -146,8 +159,8 @@ export default function AddStaffModal({
               placeholder="staff@example.com"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full ... ${
-                errors.email ? "border-red-500" : "border-slate-300"
+              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
+                errors.email ? "border-red-500" : "border-gray-300"
               }`}
               required
             />
@@ -157,15 +170,15 @@ export default function AddStaffModal({
           </div>
           {/* Role */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Role *
             </label>
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
-              className={`w-full ... ${
-                errors.role ? "border-red-500" : "border-slate-300"
+              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
+                errors.role ? "border-red-500" : "border-gray-300"
               }`}
               required
             >
@@ -182,7 +195,7 @@ export default function AddStaffModal({
           </div>
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Password {staffToEdit ? "(Optional)" : "*"}
             </label>
             <input
@@ -195,30 +208,58 @@ export default function AddStaffModal({
               }
               value={formData.password}
               onChange={handleChange}
-              className={`w-full ... ${
-                errors.password ? "border-red-500" : "border-slate-300"
+              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
+                errors.password ? "border-red-500" : "border-gray-300"
               }`}
             />
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password}</p>
             )}
           </div>
-          {/* ✅ REMOVED: Status field is gone */}
-          <div className="md:col-span-2 flex justify-end space-x-3 pt-4">
+
+          <div className="md:col-span-2 flex justify-end space-x-3 pt-4 border-t border-gray-200">
             <button
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="..."
+              className="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50"
             >
               Cancel
             </button>
-            <button type="submit" disabled={isLoading} className="...">
-              {isLoading
-                ? "Saving..."
-                : staffToEdit
-                ? "Update Staff"
-                : "Add Staff"}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 flex items-center"
+            >
+              {isLoading ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  {staffToEdit ? "Updating..." : "Adding..."}
+                </>
+              ) : staffToEdit ? (
+                "Update Staff"
+              ) : (
+                "Add Staff"
+              )}
             </button>
           </div>
         </form>

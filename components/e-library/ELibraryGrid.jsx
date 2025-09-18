@@ -2,20 +2,24 @@ import React from 'react';
 
 // Single Resource Card
 const ResourceCard = ({ resource, onResourceClick, onEditClick, onDeleteClick }) => {
-  const { title, author, coverImage, type, isAvailable } = resource;
+  const { title, author, coverImage } = resource;
 
   const handleCardClick = () => onResourceClick(resource);
-  const handleBorrowClick = (e) => {
-    e.stopPropagation();
-    alert(`Borrowing "${title}"...`);
-  };
-  const handleEdit = (e) => { e.stopPropagation(); onEditClick(resource); };
-  const handleDelete = (e) => { e.stopPropagation(); onDeleteClick(resource); };
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       handleCardClick();
     }
+  };
+
+  const handleEditClick = (e) => {
+    e.stopPropagation(); // Prevent card click event
+    onEditClick(resource);
+  };
+
+  const handleDeleteClick = (e) => {
+    e.stopPropagation(); // Prevent card click event
+    onDeleteClick(resource);
   };
 
   return (
@@ -28,52 +32,38 @@ const ResourceCard = ({ resource, onResourceClick, onEditClick, onDeleteClick })
       aria-label={`View details for ${title}`}
     >
       <div className="relative h-56">
-      <img
-  className="w-full h-full object-cover"
-  src={resource.fileUrl || '/default-cover.png'}
-  alt={`Cover for ${resource.title}`}
-  loading="lazy"
-/>
-
-
-        <div className="absolute top-2 left-2 px-2 py-1 text-xs font-semibold text-white bg-black bg-opacity-50 rounded-full">
-          {type?.name || 'Unknown Type'}
-        </div>
-        <div className="absolute top-2 right-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <img
+          className="w-full h-full object-cover"
+          src={coverImage || '/default-cover.jpg'}
+          alt={`Cover for ${title}`}
+          loading="lazy"
+        />
+        {/* Action buttons overlay */}
+        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
           <button
-            onClick={handleEdit}
-            className="w-8 h-8 flex items-center justify-center bg-white/80 hover:bg-white rounded-full shadow text-slate-700 hover:text-blue-600 transition"
+            onClick={handleEditClick}
+            className="text-white bg-blue-600 hover:bg-blue-700 rounded-full p-3 transition-transform duration-300 hover:scale-110"
             aria-label={`Edit ${title}`}
-          >✎</button>
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+              <path fillRule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clipRule="evenodd" />
+            </svg>
+          </button>
           <button
-            onClick={handleDelete}
-            className="w-8 h-8 flex items-center justify-center bg-white/80 hover:bg-white rounded-full shadow text-slate-700 hover:text-red-600 transition"
+            onClick={handleDeleteClick}
+            className="text-white bg-red-600 hover:bg-red-700 rounded-full p-3 transition-transform duration-300 hover:scale-110"
             aria-label={`Delete ${title}`}
-          >🗑️</button>
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
+            </svg>
+          </button>
         </div>
       </div>
       <div className="p-4 flex flex-col flex-grow">
         <h3 className="text-md font-bold text-slate-800 truncate" title={title}>{title}</h3>
         <p className="text-sm text-slate-500 mb-3">{author || 'Unknown Author'}</p>
-        <div className="mt-auto flex justify-between items-center">
-          {isAvailable ? (
-            <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Available</span>
-          ) : (
-            <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Borrowed</span>
-          )}
-          <button 
-            onClick={handleBorrowClick}
-            disabled={!isAvailable}
-            className={`px-4 py-1.5 text-sm font-semibold rounded-md transition ${
-              isAvailable
-                ? 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-                : 'bg-slate-300 text-slate-500 cursor-not-allowed'
-            }`}
-            aria-label={isAvailable ? `Borrow ${title}` : `${title} is not available`}
-          >
-            Borrow
-          </button>
-        </div>
       </div>
     </div>
   );

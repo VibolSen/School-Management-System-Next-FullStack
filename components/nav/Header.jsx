@@ -10,7 +10,7 @@ export default function Header({ toggleSidebar }) {
   const [user, setUser] = useState({
     name: "Guest",
     role: "Guest",
-    image: "/illustration/deault.jpg",
+    image: "/illustration/default.jpg",
   });
 
   const router = useRouter();
@@ -58,7 +58,7 @@ export default function Header({ toggleSidebar }) {
             ? data.user.role.charAt(0).toUpperCase() +
               data.user.role.slice(1).toLowerCase()
             : "Guest",
-          image: data.user.image || "/illustration/deault.jpg", // Assuming image field might exist later
+          image: data.user.image || "/illustration/default.jpg", // Assuming image field might exist later
         });
       } catch (err) {
         console.error("Error fetching user:", err);
@@ -113,7 +113,7 @@ export default function Header({ toggleSidebar }) {
               src={user.image}
               alt={user.name}
               onError={(e) =>
-                (e.currentTarget.src = "/illustration/deault.jpg")
+                (e.currentTarget.src = "/illustration/default.jpg")
               }
             />
             <div className="hidden md:block text-left">
@@ -163,4 +163,3 @@ export default function Header({ toggleSidebar }) {
     </header>
   );
 }
-

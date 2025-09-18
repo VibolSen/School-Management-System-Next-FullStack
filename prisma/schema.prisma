@@ -47,7 +47,6 @@ model User {
   examSubmissions ExamSubmission[] @relation("ExamSubmissionsMade")
 
   uploadedResources LibraryResource[] @relation("UploadedResources")
-  borrowedResources LibraryResource[] @relation("BorrowedResources")
 }
 
 model LibraryResource {
@@ -57,8 +56,9 @@ model LibraryResource {
   coverImage   String
   uploadedBy   User    @relation("UploadedResources", fields: [uploadedById], references: [id])
   uploadedById String  @db.ObjectId
-  borrowedBy   User?   @relation("BorrowedResources", fields: [borrowedById], references: [id])
-  borrowedById String? @db.ObjectId
+  department   String?
+  description  String?
+  publicationYear Int?
 }
 
 model Department {

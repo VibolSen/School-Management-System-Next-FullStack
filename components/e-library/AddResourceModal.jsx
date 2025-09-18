@@ -4,13 +4,11 @@ import React, { useState, useEffect } from 'react';
 
 const AddResourceModal = ({ 
   isOpen, 
-  onClose, 
-  onSaveResource, 
-  resourceToEdit, 
-  departments = [], // from parent
-  types = [] // MaterialTypeEnum types
-}) => {
-  const isEditMode = !!resourceToEdit;
+    onClose,
+    onSaveResource,
+    resourceToEdit,
+    departments = [], // from parent
+  }) => {  const isEditMode = !!resourceToEdit;
 
   const [formData, setFormData] = useState({
     title: '',
@@ -18,7 +16,6 @@ const AddResourceModal = ({
     coverImage: null,
     publicationYear: new Date().getFullYear(),
     department: departments[0]?.name || departments[0] || '',
-    typeId: types[0]?.id || '', // default type
     description: '',
   });
 
@@ -34,7 +31,6 @@ const AddResourceModal = ({
         coverImage: resourceToEdit.coverImage || null,
         publicationYear: resourceToEdit.publicationYear || new Date().getFullYear(),
         department: resourceToEdit.department || departments[0]?.name || departments[0] || '',
-        typeId: resourceToEdit.type?.id || types[0]?.id || '',
         description: resourceToEdit.description || '',
       });
     } else {
@@ -44,13 +40,12 @@ const AddResourceModal = ({
         coverImage: null,
         publicationYear: new Date().getFullYear(),
         department: departments[0]?.name || departments[0] || '',
-        typeId: types[0]?.id || '',
         description: '',
       });
     }
 
     setErrors({});
-  }, [isOpen, resourceToEdit, departments, types]);
+  }, [isOpen, resourceToEdit, departments]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -74,7 +69,6 @@ const AddResourceModal = ({
       newErrors.publicationYear = 'Publication year must be a valid number.';
     }
     if (!formData.department.trim()) newErrors.department = 'Department is required.';
-    if (!formData.typeId) newErrors.typeId = 'Type is required.';
     if (!formData.description.trim()) newErrors.description = 'Description is required.';
 
     setErrors(newErrors);
@@ -190,23 +184,7 @@ const AddResourceModal = ({
               {errors.department && <p className="text-xs text-red-500 mt-1">{errors.department}</p>}
             </div>
 
-           {/* Material Type */}
-<div>
-  <label className="block text-sm font-medium text-slate-700 mb-1">Material Type</label>
-  <select
-    name="typeId"
-    value={formData.typeId || ""}
-    onChange={handleChange}
-    className={`w-full px-3 py-2 border rounded-md text-sm ${errors.typeId ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300'} focus:outline-none focus:ring-1 focus:ring-blue-500`}
-    required
-  >
-    <option value="">Select Type</option>
-    {types.map(type => (
-      <option key={type.id} value={type.id}>{type.name}</option>
-    ))}
-  </select>
-  {errors.typeId && <p className="text-xs text-red-500 mt-1">{errors.typeId}</p>}
-</div>
+
 
 
             {/* Description */}

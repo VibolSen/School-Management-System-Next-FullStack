@@ -16,7 +16,7 @@ const roleProtectedPaths = {
 
 export async function middleware(request) {
   const path = request.nextUrl.pathname;
-  const isAuthPath = path === "/login" || path === "/register";
+  const isAuthPath = path === "/" || path === "/login" || path === "/register" || path === "/about" || path === "/contact";
   const token = request.cookies.get("token")?.value;
 
   // 1. If no token and trying to access a protected route, redirect to login
@@ -45,6 +45,14 @@ export async function middleware(request) {
       return NextResponse.redirect(new URL(dashboardUrl, request.url));
     }
 
+    // Protect API routes
+    if (path.startsWith('/api/library')) {
+      if (request.method === 'POST' || request.method === 'PUT' || request.method === 'DELETE') {
+        if (userRole !== 'admin' && userRole !== 'faculty') {
+          return new NextResponse(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+        }
+      }
+    }
     // ✅ IMPROVED LOGIC: Check if the user is in an area they are allowed to be in
     const allowedPaths = roleProtectedPaths[userRole];
     const isAccessingAllowedPath =
@@ -67,6 +75,6 @@ export async function middleware(request) {
 export const config = {
   matcher: [
     // This matcher remains the same
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api|_next/static|_next/image|.*\\.(?:png|jpg|jpeg|gif|svg)|favicon.ico).*)",
   ],
 };

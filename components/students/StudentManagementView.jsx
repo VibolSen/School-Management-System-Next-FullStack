@@ -128,18 +128,30 @@ export default function StudentManagementView() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
       <Notification
         {...notification}
         onClose={() => setNotification({ ...notification, show: false })}
       />
-      <h1 className="text-3xl font-bold text-slate-800">Student Management</h1>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 p-4 bg-white rounded-2xl shadow-md">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">
+            Student Management
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Manage all students and their information
+          </p>
+        </div>
+      </div>
+
       <StudentTable
         students={students}
         onAddStudentClick={handleAddClick}
         onEditClick={handleEditClick}
         onDeleteClick={handleDeleteRequest}
+        isLoading={isLoading}
       />
+
       {isModalOpen && (
         <AddStudentModal
           isOpen={isModalOpen}
@@ -148,6 +160,7 @@ export default function StudentManagementView() {
           studentToEdit={editingStudent}
         />
       )}
+
       <ConfirmationDialog
         isOpen={!!itemToDelete}
         onCancel={() => setItemToDelete(null)}
