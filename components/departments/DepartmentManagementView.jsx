@@ -83,8 +83,11 @@ export default function DepartmentManagementView() {
       const response = await fetch(`${API_ENDPOINT}?id=${itemToDelete.id}`, {
         method: "DELETE",
       });
-      if (response.status !== 204)
-        throw new Error("Failed to delete the department.");
+      // A successful DELETE often returns 204 No Content
+      if (!response.ok && response.status !== 204) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete the department.");
+      }
       showMessage("Department deleted successfully!");
       setDepartments((prevDepts) =>
         prevDepts.filter((d) => d.id !== itemToDelete.id)
@@ -123,19 +126,15 @@ export default function DepartmentManagementView() {
         onClose={() => setNotification({ ...notification, show: false })}
       />
 
-      {/* ✅ FIX: Moved the "Add Department" button here, into the main page header. */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-800">Departments</h1>
-        <button
-          onClick={handleAddClick}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700"
-        >
-          Add Department
-        </button>
+        <h1 className="text-3xl font-bold text-slate-800">
+          Department Management
+        </h1>
       </div>
 
       <DepartmentsTable
         departments={departments}
+        onAddDepartmentClick={handleAddClick}
         onEditClick={handleEditClick}
         onDeleteClick={handleDeleteRequest}
         isLoading={isLoading}

@@ -36,7 +36,6 @@ export default function StudentManagementView() {
         throw new Error(`HTTP error! status: ${resUsers.status}`);
       const allUsers = await resUsers.json();
 
-      // ✅ MODIFIED: Filter users to get only those with the STUDENT role.
       const studentsOnly = allUsers.filter(
         (user) => user.role === STUDENT_ROLE
       );
@@ -101,7 +100,6 @@ export default function StudentManagementView() {
       : "/api/users";
     const method = isEditing ? "PUT" : "POST";
 
-    // ✅ MODIFIED: Automatically assign the STUDENT role for new students.
     const payload = { ...studentData };
     if (!isEditing) {
       payload.role = STUDENT_ROLE;
@@ -118,7 +116,7 @@ export default function StudentManagementView() {
         throw new Error(errData.error || `HTTP error ${res.status}`);
       }
       showMessage(`Student ${isEditing ? "updated" : "added"} successfully!`);
-      await fetchStudents(); // Refresh data
+      await fetchStudents();
       handleCloseModal();
     } catch (err) {
       showMessage(`Failed to save student: ${err.message}`, "error");
@@ -128,20 +126,15 @@ export default function StudentManagementView() {
   };
 
   return (
-    <div className="space-y-6 p-6 bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+    <div className="space-y-6">
       <Notification
         {...notification}
         onClose={() => setNotification({ ...notification, show: false })}
       />
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 p-4 bg-white rounded-2xl shadow-md">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">
-            Student Management
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Manage all students and their information
-          </p>
-        </div>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-slate-800">
+          Student Management
+        </h1>
       </div>
 
       <StudentTable

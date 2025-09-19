@@ -10,7 +10,6 @@ export default function AddStaffModal({
   roles,
   isLoading = false,
 }) {
-  // ✅ MODIFIED: State updated for the new schema
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -18,8 +17,9 @@ export default function AddStaffModal({
     role: "",
     password: "",
   });
-
   const [errors, setErrors] = useState({});
+
+  const isEditMode = !!staffToEdit;
 
   useEffect(() => {
     if (isOpen) {
@@ -36,8 +36,8 @@ export default function AddStaffModal({
           firstName: "",
           lastName: "",
           email: "",
-          role: roles?.[0] || "",
           password: "",
+          role: roles?.[0] || "",
         });
       }
       setErrors({});
@@ -58,7 +58,7 @@ export default function AddStaffModal({
     if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email))
       newErrors.email = "A valid email is required";
     if (!formData.role) newErrors.role = "Role is required";
-    if (!staffToEdit && (!formData.password || formData.password.length < 6)) {
+    if (!isEditMode && (!formData.password || formData.password.length < 6)) {
       newErrors.password = "Password must be at least 6 characters";
     }
     setErrors(newErrors);
@@ -69,7 +69,9 @@ export default function AddStaffModal({
     e.preventDefault();
     if (validateForm()) {
       const dataToSend = { ...formData };
-      if (staffToEdit && !dataToSend.password) delete dataToSend.password;
+      if (isEditMode && !dataToSend.password) {
+        delete dataToSend.password;
+      }
       onSave(dataToSend);
     }
   };
@@ -78,188 +80,178 @@ export default function AddStaffModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-full overflow-y-auto">
-        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-800">
-            {staffToEdit ? "Edit Staff Member" : "Add New Staff Member"}
-          </h2>
-          <button
-            onClick={onClose}
-            disabled={isLoading}
-            className="text-gray-500 hover:text-gray-800 p-1 rounded-full hover:bg-gray-100 transition-colors duration-150"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-full overflow-y-auto animate-fade-in-scale">
+        <div className="p-6 border-b">
+          <div className="flex justify-between items-center">
+            <h2
+              id="add-staff-modal-title"
+              className="text-xl font-bold text-slate-800"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              {isEditMode ? "Edit Staff Details" : "Add New Staff"}
+            </h2>
+            <button
+              onClick={onClose}
+              className="text-slate-500 hover:text-slate-800"
+              aria-label="Close modal"
+              disabled={isLoading}
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
+        <form onSubmit={handleSubmit} noValidate>
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* First Name */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                First Name
+              </label>
+              <input
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md text-sm ${
+                  errors.firstName
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+              />
+              {errors.firstName && (
+                <p className="text-xs text-red-500 mt-1">{errors.firstName}</p>
+              )}
+            </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5"
-        >
-          {/* ✅ MODIFIED: Split name into two fields */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              First Name *
-            </label>
-            <input
-              type="text"
-              name="firstName"
-              placeholder="Jane"
-              value={formData.firstName}
-              onChange={handleChange}
-              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                errors.firstName ? "border-red-500" : "border-gray-300"
-              }`}
-              required
-            />
-            {errors.firstName && (
-              <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Last Name *
-            </label>
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Smith"
-              value={formData.lastName}
-              onChange={handleChange}
-              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                errors.lastName ? "border-red-500" : "border-gray-300"
-              }`}
-              required
-            />
-            {errors.lastName && (
-              <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
-            )}
-          </div>
-          {/* Email */}
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address *
-            </label>
-            <input
-              type="email"
-              name="email"
-              placeholder="staff@example.com"
-              value={formData.email}
-              onChange={handleChange}
-              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                errors.email ? "border-red-500" : "border-gray-300"
-              }`}
-              required
-            />
-            {errors.email && (
-              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-            )}
-          </div>
-          {/* Role */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Role *
-            </label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                errors.role ? "border-red-500" : "border-gray-300"
-              }`}
-              required
-            >
-              <option value="">Select Role</option>
-              {(roles || []).map((role) => (
-                <option key={role} value={role}>
-                  {role}
+            {/* Last Name */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Last Name
+              </label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md text-sm ${
+                  errors.lastName
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+              />
+              {errors.lastName && (
+                <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>
+              )}
+            </div>
+
+            {/* Email */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Email Address
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md text-sm ${
+                  errors.email
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+              />
+              {errors.email && (
+                <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Role */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Role
+              </label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md text-sm bg-white ${
+                  errors.role
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+              >
+                <option value="" disabled>
+                  Select Role
                 </option>
-              ))}
-            </select>
-            {errors.role && (
-              <p className="text-red-500 text-xs mt-1">{errors.role}</p>
-            )}
-          </div>
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password {staffToEdit ? "(Optional)" : "*"}
-            </label>
-            <input
-              type="password"
-              name="password"
-              placeholder={
-                staffToEdit
-                  ? "Leave blank to keep unchanged"
-                  : "Min. 6 characters"
-              }
-              value={formData.password}
-              onChange={handleChange}
-              className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              }`}
-            />
-            {errors.password && (
-              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-            )}
+                {(roles || []).map((role) => (
+                  <option key={role} value={role}>
+                    {role}
+                  </option>
+                ))}
+              </select>
+              {errors.role && (
+                <p className="text-xs text-red-500 mt-1">{errors.role}</p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Password {isEditMode ? "(Optional)" : ""}
+              </label>
+              <input
+                type="password"
+                name="password"
+                placeholder={
+                  isEditMode
+                    ? "Leave blank to keep current password"
+                    : "Minimum 6 characters"
+                }
+                value={formData.password}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md text-sm ${
+                  errors.password
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+              />
+              {errors.password && (
+                <p className="text-xs text-red-500 mt-1">{errors.password}</p>
+              )}
+            </div>
           </div>
 
-          <div className="md:col-span-2 flex justify-end space-x-3 pt-4 border-t border-gray-200">
+          {/* Actions */}
+          <div className="p-6 bg-slate-50 border-t rounded-b-xl flex justify-end items-center gap-4">
             <button
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50"
+              className="px-4 py-2 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 flex items-center"
+              className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              {isLoading ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  {staffToEdit ? "Updating..." : "Adding..."}
-                </>
-              ) : staffToEdit ? (
-                "Update Staff"
-              ) : (
-                "Add Staff"
-              )}
+              {isLoading
+                ? "Saving..."
+                : isEditMode
+                ? "Save Changes"
+                : "Save Staff"}
             </button>
           </div>
         </form>

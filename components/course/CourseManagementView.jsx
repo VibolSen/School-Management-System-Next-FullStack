@@ -7,7 +7,6 @@ import ConfirmationDialog from "@/components/ConfirmationDialog";
 import Notification from "@/components/Notification";
 
 export default function CourseManagementView() {
-  // STATE MANAGEMENT
   const [courses, setCourses] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [teachers, setTeachers] = useState([]);
@@ -21,7 +20,6 @@ export default function CourseManagementView() {
     type: "",
   });
 
-  // HELPER to show notifications
   const showMessage = (message, type = "success") => {
     setNotification({ show: true, message, type });
     setTimeout(
@@ -30,14 +28,13 @@ export default function CourseManagementView() {
     );
   };
 
-  // DATA FETCHING: Fetches courses, departments, and teachers in parallel
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
       const [coursesRes, deptsRes, teachersRes] = await Promise.all([
         fetch("/api/courses"),
         fetch("/api/departments"),
-        fetch("/api/users/teachers"), // Fetches users with the 'TEACHER' role
+        fetch("/api/users?role=TEACHER"),
       ]);
 
       if (!coursesRes.ok) throw new Error("Failed to fetch courses.");
@@ -54,12 +51,10 @@ export default function CourseManagementView() {
     }
   }, []);
 
-  // Run fetchData on component mount
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // CRUD HANDLERS
   const handleSave = async (courseData) => {
     setIsLoading(true);
     const isEditing = !!editingCourse;
@@ -79,7 +74,7 @@ export default function CourseManagementView() {
         throw new Error(errData.error || "Failed to save course.");
       }
       showMessage(`Course ${isEditing ? "updated" : "created"} successfully!`);
-      await fetchData(); // Refresh all data
+      await fetchData();
       handleCloseModal();
     } catch (err) {
       showMessage(err.message, "error");
@@ -95,12 +90,12 @@ export default function CourseManagementView() {
       const res = await fetch(`/api/courses?id=${itemToDelete.id}`, {
         method: "DELETE",
       });
-      if (res.status !== 204) {
+      if (res.status !== 204 && !res.ok) {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to delete the course.");
       }
       showMessage("Course deleted successfully!");
-      setCourses((courses) => courses.filter((c) => c.id !== itemToDelete.id));
+      setCourses((prev) => prev.filter((c) => c.id !== itemToDelete.id));
     } catch (err) {
       showMessage(err.message, "error");
     } finally {
@@ -109,7 +104,6 @@ export default function CourseManagementView() {
     }
   };
 
-  // MODAL & DIALOG CONTROL
   const handleAddClick = () => {
     setEditingCourse(null);
     setIsModalOpen(true);
@@ -132,30 +126,19 @@ export default function CourseManagementView() {
   return (
     <div className="space-y-6">
       <Notification
-        show={notification.show}
-        message={notification.message}
-        type={notification.type}
+        {...notification}
         onClose={() => setNotification({ ...notification, show: false })}
       />
 
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-slate-800">Course Management</h1>
-        <button
-          onClick={handleAddClick}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 disabled:opacity-50"
-          disabled={departments.length === 0}
-          title={
-            departments.length === 0
-              ? "Please add a department first"
-              : "Add a new course"
-          }
-        >
-          Add Course
-        </button>
       </div>
 
       <CoursesTable
         courses={courses}
+        departments={departments}
+        teachers={teachers}
+        onAddCourseClick={handleAddClick}
         onEdit={handleEditClick}
         onDelete={handleDeleteRequest}
         isLoading={isLoading}

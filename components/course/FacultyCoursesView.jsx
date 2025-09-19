@@ -1,9 +1,7 @@
-
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 
-// The main view component for the teacher's course list
 export default function FacultyCoursesView({ loggedInUser }) {
   const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -11,29 +9,24 @@ export default function FacultyCoursesView({ loggedInUser }) {
 
   const teacherId = loggedInUser?.id;
 
-  // Fetches the courses for the logged-in teacher
   const fetchMyCourses = useCallback(async () => {
     if (!teacherId) return;
     setIsLoading(true);
     try {
       const res = await fetch(`/api/faculty/my-courses?teacherId=${teacherId}`);
       if (!res.ok) throw new Error("Failed to fetch your courses.");
-      const data = await res.json();
-      setCourses(data);
+      setCourses(await res.json());
     } catch (err) {
       console.error(err);
-      // You could set an error state here
     } finally {
       setIsLoading(false);
     }
   }, [teacherId]);
 
-  // Fetch data on component mount
   useEffect(() => {
     fetchMyCourses();
   }, [fetchMyCourses]);
 
-  // Memoized filtering for the search input
   const filteredCourses = useMemo(() => {
     return courses.filter(
       (course) =>
@@ -45,7 +38,6 @@ export default function FacultyCoursesView({ loggedInUser }) {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-slate-800">My Courses</h1>
-
       <div className="bg-white p-6 rounded-xl shadow-md">
         <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
           <h2 className="text-xl font-semibold text-slate-800">
@@ -69,29 +61,26 @@ export default function FacultyCoursesView({ loggedInUser }) {
                 <th className="px-6 py-3 text-center">Students</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="bg-white divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-8">
-                    Loading your courses...
+                  <td colSpan={4} className="text-center py-8 text-slate-500">
+                    Loading courses...
                   </td>
                 </tr>
               ) : filteredCourses.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-8 text-gray-500">
+                  <td colSpan={4} className="text-center py-8 text-slate-500">
                     You are not assigned to any courses.
                   </td>
                 </tr>
               ) : (
                 filteredCourses.map((course) => (
-                  <tr
-                    key={course.id}
-                    className="bg-white border-b hover:bg-slate-50"
-                  >
-                    <td className="px-6 py-4 font-medium text-gray-900">
+                  <tr key={course.id} className="hover:bg-slate-50">
+                    <td className="px-6 py-4 font-medium text-slate-900">
                       {course.name}
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-6 py-4">
                       {course.department?.name || "N/A"}
                     </td>
                     <td className="px-6 py-4 text-center">

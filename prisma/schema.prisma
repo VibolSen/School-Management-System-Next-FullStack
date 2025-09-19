@@ -28,65 +28,67 @@ enum ExamSubmissionStatus {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
   firstName String
   lastName  String
-  email     String   @unique
+  email     String @unique
   password  String
-  role      Role     @default(STUDENT)
+  role      Role   @default(STUDENT)
 
-  groups           Group[]      @relation(fields: [groupIds], references: [id])
-  groupIds         String[]     @db.ObjectId
-  ledCourses       Course[]     @relation("CourseLead")
-  headedDepartment Department?  @relation("DepartmentHead")
+  groups           Group[]     @relation(fields: [groupIds], references: [id])
+  groupIds         String[]    @db.ObjectId
+  ledCourses       Course[]    @relation("CourseLead")
+  headedDepartment Department? @relation("DepartmentHead")
 
   createdAssignments Assignment[] @relation("AssignmentsCreated")
   submissions        Submission[] @relation("SubmissionsMade")
 
-  createdExams   Exam[]           @relation("ExamsCreated")
+  createdExams    Exam[]           @relation("ExamsCreated")
   examSubmissions ExamSubmission[] @relation("ExamSubmissionsMade")
 
   uploadedResources LibraryResource[] @relation("UploadedResources")
+  attendances       Attendance[]
 }
 
 model LibraryResource {
-  id           String  @id @default(auto()) @map("_id") @db.ObjectId
-  title        String
-  author       String
-  coverImage   String
-  uploadedBy   User    @relation("UploadedResources", fields: [uploadedById], references: [id])
-  uploadedById String  @db.ObjectId
-  department   String?
-  description  String?
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  author          String
+  coverImage      String
+  uploadedBy      User    @relation("UploadedResources", fields: [uploadedById], references: [id])
+  uploadedById    String  @db.ObjectId
+  department      String?
+  description     String?
   publicationYear Int?
 }
 
 model Department {
-  id      String  @id @default(auto()) @map("_id") @db.ObjectId
-  name    String  @unique
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name    String   @unique
   courses Course[]
-  head    User?   @relation("DepartmentHead", fields: [headId], references: [id])
-  headId  String? @db.ObjectId @unique
+  head    User?    @relation("DepartmentHead", fields: [headId], references: [id])
+  headId  String?  @unique @db.ObjectId
 }
 
 model Course {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  name         String     @unique
-  department   Department @relation(fields: [departmentId], references: [id])
-  departmentId String     @db.ObjectId
-  groups       Group[]
-  teacher      User?      @relation("CourseLead", fields: [teacherId], references: [id])
-  teacherId    String?    @db.ObjectId
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  name           String          @unique
+  department     Department      @relation(fields: [departmentId], references: [id])
+  departmentId   String          @db.ObjectId
+  groups         Group[]
+  teacher        User?           @relation("CourseLead", fields: [teacherId], references: [id])
+  teacherId      String?         @db.ObjectId
+  attendances    Attendance[]
 }
 
 model Group {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String @unique
 
-  course     Course?    @relation(fields: [courseId], references: [id])
-  courseId   String?    @db.ObjectId
-  students   User[]     @relation(fields: [studentIds], references: [id])
-  studentIds String[]   @db.ObjectId
+  course     Course?  @relation(fields: [courseId], references: [id])
+  courseId   String?  @db.ObjectId
+  students   User[]   @relation(fields: [studentIds], references: [id])
+  studentIds String[] @db.ObjectId
 
   assignments Assignment[]
   exams       Exam[]
@@ -98,11 +100,11 @@ model Assignment {
   description String?
   dueDate     DateTime?
 
-  teacher      User         @relation("AssignmentsCreated", fields: [teacherId], references: [id])
-  teacherId    String       @db.ObjectId
-  group        Group        @relation(fields: [groupId], references: [id])
-  groupId      String       @db.ObjectId
-  submissions  Submission[]
+  teacher     User         @relation("AssignmentsCreated", fields: [teacherId], references: [id])
+  teacherId   String       @db.ObjectId
+  group       Group        @relation(fields: [groupId], references: [id])
+  groupId     String       @db.ObjectId
+  submissions Submission[]
 }
 
 model Submission {
@@ -129,10 +131,10 @@ model Exam {
   description String?
   examDate    DateTime?
 
-  teacher   User           @relation("ExamsCreated", fields: [teacherId], references: [id])
-  teacherId String         @db.ObjectId
-  group     Group          @relation(fields: [groupId], references: [id])
-  groupId   String         @db.ObjectId
+  teacher     User             @relation("ExamsCreated", fields: [teacherId], references: [id])
+  teacherId   String           @db.ObjectId
+  group       Group            @relation(fields: [groupId], references: [id])
+  groupId     String           @db.ObjectId
   submissions ExamSubmission[]
 }
 
@@ -152,4 +154,34 @@ model ExamSubmission {
   studentId String @db.ObjectId
 
   @@unique([examId, studentId])
+}
+
+model AttendanceStatus {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  name        String       @unique
+  attendances Attendance[]
+}
+
+model Attendance {
+  id       String           @id @default(auto()) @map("_id") @db.ObjectId
+  user     User             @relation(fields: [userId], references: [id])
+  userId   String           @db.ObjectId
+  course   Course?          @relation(fields: [courseId], references: [id])
+  courseId String?          @db.ObjectId
+  status   AttendanceStatus @relation(fields: [statusId], references: [id])
+  statusId String           @db.ObjectId
+  date     DateTime
+  checkIn  DateTime?
+  checkOut DateTime?
+
+  staffAttendanceSession   StaffAttendanceSession? @relation(fields: [staffAttendanceSessionId], references: [id])
+  staffAttendanceSessionId String?                 @db.ObjectId
+
+  @@unique([userId, courseId, date])
+}
+
+model StaffAttendanceSession {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  expiresAt   DateTime
+  attendances Attendance[]
 }

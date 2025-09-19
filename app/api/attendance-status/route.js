@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 export async function GET(req) {
   try {
-    const statuses = await prisma.attendanceStatusEnum.findMany({
+    const statuses = await prisma.attendanceStatus.findMany({
       include: { attendances: true },
     });
     return new Response(JSON.stringify(statuses), {
@@ -24,7 +24,7 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: 'Name is required' }), { status: 400 });
     }
 
-    const status = await prisma.attendanceStatusEnum.create({
+    const status = await prisma.attendanceStatus.create({
       data: { name: data.name },
     });
 
@@ -52,7 +52,7 @@ export async function PUT(req) {
       return new Response(JSON.stringify({ error: 'Name is required' }), { status: 400 });
     }
 
-    const updatedStatus = await prisma.attendanceStatusEnum.update({
+    const updatedStatus = await prisma.attendanceStatus.update({
       where: { id },
       data: { name: data.name },
     });
@@ -76,7 +76,7 @@ export async function DELETE(req) {
       return new Response(JSON.stringify({ error: 'AttendanceStatusEnum ID is required' }), { status: 400 });
     }
 
-    const deletedStatus = await prisma.attendanceStatusEnum.delete({
+    const deletedStatus = await prisma.attendanceStatus.delete({
       where: { id },
     });
 

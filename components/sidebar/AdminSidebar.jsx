@@ -104,6 +104,11 @@ const ADMIN_NAV_ITEMS = [
     href: "/admin/attendance-status",
   },
   {
+    label: "Staff Attendance",
+    icon: <FiCheckSquare className="w-5 h-5" />,
+    href: "/admin/staff-attendance",
+  },
+  {
     label: "Settings",
     icon: <FiSettings className="w-5 h-5" />,
     href: "/admin/settings",

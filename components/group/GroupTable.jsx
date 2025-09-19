@@ -1,42 +1,134 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import Link from "next/link"; // ✅ Import Link from Next.js
+import Link from "next/link";
 
-export default function GroupsTable({ groups, onEdit, onDelete, isLoading }) {
+// Helper component for rendering sort direction arrows
+const SortIndicator = ({ direction }) => {
+  if (!direction) return null;
+  return (
+    <span className="text-slate-500">
+      {direction === "ascending" ? (
+        <svg
+          className="w-3 h-3"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M5 15l7-7 7 7"
+          ></path>
+        </svg>
+      ) : (
+        <svg
+          className="w-3 h-3"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M19 9l-7 7-7-7"
+          ></path>
+        </svg>
+      )}
+    </span>
+  );
+};
+
+export default function GroupsTable({
+  groups,
+  courses, // Added for filtering
+  onAddGroupClick,
+  onEdit,
+  onDelete,
+  isLoading,
+}) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [courseFilter, setCourseFilter] = useState("All");
+  const [sortConfig, setSortConfig] = useState({
+    key: "name",
+    direction: "ascending",
+  });
 
-  const filteredGroups = useMemo(() => {
-    return groups.filter(
-      (group) =>
+  // Combined filtering and sorting logic
+  const processedGroups = useMemo(() => {
+    const filtered = groups.filter((group) => {
+      const matchesSearch =
         group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        group.course?.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [groups, searchTerm]);
+        group.course?.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCourse =
+        courseFilter === "All" || group.courseId === courseFilter;
+      return matchesSearch && matchesCourse;
+    });
 
-  if (isLoading && groups.length === 0) {
-    return (
-      <div className="bg-white p-6 rounded-xl shadow-md">
-        <div className="flex justify-center items-center py-10">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <span className="ml-3">Loading groups...</span>
-        </div>
-      </div>
-    );
-  }
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        let aValue = a[sortConfig.key];
+        let bValue = b[sortConfig.key];
+
+        // Handle nested properties for sorting (e.g., course.name)
+        if (sortConfig.key === "course.name") {
+          aValue = a.course?.name || "";
+          bValue = b.course?.name || "";
+        }
+
+        if (aValue < bValue)
+          return sortConfig.direction === "ascending" ? -1 : 1;
+        if (aValue > bValue)
+          return sortConfig.direction === "ascending" ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [groups, searchTerm, courseFilter, sortConfig]);
+
+  const handleSort = (key) => {
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key, direction });
+  };
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md">
-      {/* Search & Add */}
+      {/* Header, Filters & Actions */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
         <h2 className="text-xl font-semibold text-slate-800">Groups</h2>
-        <input
-          type="text"
-          placeholder="Search groups..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full md:w-64 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
+        <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
+          <input
+            type="text"
+            placeholder="Search groups..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+          <select
+            value={courseFilter}
+            onChange={(e) => setCourseFilter(e.target.value)}
+            className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+          >
+            <option value="All">All Courses</option>
+            {courses.map((course) => (
+              <option key={course.id} value={course.id}>
+                {course.name}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={onAddGroupClick}
+            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+          >
+            Add Group
+          </button>
+        </div>
       </div>
 
       {/* Table */}
@@ -44,26 +136,55 @@ export default function GroupsTable({ groups, onEdit, onDelete, isLoading }) {
         <table className="w-full text-sm text-left text-slate-500">
           <thead className="text-xs text-slate-700 uppercase bg-slate-100">
             <tr>
-              <th className="px-6 py-3">Group Name</th>
-              <th className="px-6 py-3">Course</th>
+              <th
+                className="px-6 py-3 cursor-pointer"
+                onClick={() => handleSort("name")}
+              >
+                <div className="flex items-center gap-1.5">
+                  Group Name{" "}
+                  <SortIndicator
+                    direction={
+                      sortConfig.key === "name" ? sortConfig.direction : null
+                    }
+                  />
+                </div>
+              </th>
+              <th
+                className="px-6 py-3 cursor-pointer"
+                onClick={() => handleSort("course.name")}
+              >
+                <div className="flex items-center gap-1.5">
+                  Course{" "}
+                  <SortIndicator
+                    direction={
+                      sortConfig.key === "course.name"
+                        ? sortConfig.direction
+                        : null
+                    }
+                  />
+                </div>
+              </th>
               <th className="px-6 py-3 text-center">Students</th>
               <th className="px-6 py-3 text-center">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {filteredGroups.length === 0 ? (
+          <tbody className="bg-white divide-y divide-gray-200">
+            {isLoading && processedGroups.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-8 text-gray-500">
+                <td colSpan={4} className="text-center py-8 text-slate-500">
+                  Loading groups...
+                </td>
+              </tr>
+            ) : processedGroups.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="text-center py-8 text-slate-500">
                   No groups found.
                 </td>
               </tr>
             ) : (
-              filteredGroups.map((group) => (
-                <tr
-                  key={group.id}
-                  className="bg-white border-b hover:bg-slate-50"
-                >
-                  <td className="px-6 py-4 font-medium text-gray-900">
+              processedGroups.map((group) => (
+                <tr key={group.id} className="hover:bg-slate-50">
+                  <td className="px-6 py-4 font-medium text-slate-900">
                     {group.name}
                   </td>
                   <td className="px-6 py-4">{group.course?.name || "N/A"}</td>
@@ -77,7 +198,7 @@ export default function GroupsTable({ groups, onEdit, onDelete, isLoading }) {
                       </span>
                     </Link>
                   </td>
-                  <td className="px-6 py-4 text-center space-x-4">
+                  <td className="px-6 py-4 text-center space-x-2">
                     <button
                       onClick={() => onEdit(group)}
                       className="text-indigo-600 hover:text-indigo-900"

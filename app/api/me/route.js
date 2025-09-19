@@ -31,6 +31,24 @@ export async function GET(req) {
     // ✅ MODIFIED: Removed `include: { role: true }` as role is now a direct field.
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
+      include: {
+        ledCourses: {
+          include: {
+            department: true,
+            groups: {
+              include: {
+                students: true,
+              },
+            },
+          },
+        },
+        groups: {
+          include: {
+            course: true,
+            students: true,
+          },
+        },
+      },
     });
 
     if (!user) {

@@ -19,5 +19,5 @@ export default async function AttendancePage() {
   const cookie = cookies().toString();
   const loggedInUser = await getLoggedInUser(cookie);
 
-  return <AttendanceView loggedInUser={loggedInUser} />;
+  return <AttendanceView loggedInUser={loggedInUser} roleToView="staff" />;
 }

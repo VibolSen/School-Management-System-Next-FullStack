@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import AttendanceTable from "./AttendanceTable";
-import QRCodeGeneratorModal from "./QRCodeGeneratorModal";
 
-const AttendanceView = ({ loggedInUser }) => {
+const AttendanceView = ({ loggedInUser, roleToView = "student" }) => {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [courses, setCourses] = useState([]);
-  const [students, setStudents] = useState([]); // These are 'users' with role 'student'
+  const [students, setStudents] = useState([]); // users with role student
   const [departments, setDepartments] = useState([]);
   const [attendanceStatuses, setAttendanceStatuses] = useState([]);
 
@@ -18,166 +17,12 @@ const AttendanceView = ({ loggedInUser }) => {
   const [courseFilter, setCourseFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  const [isQrModalOpen, setIsQrModal] = useState(false);
-  const [selectedCourseForQr, setSelectedCourseForQr] = useState(null);
-  const [qrCourseSelection, setQrCourseSelection] = useState("");
-  const [liveCheckedInStudents, setLiveCheckedInStudents] = useState([]);
-  const [currentQrSessionId, setCurrentQrSessionId] = useState(null); // New state to hold the active QR session ID
-
-  // Hardcoded role for now (replace with real auth later)
   const currentUserId = loggedInUser?.id;
   const currentUserRole = loggedInUser?.role;
-const canGenerateQr =
-  loggedInUser.role.name === "faculty" || loggedInUser.role.name === "Admin";
-
-
-  // -------------------------------
-  // Fetch courses, users, departments, and attendance statuses
-  // -------------------------------
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [coursesRes, usersRes, departmentsRes, statusesRes] =
-          await Promise.all([
-            fetch("/api/courses"),
-            fetch("/api/users"),
-            fetch("/api/departments"),
-            fetch("/api/attendance-status"),
-          ]);
-
-        const coursesData = coursesRes.ok ? await coursesRes.json() : [];
-        const usersData = usersRes.ok ? await usersRes.json() : []; // Renamed to usersData
-        const departmentsData = departmentsRes.ok
-          ? await departmentsRes.json()
-          : [];
-        const statusesData = statusesRes.ok ? await statusesRes.json() : [];
-
-        setCourses(Array.isArray(coursesData) ? coursesData : []);
-        setStudents(
-          Array.isArray(usersData)
-            ? usersData.filter((user) => user.role === "student")
-            : []
-        ); // Filter for students
-        setDepartments(Array.isArray(departmentsData) ? departmentsData : []);
-        setAttendanceStatuses(Array.isArray(statusesData) ? statusesData : []);
-      } catch (err) {
-        console.error("Failed to fetch initial data:", err);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-
-  // -------------------------------
-  // Fetch attendance records (to populate the table)
-  // This should ideally be debounced or triggered on filter changes
-  // For simplicity, let's fetch based on selectedDate and filters
-  // -------------------------------
-  useEffect(() => {
-    const fetchAttendanceRecords = async () => {
-      try {
-        // Construct query parameters for filtering
-        const params = new URLSearchParams();
-        if (selectedDate) params.append("date", selectedDate);
-        if (departmentFilter !== "All") {
-          // Find department ID if departmentFilter is by name
-          const dept = departments.find((d) => d.name === departmentFilter);
-          if (dept) params.append("departmentId", dept.id);
-        }
-        if (courseFilter !== "All") params.append("courseId", courseFilter);
-        if (statusFilter !== "All") {
-          // Find status ID if statusFilter is by name
-          const status = attendanceStatuses.find(
-            (s) => s.name === statusFilter
-          );
-          if (status) params.append("statusId", status.id);
-        }
-
-        const res = await fetch(`/api/attendances?${params.toString()}`); // Corrected API endpoint
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        const data = await res.json();
-        setAttendanceRecords(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Failed to fetch attendance records:", error);
-        setAttendanceRecords([]);
-      }
-    };
-
-    // Ensure dependencies are loaded before fetching
-    if (
-      departments.length > 0 &&
-      attendanceStatuses.length > 0 &&
-      courses.length > 0
-    ) {
-      fetchAttendanceRecords();
-    }
-  }, [
-    selectedDate,
-    departmentFilter,
-    courseFilter,
-    statusFilter,
-    departments,
-    attendanceStatuses,
-    courses, // Added courses to dependency array
-  ]);
-
-  // -------------------------------
-  // QR modal handlers
-  // -------------------------------
-  const handleCourseSelectionForQr = (courseId) => {
-    setQrCourseSelection(courseId);
-    if (!courseId) {
-      setIsQrModal(false);
-      setSelectedCourseForQr(null);
-      setCurrentQrSessionId(null);
-      setLiveCheckedInStudents([]); // Clear live checked-in students
-      return;
-    }
-    const course = courses.find((c) => c.id === courseId);
-    if (course) {
-      setLiveCheckedInStudents([]);
-      setSelectedCourseForQr(course);
-      setIsQrModal(true);
-      // The QRCodeGeneratorModal will handle the creation of the session
-    }
-  };
-
-  const handleCloseQrModal = async () => {
-    if (currentQrSessionId) {
-      try {
-        // Optionally update the session status to 'ended' or similar on the backend
-        // For now, we just close the modal and delete the session.
-        await fetch(`/api/qrcode-sessions?id=${currentQrSessionId}`, {
-          method: "DELETE",
-        });
-      } catch (error) {
-        console.error("Failed to delete/end QR session:", error);
-      }
-    }
-    setIsQrModal(false);
-    setSelectedCourseForQr(null);
-    setQrCourseSelection("");
-    setCurrentQrSessionId(null);
-    setLiveCheckedInStudents([]); // Clear live checked-in students on close
-  };
-
-  const handleQrSessionCreated = (sessionId) => {
-    setCurrentQrSessionId(sessionId);
-  };
-
-  // -------------------------------
-  // Total students in selected course
-  // -------------------------------
-  const totalStudentsInCourse = useMemo(() => {
-    if (!selectedCourseForQr || !Array.isArray(students)) return 0;
-    // Assuming a student object has a 'courses' array, and each course object in that array has an 'id'
-    return students.filter(
-      (student) =>
-        Array.isArray(student.courses) &&
-        student.courses.some((course) => course.id === selectedCourseForQr.id)
-    ).length;
-  }, [students, selectedCourseForQr]);
+  const canGenerateQr =
+    loggedInUser?.role?.name === "faculty" ||
+    loggedInUser?.role?.name === "Admin" ||
+    loggedInUser?.role?.name === "teacher";
 
   // -------------------------------
   // Update attendance status
@@ -191,10 +36,9 @@ const canGenerateQr =
       }
 
       const res = await fetch(`/api/attendances?id=${recordId}`, {
-        // Corrected API endpoint
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ statusId: statusObj.id }), // Send statusId
+        body: JSON.stringify({ statusId: statusObj.id }),
       });
 
       if (!res.ok)
@@ -203,7 +47,7 @@ const canGenerateQr =
       setAttendanceRecords((prev) =>
         prev.map((record) =>
           record.id === recordId
-            ? { ...record, status: { name: newStatus, id: statusObj.id } } // Update status object correctly
+            ? { ...record, status: { name: newStatus, id: statusObj.id } }
             : record
         )
       );
@@ -221,7 +65,7 @@ const canGenerateQr =
       (dep) => dep.name === departmentFilter
     );
     if (!selectedDepartment) return [];
-    return courses.filter((c) => c.departmentId === selectedDepartment.id); // Assuming course has departmentId
+    return courses.filter((c) => c.departmentId === selectedDepartment.id);
   }, [departmentFilter, courses, departments]);
 
   useEffect(() => {
@@ -230,8 +74,58 @@ const canGenerateQr =
     }
   }, [coursesByDepartment, courseFilter]);
 
+
+
   // -------------------------------
-  // Prepare display data (client-side filtering for simplicity, backend filtering is better)
+  // Fetch attendance records
+  // -------------------------------
+  useEffect(() => {
+    const fetchAttendanceRecords = async () => {
+      try {
+        const params = new URLSearchParams();
+        if (selectedDate) params.append("date", selectedDate);
+        if (departmentFilter !== "All") {
+          const dept = departments.find((d) => d.name === departmentFilter);
+          if (dept) params.append("departmentId", dept.id);
+        }
+        if (courseFilter !== "All") params.append("courseId", courseFilter);
+        if (statusFilter !== "All") {
+          const status = attendanceStatuses.find(
+            (s) => s.name === statusFilter
+          );
+          if (status) params.append("statusId", status.id);
+        }
+
+        const res = await fetch(`/api/attendances?${params.toString()}`); // Corrected API endpoint
+        console.log("Attendance records API response:", res);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const data = await res.json();
+        setAttendanceRecords(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to fetch attendance records:", error);
+        setAttendanceRecords([]);
+      }
+    };
+
+    if (
+      departments.length > 0 &&
+      attendanceStatuses.length > 0 &&
+      courses.length > 0
+    ) {
+      fetchAttendanceRecords();
+    }
+  }, [
+    selectedDate,
+    departmentFilter,
+    courseFilter,
+    statusFilter,
+    departments,
+    attendanceStatuses,
+    courses,
+  ]);
+
+  // -------------------------------
+  // Prepare display data
   // -------------------------------
   const displayData = useMemo(() => {
     if (
@@ -245,26 +139,26 @@ const canGenerateQr =
     const studentMap = new Map(students.map((s) => [s.id, s]));
     const courseMap = new Map(courses.map((c) => [c.id, c]));
     const statusMap = new Map(attendanceStatuses.map((s) => [s.id, s]));
-    const departmentMap = new Map(departments.map((d) => [d.id, d.name])); // Map for department names
+    const departmentMap = new Map(departments.map((d) => [d.id, d.name]));
 
     return attendanceRecords
       .map((record) => {
-        const student = studentMap.get(record.userId); // Corrected to userId
+        const student = studentMap.get(record.userId);
         const course = courseMap.get(record.courseId);
         const status = statusMap.get(record.statusId);
         if (!student || !course || !status) return null;
 
-        const departmentName = departmentMap.get(course.departmentId) || "N/A"; // Get department name
+        const departmentName = departmentMap.get(course.departmentId) || "N/A";
 
         return {
           ...record,
-          studentName: `${student.firstName} ${student.lastName}`, // Assuming firstName and lastName
-          courseName: course.title,
+          studentName: `${student.firstName} ${student.lastName}`,
+          courseName: course.name,
           department: departmentName,
           status: status.name,
         };
       })
-      .filter((record) => record !== null) // Filter out records that couldn't be mapped
+      .filter((record) => record !== null)
       .sort((a, b) => a.studentName.localeCompare(b.studentName));
   }, [attendanceRecords, students, courses, attendanceStatuses, departments]);
 
@@ -274,35 +168,6 @@ const canGenerateQr =
       <p className="text-slate-500">
         Monitor and manage student attendance records for daily classes.
       </p>
-
-      {/* QR Generator */}
-      {canGenerateQr && (
-        <div className="bg-white p-4 rounded-xl shadow-md">
-          <label
-            htmlFor="qr-course-select"
-            className="font-semibold text-slate-800 mb-2 block"
-          >
-            Start Live QR Session
-          </label>
-          <select
-            id="qr-course-select"
-            value={qrCourseSelection}
-            onChange={(e) => handleCourseSelectionForQr(e.target.value)}
-            className="w-full sm:max-w-md px-3 py-2 border border-slate-300 rounded-md text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
-          >
-            <option value="">Select a course...</option>
-            {coursesByDepartment.map((course) => (
-              <option
-                key={course.id}
-                value={course.id}
-                className="text-slate-800"
-              >
-                {course.title}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
 
       {/* Filters */}
       <div className="bg-white p-4 rounded-xl shadow-md sticky top-0 z-10">
@@ -372,7 +237,7 @@ const canGenerateQr =
                   value={course.id}
                   className="text-slate-800"
                 >
-                  {course.title}
+                  {course.name}
                 </option>
               ))}
             </select>
@@ -412,19 +277,6 @@ const canGenerateQr =
         records={displayData}
         onStatusChange={handleStatusChange}
         attendanceStatuses={attendanceStatuses}
-      />
-
-      {/* QR Modal */}
-      <QRCodeGeneratorModal
-        isOpen={isQrModalOpen}
-        onClose={handleCloseQrModal}
-        course={selectedCourseForQr}
-        checkedInStudents={liveCheckedInStudents}
-        totalStudents={totalStudentsInCourse}
-        currentUserId={currentUserId} // now real user ID
-        onQrSessionCreated={handleQrSessionCreated}
-        activeQrSessionId={currentQrSessionId}
-        setLiveCheckedInStudents={setLiveCheckedInStudents}
       />
     </div>
   );

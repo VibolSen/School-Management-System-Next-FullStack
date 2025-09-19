@@ -8,7 +8,7 @@ import Notification from "@/components/Notification";
 
 export default function GroupManagementView() {
   const [groups, setGroups] = useState([]);
-  const [courses, setCourses] = useState([]); // ✅ ADDED: State for courses
+  const [courses, setCourses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +24,6 @@ export default function GroupManagementView() {
     setTimeout(() => setNotification({ ...notification, show: false }), 3000);
   };
 
-  // ✅ MODIFIED: Fetch both groups and courses
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -83,12 +82,12 @@ export default function GroupManagementView() {
       const res = await fetch(`/api/groups?id=${itemToDelete.id}`, {
         method: "DELETE",
       });
-      if (res.status !== 204) {
+      if (res.status !== 204 && !res.ok) {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to delete group.");
       }
       showMessage("Group deleted successfully!");
-      setGroups((groups) => groups.filter((g) => g.id !== itemToDelete.id));
+      setGroups((prev) => prev.filter((g) => g.id !== itemToDelete.id));
     } catch (err) {
       showMessage(err.message, "error");
     } finally {
@@ -124,21 +123,11 @@ export default function GroupManagementView() {
       />
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-slate-800">Group Management</h1>
-        <button
-          onClick={handleAddClick}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 disabled:opacity-50"
-          disabled={courses.length === 0}
-          title={
-            courses.length === 0
-              ? "Please add a course first"
-              : "Add a new group"
-          }
-        >
-          Add Group
-        </button>
       </div>
       <GroupsTable
         groups={groups}
+        courses={courses}
+        onAddGroupClick={handleAddClick}
         onEdit={handleEditClick}
         onDelete={handleDeleteRequest}
         isLoading={isLoading}
@@ -149,7 +138,7 @@ export default function GroupManagementView() {
           onClose={handleCloseModal}
           onSave={handleSave}
           groupToEdit={editingGroup}
-          courses={courses} // ✅ ADDED: Pass courses to the modal
+          courses={courses}
           isLoading={isLoading}
         />
       )}

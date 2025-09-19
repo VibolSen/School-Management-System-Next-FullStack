@@ -13,6 +13,7 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiUsers,
+  FiCode,
 } from "react-icons/fi";
 
 const NavLink = ({
@@ -67,6 +68,11 @@ const HR_NAV_ITEMS = [
     label: "Reports",
     icon: <FiBarChart2 className="w-5 h-5" />,
     href: "/hr/reports",
+  },
+  {
+    label: "Scan Attendance",
+    icon: <FiCode className="w-5 h-5" />,
+    href: "/staff/scan-attendance",
   },
 ];
 

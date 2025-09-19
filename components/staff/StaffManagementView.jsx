@@ -6,7 +6,7 @@ import AddStaffModal from "./AddStaffModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import Notification from "@/components/Notification";
 
-// ✅ MODIFIED: Static list of roles available for staff, excluding 'STUDENT'.
+// Static list of roles available for staff, excluding 'STUDENT'.
 const STAFF_ROLES = ["ADMIN", "HR", "FACULTY", "TEACHER"];
 
 export default function StaffManagementView() {
@@ -29,7 +29,7 @@ export default function StaffManagementView() {
     );
   };
 
-  // ✅ MODIFIED: Fetches all users, then filters out students.
+  // Fetches all users, then filters out students.
   const fetchStaff = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -92,7 +92,6 @@ export default function StaffManagementView() {
     setEditingStaff(null);
   };
 
-  // ✅ MODIFIED: Save logic updated for the new schema.
   const handleSaveStaff = async (staffData) => {
     setIsLoading(true);
     const isEditing = !!editingStaff?.id;
@@ -125,39 +124,13 @@ export default function StaffManagementView() {
   };
 
   return (
-    <div className="space-y-6 p-6 bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
+    <div className="space-y-6">
       <Notification
         {...notification}
         onClose={() => setNotification({ ...notification, show: false })}
       />
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 p-4 bg-white rounded-2xl shadow-md">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">Staff Management</h1>
-          <p className="text-gray-600 mt-1">
-            Manage all staff members and their roles
-          </p>
-        </div>
-        <button
-          onClick={handleAddClick}
-          disabled={isLoading}
-          className="mt-4 md:mt-0 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium py-2.5 px-5 rounded-lg shadow-md transition-all duration-200 flex items-center"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-          Add Staff
-        </button>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-slate-800">Staff Management</h1>
       </div>
 
       <StaffTable

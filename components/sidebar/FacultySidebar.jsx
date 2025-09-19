@@ -19,6 +19,7 @@ import {
   FiUser,
   FiCheckSquare,
   FiSend,
+  FiCode,
 } from "react-icons/fi";
 
 // ✅ 1. The `title` attribute for the tooltip is now handled directly inside NavLink.
@@ -106,6 +107,11 @@ const FACULTY_NAV_ITEMS = [
     label: "Settings",
     icon: <FiSettings className="w-5 h-5" />,
     href: "/faculty/settings",
+  },
+  {
+    label: "Scan Attendance",
+    icon: <FiCode className="w-5 h-5" />,
+    href: "/staff/scan-attendance",
   },
 ];
 

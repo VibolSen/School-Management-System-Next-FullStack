@@ -1,9 +1,7 @@
-
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 
-// The main view component for the student's course list
 export default function StudentCoursesView({ loggedInUser }) {
   const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -11,34 +9,31 @@ export default function StudentCoursesView({ loggedInUser }) {
 
   const studentId = loggedInUser?.id;
 
-  // Fetches the courses for the logged-in student
   const fetchStudentCourses = useCallback(async () => {
     if (!studentId) return;
     setIsLoading(true);
     try {
       const res = await fetch(`/api/student/my-courses?studentId=${studentId}`);
       if (!res.ok) throw new Error("Failed to fetch your courses.");
-      const data = await res.json();
-      setCourses(data);
+      setCourses(await res.json());
     } catch (err) {
       console.error(err);
-      // You could set an error state here
     } finally {
       setIsLoading(false);
     }
   }, [studentId]);
 
-  // Fetch data on component mount
   useEffect(() => {
     fetchStudentCourses();
   }, [fetchStudentCourses]);
 
-  // Memoized filtering for the search input
   const filteredCourses = useMemo(() => {
     return courses.filter(
       (course) =>
         course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        course.department?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        course.department?.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
         (course.teacher &&
           `${course.teacher.firstName} ${course.teacher.lastName}`
             .toLowerCase()
@@ -49,7 +44,6 @@ export default function StudentCoursesView({ loggedInUser }) {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-slate-800">My Courses</h1>
-
       <div className="bg-white p-6 rounded-xl shadow-md">
         <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
           <h2 className="text-xl font-semibold text-slate-800">
@@ -72,36 +66,35 @@ export default function StudentCoursesView({ loggedInUser }) {
                 <th className="px-6 py-3">Teacher</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="bg-white divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
-                  <td colSpan={3} className="text-center py-8">
-                    Loading your courses...
+                  <td colSpan={3} className="text-center py-8 text-slate-500">
+                    Loading courses...
                   </td>
                 </tr>
               ) : filteredCourses.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="text-center py-8 text-gray-500">
+                  <td colSpan={3} className="text-center py-8 text-slate-500">
                     You are not enrolled in any courses.
                   </td>
                 </tr>
               ) : (
                 filteredCourses.map((course) => (
-                  <tr
-                    key={course.id}
-                    className="bg-white border-b hover:bg-slate-50"
-                  >
-                    <td className="px-6 py-4 font-medium text-gray-900">
+                  <tr key={course.id} className="hover:bg-slate-50">
+                    <td className="px-6 py-4 font-medium text-slate-900">
                       {course.name}
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-6 py-4">
                       {course.department?.name || "N/A"}
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className="px-6 py-4">
                       {course.teacher ? (
                         `${course.teacher.firstName} ${course.teacher.lastName}`
                       ) : (
-                        <span className="italic text-gray-400">Unassigned</span>
+                        <span className="italic text-slate-400">
+                          Unassigned
+                        </span>
                       )}
                     </td>
                   </tr>

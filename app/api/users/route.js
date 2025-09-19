@@ -9,6 +9,7 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
+    const role = searchParams.get("role");
 
     if (id) {
       const user = await prisma.user.findUnique({ where: { id } });
@@ -19,6 +20,12 @@ export async function GET(req) {
       }
       const { password, ...userWithoutPassword } = user;
       return new Response(JSON.stringify(userWithoutPassword), { status: 200 });
+    }
+
+    if (role) {
+      const users = await prisma.user.findMany({ where: { role } });
+      const usersWithoutPasswords = users.map(({ password, ...rest }) => rest);
+      return new Response(JSON.stringify(usersWithoutPasswords), { status: 200 });
     }
 
     const users = await prisma.user.findMany();
