@@ -1,76 +1,57 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 
-// A basic placeholder for the performance view.
-export default function StudentPerformanceView() {
+const StudentPerformanceView = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      setLoading(true);
+    const fetchStudentPerformance = async () => {
       try {
-        const res = await fetch("/api/users");
-        if (!res.ok) throw new Error("Failed to fetch students");
-        const allUsers = await res.json();
-        // This component now shows ALL students, as course data isn't available
-        // to filter by "my" students.
-        setStudents(allUsers.filter((u) => u.role === "STUDENT"));
+        const res = await fetch("/api/student-performance");
+        if (!res.ok) {
+          throw new Error("Failed to fetch student performance");
+        }
+        const data = await res.json();
+        setStudents(data);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-    fetchStudents();
+
+    fetchStudentPerformance();
   }, []);
 
-  const filteredStudents = useMemo(() => {
-    return students.filter((s) =>
-      `${s.firstName} ${s.lastName}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    );
-  }, [students, searchTerm]);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-  if (loading) return <div>Loading students...</div>;
-  if (error) return <div className="text-red-500">Error: {error}</div>;
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-slate-800">Student Performance</h1>
-      <p className="text-slate-500">
-        This is a list of all students. Performance metrics like attendance and
-        course alerts require Course and Attendance models in the database
-        schema.
-      </p>
-
-      <div className="bg-white p-6 rounded-xl shadow-md">
-        <input
-          type="text"
-          placeholder="Search students..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full md:w-64 mb-4 px-3 py-2 border border-slate-300 rounded-md"
-        />
-        <table className="w-full text-sm text-left">
-          <thead className="text-xs text-slate-700 uppercase bg-slate-100">
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Student Performance</h1>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white">
+          <thead>
             <tr>
-              <th className="px-6 py-3">Student Name</th>
-              <th className="px-6 py-3">Email</th>
+              <th className="py-2 px-4 border-b">Name</th>
+              <th className="py-2 px-4 border-b">Attendance Rate</th>
+              <th className="py-2 px-4 border-b">Average Grade</th>
             </tr>
           </thead>
           <tbody>
-            {filteredStudents.map((student) => (
-              <tr
-                key={student.id}
-                className="bg-white border-b hover:bg-slate-50"
-              >
-                <td className="px-6 py-4 font-medium">{`${student.firstName} ${student.lastName}`}</td>
-                <td className="px-6 py-4">{student.email}</td>
+            {students.map((student) => (
+              <tr key={student.id}>
+                <td className="py-2 px-4 border-b">{`${student.firstName} ${student.lastName}`}</td>
+                <td className="py-2 px-4 border-b">{student.attendanceRate}%</td>
+                <td className="py-2 px-4 border-b">{student.averageGrade}%</td>
               </tr>
             ))}
           </tbody>
@@ -78,4 +59,6 @@ export default function StudentPerformanceView() {
       </div>
     </div>
   );
-}
+};
+
+export default StudentPerformanceView;

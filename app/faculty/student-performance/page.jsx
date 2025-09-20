@@ -1,5 +1,5 @@
-import NotFoundPage from "../../not-found";
+import StudentPerformanceView from "@/components/students/StudentPerformanceView";
 
-export default function SettingsPage() {
-  return <NotFoundPage />;
+export default function StudentPerformancePage() {
+  return <StudentPerformanceView />;
 }
