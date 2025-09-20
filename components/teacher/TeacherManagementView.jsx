@@ -126,9 +126,6 @@ export default function TeacherManagementView() {
         <h1 className="text-3xl font-bold text-slate-800">
           Teacher Management
         </h1>
-        <button onClick={handleAddClick} className="bg-blue-600 text-white ...">
-          Add Teacher
-        </button>
       </div>
       <TeacherTable
         teachers={teachers}

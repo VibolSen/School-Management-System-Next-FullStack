@@ -18,163 +18,74 @@ import ChartBarIcon from "@/components/icons/ChartBarIcon";
 const CourseAnalyticsView = ({ loggedInUser }) => {
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [courses, setCourses] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [attendances, setAttendances] = useState([]);
+  const [courseData, setCourseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch courses, students, and attendance records from API
+  // Fetch initial list of courses for the dropdown
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCourses = async () => {
       try {
-        setLoading(true);
-        const [coursesRes, studentsRes, attendanceRes] = await Promise.all([
-          fetch("/api/courses"),
-          fetch("/api/users?role=student"),
-          fetch("/api/attendances"),
-        ]);
-
-        if (!coursesRes.ok) throw new Error("Failed to fetch courses");
-        if (!studentsRes.ok) throw new Error("Failed to fetch students");
-        if (!attendanceRes.ok) throw new Error("Failed to fetch attendances");
-
-        const coursesData = await coursesRes.json();
-        const studentsData = await studentsRes.json();
-        const attendanceData = await attendanceRes.json();
-
-        setCourses(coursesData);
-        setStudents(studentsData);
-        setAttendances(attendanceData);
+        // Admins see all courses, others see their own
+        const url =
+          loggedInUser.role === "ADMIN" || loggedInUser.role === "FACULTY"
+            ? "/api/courses"
+            : `/api/courses?teacherId=${loggedInUser.id}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("Failed to fetch courses");
+        const data = await res.json();
+        setCourses(data);
+        // Select the first course by default
+        if (data.length > 0) {
+          setSelectedCourseId(data[0].id);
+        }
       } catch (err) {
-        console.error("Failed to fetch analytics data:", err);
-        setError(err.message);
+        console.error("Failed to fetch courses:", err);
+        setError("Could not load course list.");
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
-  }, []);
+    fetchCourses();
+  }, [loggedInUser]);
 
-  const myCourses = useMemo(() => {
-    if (loggedInUser.role === "ADMIN") {
-      return courses; // Admins see all courses
-    }
-    return courses.filter((c) => c.teacherId === loggedInUser.id);
-  }, [courses, loggedInUser]);
-
+  // Fetch analytics data when a course is selected
   useEffect(() => {
-    if (!selectedCourseId && myCourses.length > 0) {
-      setSelectedCourseId(myCourses[0].id);
+    if (!selectedCourseId) {
+      setCourseData(null);
+      return;
     }
-  }, [myCourses, selectedCourseId]);
 
-  const selectedCourse = useMemo(() => {
-    if (!selectedCourseId) return null;
-    return myCourses.find((c) => c.id === selectedCourseId) || null;
-  }, [selectedCourseId, myCourses]);
-
-  const courseData = useMemo(() => {
-    if (!selectedCourse) return null;
-
-    // Get enrolled students for this course
-    const enrolledStudents = students.filter((student) =>
-      student.groupIds?.some((groupId) => selectedCourse.groups.some((g) => g.id === groupId))
-    );
-
-    // Get attendance records for this course
-    const courseAttendanceRecords = attendances.filter(
-      (rec) => rec.courseId === selectedCourse.id
-    );
-
-    // Calculate overall attendance rate
-    const presentCount = courseAttendanceRecords.filter(
-      (r) => r.status.name === "Present" || r.status.name === "Late"
-    ).length;
-
-    const overallAttendanceRate =
-      courseAttendanceRecords.length > 0
-        ? Math.round((presentCount / courseAttendanceRecords.length) * 100)
-        : 0;
-
-    // Calculate attendance trend by date
-    const attendanceByDate = {};
-    courseAttendanceRecords.forEach((record) => {
-      const dateKey = new Date(record.date).toISOString().split("T")[0];
-      if (!attendanceByDate[dateKey]) {
-        attendanceByDate[dateKey] = { present: 0, total: 0 };
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const res = await fetch(
+          `/api/course-analytics?courseId=${selectedCourseId}`
+        );
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Failed to fetch analytics");
+        }
+        const data = await res.json();
+        setCourseData(data);
+      } catch (err) {
+        console.error(`Analytics fetch error for ${selectedCourseId}:`, err);
+        setError(err.message);
+        setCourseData(null); // Clear old data on error
+      } finally {
+        setLoading(false);
       }
-      attendanceByDate[dateKey].total++;
-      if (record.status.name === "Present" || record.status.name === "Late") {
-        attendanceByDate[dateKey].present++;
-      }
-    });
-
-    const attendanceTrend = Object.entries(attendanceByDate)
-      .map(([date, data]) => ({
-        date: new Date(date).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        }),
-        "Attendance Rate": Math.round((data.present / data.total) * 100),
-      }))
-      .sort((a, b) => new Date(a.date) - new Date(b.date))
-      .slice(-10);
-
-    // Calculate individual student attendance
-    const studentAttendance = enrolledStudents.map((student) => {
-      const studentRecords = courseAttendanceRecords.filter(
-        (rec) => rec.userId === student.id
-      );
-      const studentPresentCount = studentRecords.filter(
-        (r) => r.status.name === "Present" || r.status.name === "Late"
-      ).length;
-      const attendanceRate =
-        studentRecords.length > 0
-          ? Math.round((studentPresentCount / studentRecords.length) * 100)
-          : 0;
-
-      // Get most recent status
-      const sortedRecords = [...studentRecords].sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
-      );
-      const lastStatus = sortedRecords[0]?.status.name || "N/A";
-
-      return {
-        ...student,
-        attendanceRate,
-        lastStatus,
-      };
-    });
-
-    return {
-      enrolledStudents,
-      overallAttendanceRate,
-      attendanceTrend,
-      studentAttendance,
-      totalRecords: courseAttendanceRecords.length,
-      presentCount,
     };
-  }, [selectedCourse, students, attendances]);
+
+    fetchAnalytics();
+  }, [selectedCourseId]);
 
   const handleCourseChange = (e) => {
     setSelectedCourseId(e.target.value || null);
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-slate-600">Loading analytics data...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        Error: {error}
-      </div>
-    );
-  }
+  const selectedCourse = courseData?.course;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -183,7 +94,7 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
         Dive into the performance and engagement metrics for your courses.
       </p>
 
-      <div className="bg-white p-4 rounded-xl shadow-md sticky top-0 z-10">
+      <div className="bg-white p-4 rounded-xl shadow-md top-0 z-10">
         <label
           htmlFor="course-selector"
           className="block text-sm font-medium text-slate-700 mb-1"
@@ -194,32 +105,60 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
           id="course-selector"
           value={selectedCourseId || ""}
           onChange={handleCourseChange}
+          disabled={loading && !courseData} // Disable while initial courses load
           className="w-full sm:max-w-md px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
         >
-          {myCourses.length > 0 ? (
-            myCourses.map((course) => (
+          {courses.length > 0 ? (
+            courses.map((course) => (
               <option key={course.id} value={course.id}>
                 {course.name}
               </option>
             ))
           ) : (
-            <option disabled>No courses assigned to you</option>
+            <option disabled>
+              {loading ? "Loading courses..." : "No courses assigned to you"}
+            </option>
           )}
         </select>
       </div>
 
-      {!selectedCourse || !courseData ? (
+      {loading && (
+        <div className="flex justify-center items-center h-64">
+          <div className="text-slate-600">Loading analytics data...</div>
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded text-center">
+          <h3 className="font-bold">An Error Occurred</h3>
+          <p>{error}</p>
+        </div>
+      )}
+
+      {!loading && !error && !selectedCourseId && (
+         <div className="text-center py-20 bg-white rounded-xl shadow-md">
+           <h3 className="mt-2 text-sm font-semibold text-slate-900">
+             No courses found
+           </h3>
+           <p className="mt-1 text-sm text-slate-500">
+             You are not currently assigned to any courses.
+           </p>
+         </div>
+      )}
+
+      {!loading && !error && selectedCourseId && !courseData && (
         <div className="text-center py-20 bg-white rounded-xl shadow-md">
           <h3 className="mt-2 text-sm font-semibold text-slate-900">
-            {myCourses.length > 0 ? "Select a course" : "No courses found"}
+            Select a course
           </h3>
           <p className="mt-1 text-sm text-slate-500">
-            {myCourses.length > 0
-              ? "Please choose a course from the dropdown to view its analytics."
-              : "You are not currently assigned to any courses."}
+            Please choose a course from the dropdown to view its analytics.
           </p>
         </div>
-      ) : (
+      )}
+
+
+      {!loading && !error && courseData && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <DashboardCard
@@ -235,18 +174,10 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
               subtitle={`${courseData.presentCount}/${courseData.totalRecords} sessions`}
             />
             <DashboardCard
-              title="Attendance Trend"
-              value={
-                courseData.attendanceTrend.length > 0
-                  ? `${
-                      courseData.attendanceTrend[
-                        courseData.attendanceTrend.length - 1
-                      ]["Attendance Rate"]
-                    }%`
-                  : "N/A"
-              }
+              title="Completion Rate"
+              value={`${courseData.completionRate}%`}
               icon={<ChartBarIcon />}
-              subtitle="Latest session rate"
+              subtitle="Based on progress"
             />
           </div>
 
@@ -357,47 +288,6 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
                   </tbody>
                 </table>
               </div>
-
-              {courseData.studentAttendance.length > 0 && (
-                <div className="mt-4 p-3 bg-slate-50 rounded-lg">
-                  <h4 className="text-sm font-semibold text-slate-700 mb-2">
-                    Attendance Summary
-                  </h4>
-                  <div className="grid grid-cols-3 gap-2 text-xs">
-                    <div className="text-center">
-                      <div className="text-green-600 font-semibold">
-                        {
-                          courseData.studentAttendance.filter(
-                            (s) => s.attendanceRate >= 80
-                          ).length
-                        }
-                      </div>
-                      <div className="text-slate-500">Good (80%+)</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-yellow-600 font-semibold">
-                        {
-                          courseData.studentAttendance.filter(
-                            (s) =>
-                              s.attendanceRate >= 60 && s.attendanceRate < 80
-                          ).length
-                        }
-                      </div>
-                      <div className="text-slate-500">Fair (60-79%)</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-red-600 font-semibold">
-                        {
-                          courseData.studentAttendance.filter(
-                            (s) => s.attendanceRate < 60
-                          ).length
-                        }
-                      </div>
-                      <div className="text-slate-500">Poor (&lt;60%)</div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
@@ -425,7 +315,8 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
                   <div className="flex justify-between">
                     <span className="text-slate-600">Instructor:</span>
                     <span className="font-medium">
-                      {`${selectedCourse.teacher.firstName} ${selectedCourse.teacher.lastName}` || "N/A"}
+                      {`${selectedCourse.teacher.firstName} ${selectedCourse.teacher.lastName}` ||
+                        "N/A"}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -457,19 +348,7 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
                   <div className="flex justify-between">
                     <span className="text-slate-600">Completion Rate:</span>
                     <span className="font-medium">
-                      {courseData.enrolledStudents.length > 0
-                        ? Math.round(
-                            (courseData.enrolledStudents.filter(
-                              (s) =>
-                                s.enrollments?.find(
-                                  (e) => e.courseId === selectedCourse.id
-                                )?.progress >= 100
-                            ).length /
-                              courseData.enrolledStudents.length) *
-                              100
-                          )
-                        : 0}
-                      %
+                      {courseData.completionRate}%
                     </span>
                   </div>
                 </div>

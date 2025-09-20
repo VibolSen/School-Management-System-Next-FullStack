@@ -20,9 +20,25 @@ async function getUser(req) {
 }
 
 // GET function (no changes)
-export async function GET() {
+export async function GET(req) {
   try {
+    const { searchParams } = new URL(req.url);
+    const teacherId = searchParams.get("teacherId");
+
+    const user = await getUser(req);
+
+    let whereClause = {};
+    if (teacherId) {
+      whereClause.teacherId = teacherId;
+    }
+
+    // If the user is not an admin or faculty, they can only see their own courses
+    if (user && user.role !== "ADMIN" && user.role !== "FACULTY") {
+      whereClause.teacherId = user.id;
+    }
+
     const courses = await prisma.course.findMany({
+      where: whereClause,
       orderBy: { name: "asc" },
       include: {
         department: true,
