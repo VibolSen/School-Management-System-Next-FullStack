@@ -73,11 +73,6 @@ const TEACHER_NAV_ITEMS = [
     href: "/teacher/exam",
   },
   {
-    label: "Course Analytics",
-    icon: <FiBarChart2 className="w-5 h-5" />,
-    href: "/teacher/course-analytics",
-  },
-  {
     label: "Student Performance",
     icon: <FiTrendingUp className="w-5 h-5" />,
     href: "/teacher/student-performance",
