@@ -1,106 +1,92 @@
 "use client";
 
-// ✅ ADD useCallback to your imports
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import DashboardCard from "@/components/dashboard/DashboardCard";
-import { Library, Users } from "lucide-react";
+import { Users, Library, Award } from 'lucide-react';
 
-import Link from "next/link";
-
-export default function TeacherDashboard({ loggedInUser }) {
+const TeacherDashboard = ({ loggedInUser }) => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
 
-  // ✅ FIX #1: Extract the user's ID into a stable primitive variable.
-  const teacherId = loggedInUser?.id;
-
-  // ✅ FIX #2: Wrap your data fetching logic in a useCallback hook.
-  // This tells React to only recreate this function if `teacherId` changes.
-  const fetchTeacherDashboardData = useCallback(async () => {
-    // We can now safely check for the teacherId here.
-    if (!teacherId) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/dashboard/teacher?teacherId=${teacherId}`);
-      if (!res.ok) throw new Error("Failed to fetch dashboard data");
-      const data = await res.json();
-      setDashboardData(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [teacherId]); // The dependency is now the stable ID string.
-
-  // ✅ FIX #3: The main useEffect hook now depends on the stable `fetchTeacherDashboardData` function.
-  // This will only run once when the component loads (or if the user actually changes).
   useEffect(() => {
-    fetchTeacherDashboardData();
-  }, [fetchTeacherDashboardData]);
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`/api/teacher/dashboard?teacherId=${loggedInUser.id}`);
+        if (!res.ok) {
+          throw new Error('Failed to fetch dashboard data');
+        }
+        const data = await res.json();
+        setDashboardData(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [loggedInUser]);
 
   if (loading) {
-    return <div className="p-8 text-center">Loading your dashboard...</div>;
+    return <div>Loading...</div>;
   }
+
   if (error) {
-    return <div className="p-8 text-center text-red-500">Error: {error}</div>;
-  }
-  if (!dashboardData) {
-    return <div className="p-8 text-center">No data available.</div>;
+    return <div>Error: {error}</div>;
   }
 
-  const welcomeName = loggedInUser
-    ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
-    : "Teacher";
-
-  // The rest of your JSX remains the same
   return (
-    <div className="space-y-6 animate-fade-in p-6">
-      <div className="bg-gradient-to-r from-green-600 to-teal-700 p-6 rounded-2xl shadow-lg text-white">
-        <h1 className="text-3xl font-bold mb-2">
-          Welcome back, {welcomeName}!
-        </h1>
-        <p className="text-green-100">Here is your daily teaching summary.</p>
+    <div className="p-8">
+      <h1 className="text-3xl font-bold mb-4">Teacher Dashboard</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <DashboardCard
+          title="My Students"
+          value={dashboardData.totalStudents}
+          icon={<Users className="w-6 h-6" />}
+        />
+        <DashboardCard
+          title="My Courses"
+          value={dashboardData.totalCourses}
+          icon={<Library className="w-6 h-6" />}
+        />
+        <DashboardCard
+          title="Average Grade"
+          value={`${dashboardData.averageGrade}%`}
+          icon={<Award className="w-6 h-6" />}
+        />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Link href="/teacher/courses">
-          <DashboardCard
-            title="My Courses"
-            value={dashboardData.totalCourses}
-            icon={<Library className="text-green-600" />}
-            colorClass="bg-green-100"
-          />
-        </Link>
-        <Link href="/teacher/students">
-          <DashboardCard
-            title="My Students"
-            value={dashboardData.totalStudents}
-            icon={<Users className="text-teal-600" />}
-            colorClass="bg-teal-100"
-          />
-        </Link>
-        <Link href="/teacher/groups">
-          <DashboardCard
-            title="My Groups"
-            value={dashboardData.totalGroups}
-            icon={<Users className="text-purple-600" />}
-            colorClass="bg-purple-100"
-          />
-        </Link>
-      </div>
-      <div className="bg-white p-6 rounded-xl shadow-md text-center">
-        <h2 className="text-xl font-semibold mb-2 text-slate-800">
-          Next Steps
-        </h2>
-        <p className="text-slate-500">
-          Navigate to the "Groups" section to manage your student rosters for
-          each course.
-        </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Students per Course</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={dashboardData.studentsPerCourse}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="studentCount" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Grade Distribution</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={dashboardData.gradeDistribution}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="count" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default TeacherDashboard;

@@ -124,7 +124,7 @@ export default function GradingView({ initialAssignment }) {
       />
       <div>
         <Link
-          href="/teacher/assignments"
+          href="/teacher/assignment"
           className="text-blue-600 hover:underline text-sm"
         >
           &larr; Back to All Assignments

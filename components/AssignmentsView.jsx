@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import AddAssignmentModal from "./AddAssignmentModal";
+import EditAssignmentModal from "./EditAssignmentModal";
 import Notification from "@/components/Notification";
 import AssignmentCard from "./assignment/AssignmentCard"; // This component should be in the same folder
 
@@ -11,7 +12,9 @@ export default function AssignmentsView({ loggedInUser }) {
   const [assignments, setAssignments] = useState([]);
   const [teacherGroups, setTeacherGroups] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [assignmentToEdit, setAssignmentToEdit] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [assignmentToDelete, setAssignmentToDelete] = useState(null);
   const [notification, setNotification] = useState({
@@ -69,7 +72,39 @@ export default function AssignmentsView({ loggedInUser }) {
         throw new Error(errData.error || "Failed to create assignment");
       }
       showMessage("Assignment created successfully!");
-      setIsModalOpen(false);
+      setIsAddModalOpen(false);
+      await fetchData();
+    } catch (err) {
+      showMessage(err.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEdit = (assignment) => {
+    setAssignmentToEdit(assignment);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateAssignment = async (formData) => {
+    if (!assignmentToEdit) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `/api/teacher/assignments/${assignmentToEdit.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Failed to update assignment");
+      }
+      showMessage("Assignment updated successfully!");
+      setIsEditModalOpen(false);
+      setAssignmentToEdit(null);
       await fetchData();
     } catch (err) {
       showMessage(err.message, "error");
@@ -118,7 +153,7 @@ export default function AssignmentsView({ loggedInUser }) {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-slate-800">Assignments</h1>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsAddModalOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold"
           disabled={teacherGroups.length === 0}
           title={
@@ -131,13 +166,13 @@ export default function AssignmentsView({ loggedInUser }) {
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {isLoading ? (
           <p className="text-center py-8 text-slate-500">
             Loading assignments...
           </p>
         ) : assignments.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-xl shadow-sm">
+          <div className="col-span-4 text-center py-16 bg-white rounded-xl shadow-sm">
             <p className="font-semibold text-slate-700">No Assignments Found</p>
             <p className="text-slate-500 mt-2">
               Click "Add Assignment" to get started.
@@ -151,6 +186,7 @@ export default function AssignmentsView({ loggedInUser }) {
               onNavigate={() =>
                 router.push(`/teacher/assignment/${assignment.id}`)
               }
+              onEdit={() => handleEdit(assignment)}
               onDelete={() => handleDelete(assignment.id)}
             />
           ))
@@ -158,12 +194,25 @@ export default function AssignmentsView({ loggedInUser }) {
       </div>
 
       <AddAssignmentModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
         onSave={handleSaveAssignment}
         teacherGroups={teacherGroups}
         isLoading={isLoading}
       />
+
+      {assignmentToEdit && (
+        <EditAssignmentModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setAssignmentToEdit(null);
+          }}
+          onSave={handleUpdateAssignment}
+          assignment={assignmentToEdit}
+          isLoading={isLoading}
+        />
+      )}
 
       {showConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">

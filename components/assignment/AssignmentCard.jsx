@@ -4,7 +4,7 @@
 
 import React from "react";
 
-const AssignmentCard = ({ assignment, onClick }) => {
+const AssignmentCard = ({ assignment, onNavigate, onEdit, onDelete }) => {
   // Function to determine the color of the status badge
   const getStatusBadgeStyle = (statusName) => {
     switch (statusName) {
@@ -22,10 +22,9 @@ const AssignmentCard = ({ assignment, onClick }) => {
 
   return (
     <div
-      onClick={onClick}
-      className="bg-white shadow-md rounded-lg p-5 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-transform duration-200 flex flex-col justify-between border border-slate-100"
+      className="bg-white shadow-md rounded-lg p-5 border border-slate-100 flex flex-col justify-between"
     >
-      <div>
+      <div onClick={onNavigate} className="cursor-pointer">
         {/* Group Name */}
         <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-1">
           {assignment.group?.name || "No Group"}
@@ -54,6 +53,11 @@ const AssignmentCard = ({ assignment, onClick }) => {
         >
           {assignment.status?.name || "No Status"}
         </div>
+      </div>
+
+      <div className="mt-4 flex justify-end gap-2">
+        <button onClick={onEdit} className="text-sm text-blue-600 hover:underline">Edit</button>
+        <button onClick={onDelete} className="text-sm text-red-600 hover:underline">Delete</button>
       </div>
     </div>
   );
