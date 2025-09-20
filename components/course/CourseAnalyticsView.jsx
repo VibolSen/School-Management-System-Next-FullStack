@@ -15,16 +15,13 @@ import DashboardCard from "@/components/dashboard/DashboardCard";
 import UsersIcon from "@/components/icons/UsersIcon";
 import ChartBarIcon from "@/components/icons/ChartBarIcon";
 
-const CourseAnalyticsView = () => {
+const CourseAnalyticsView = ({ loggedInUser }) => {
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [courses, setCourses] = useState([]);
   const [students, setStudents] = useState([]);
   const [attendances, setAttendances] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // Get current user from your auth system (replace with actual implementation)
-  const currentUser = { id: "S001", role: "teacher" }; // Example user
 
   // Fetch courses, students, and attendance records from API
   useEffect(() => {
@@ -59,11 +56,11 @@ const CourseAnalyticsView = () => {
   }, []);
 
   const myCourses = useMemo(() => {
-    if (currentUser.role === "admin") {
+    if (loggedInUser.role === "ADMIN") {
       return courses; // Admins see all courses
     }
-    return courses.filter((c) => c.instructorId === currentUser.id);
-  }, [courses, currentUser]);
+    return courses.filter((c) => c.teacherId === loggedInUser.id);
+  }, [courses, loggedInUser]);
 
   useEffect(() => {
     if (!selectedCourseId && myCourses.length > 0) {
@@ -81,9 +78,7 @@ const CourseAnalyticsView = () => {
 
     // Get enrolled students for this course
     const enrolledStudents = students.filter((student) =>
-      student.enrollments?.some(
-        (enrollment) => enrollment.courseId === selectedCourse.id
-      )
+      student.groupIds?.some((groupId) => selectedCourse.groups.some((g) => g.id === groupId))
     );
 
     // Get attendance records for this course
@@ -93,7 +88,7 @@ const CourseAnalyticsView = () => {
 
     // Calculate overall attendance rate
     const presentCount = courseAttendanceRecords.filter(
-      (r) => r.status === "PRESENT" || r.status === "LATE"
+      (r) => r.status.name === "Present" || r.status.name === "Late"
     ).length;
 
     const overallAttendanceRate =
@@ -109,7 +104,7 @@ const CourseAnalyticsView = () => {
         attendanceByDate[dateKey] = { present: 0, total: 0 };
       }
       attendanceByDate[dateKey].total++;
-      if (record.status === "PRESENT" || record.status === "LATE") {
+      if (record.status.name === "Present" || record.status.name === "Late") {
         attendanceByDate[dateKey].present++;
       }
     });
@@ -131,7 +126,7 @@ const CourseAnalyticsView = () => {
         (rec) => rec.userId === student.id
       );
       const studentPresentCount = studentRecords.filter(
-        (r) => r.status === "PRESENT" || r.status === "LATE"
+        (r) => r.status.name === "Present" || r.status.name === "Late"
       ).length;
       const attendanceRate =
         studentRecords.length > 0
@@ -142,7 +137,7 @@ const CourseAnalyticsView = () => {
       const sortedRecords = [...studentRecords].sort(
         (a, b) => new Date(b.date) - new Date(a.date)
       );
-      const lastStatus = sortedRecords[0]?.status || "N/A";
+      const lastStatus = sortedRecords[0]?.status.name || "N/A";
 
       return {
         ...student,
@@ -204,7 +199,7 @@ const CourseAnalyticsView = () => {
           {myCourses.length > 0 ? (
             myCourses.map((course) => (
               <option key={course.id} value={course.id}>
-                {course.title}
+                {course.name}
               </option>
             ))
           ) : (
@@ -310,14 +305,14 @@ const CourseAnalyticsView = () => {
                   <tbody>
                     {courseData.studentAttendance.length > 0 ? (
                       courseData.studentAttendance
-                        .sort((a, b) => a.name?.localeCompare(b.name || ""))
+                        .sort((a, b) => a.firstName.localeCompare(b.firstName))
                         .map((student) => (
                           <tr
                             key={student.id}
                             className="bg-white border-b hover:bg-slate-50"
                           >
                             <td className="px-4 py-3 font-medium text-slate-900">
-                              {student.name || "Unknown Student"}
+                              {`${student.firstName} ${student.lastName}`}
                             </td>
                             <td className="px-4 py-3 text-center font-semibold">
                               <span
@@ -335,11 +330,11 @@ const CourseAnalyticsView = () => {
                             <td className="px-4 py-3 text-center text-xs font-semibold">
                               <span
                                 className={`px-2 py-1 rounded-full ${
-                                  student.lastStatus === "PRESENT"
+                                  student.lastStatus === "Present"
                                     ? "bg-green-100 text-green-800"
-                                    : student.lastStatus === "LATE"
+                                    : student.lastStatus === "Late"
                                     ? "bg-yellow-100 text-yellow-800"
-                                    : student.lastStatus === "ABSENT"
+                                    : student.lastStatus === "Absent"
                                     ? "bg-red-100 text-red-800"
                                     : "bg-slate-100 text-slate-800"
                                 }`}
@@ -419,18 +414,18 @@ const CourseAnalyticsView = () => {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-slate-600">Course Title:</span>
-                    <span className="font-medium">{selectedCourse.title}</span>
+                    <span className="font-medium">{selectedCourse.name}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Department:</span>
                     <span className="font-medium">
-                      {selectedCourse.department || "N/A"}
+                      {selectedCourse.department.name || "N/A"}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Instructor:</span>
                     <span className="font-medium">
-                      {selectedCourse.instructor?.name || "N/A"}
+                      {`${selectedCourse.teacher.firstName} ${selectedCourse.teacher.lastName}` || "N/A"}
                     </span>
                   </div>
                   <div className="flex justify-between">

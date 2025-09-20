@@ -13,6 +13,8 @@ export async function GET() {
       courseCount,
       groupCount,
       teacherCount,
+      coursesByDept,
+      groups,
     ] = await Promise.all([
       prisma.user.count({ where: { role: "STUDENT" } }),
       prisma.user.count({
@@ -22,7 +24,42 @@ export async function GET() {
       prisma.course.count(),
       prisma.group.count(),
       prisma.user.count({ where: { role: "TEACHER" } }),
+      prisma.course.groupBy({
+        by: ["departmentId"],
+        _count: {
+          _all: true,
+        },
+      }),
+      prisma.group.findMany({
+        include: {
+          _count: {
+            select: { students: true },
+          },
+        },
+      }),
     ]);
+
+    const departments = await prisma.department.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    const departmentMap = departments.reduce((acc, dept) => {
+      acc[dept.id] = dept.name;
+      return acc;
+    }, {});
+
+    const coursesByDepartment = coursesByDept.map((c) => ({
+      name: departmentMap[c.departmentId],
+      count: c._count._all,
+    }));
+
+    const studentsPerGroup = groups.map((g) => ({
+      name: g.name,
+      count: g._count.students,
+    }));
 
     // Return the complete aggregated data
     return NextResponse.json({
@@ -32,6 +69,8 @@ export async function GET() {
       courseCount,
       groupCount,
       teacherCount,
+      coursesByDepartment,
+      studentsPerGroup,
     });
   } catch (error) {
     console.error("Dashboard API Error:", error);

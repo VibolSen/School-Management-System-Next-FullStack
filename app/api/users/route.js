@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
@@ -23,7 +23,7 @@ export async function GET(req) {
     }
 
     if (role) {
-      const users = await prisma.user.findMany({ where: { role } });
+      const users = await prisma.user.findMany({ where: { role: role.toUpperCase() } });
       const usersWithoutPasswords = users.map(({ password, ...rest }) => rest);
       return new Response(JSON.stringify(usersWithoutPasswords), { status: 200 });
     }

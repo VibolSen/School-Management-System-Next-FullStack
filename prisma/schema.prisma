@@ -35,6 +35,9 @@ model User {
   password  String
   role      Role   @default(STUDENT)
 
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  departmentId String?     @db.ObjectId
+
   groups           Group[]     @relation(fields: [groupIds], references: [id])
   groupIds         String[]    @db.ObjectId
   ledCourses       Course[]    @relation("CourseLead")
@@ -66,6 +69,7 @@ model Department {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
   name    String   @unique
   courses Course[]
+  users   User[]
   head    User?    @relation("DepartmentHead", fields: [headId], references: [id])
   headId  String?  @unique @db.ObjectId
 }

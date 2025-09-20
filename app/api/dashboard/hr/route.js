@@ -1,64 +1,80 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { Role } from '@prisma/client';
 
 export async function GET() {
   try {
     const staff = await prisma.user.findMany({
       where: {
         role: {
-          name: {
-            in: ['Admin', 'Faculty', 'HR', 'Teacher'],
-          },
+          in: [Role.ADMIN, Role.FACULTY, Role.HR, Role.TEACHER],
         },
       },
     });
 
     const totalStaff = staff.length;
-    const activeStaff = staff.filter((s) => s.isActive).length;
-    const onLeave = staff.filter((s) => s.status === 'On Leave').length; // Assuming you have a status field
-
-    const threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-    const newHires = staff.filter((s) => new Date(s.createdAt) > threeMonthsAgo).length;
-
-    const staffByDept = await prisma.user.groupBy({
-      by: ['department'],
+    
+    const staffByRole = await prisma.user.groupBy({
+      by: ['role'],
       _count: {
         _all: true,
       },
       where: {
         role: {
-          name: {
-            in: ['Admin', 'Faculty', 'HR', 'Teacher'],
-          },
-        },
-        department: {
-          not: null,
+          in: [Role.ADMIN, Role.FACULTY, Role.HR, Role.TEACHER],
         },
       },
     });
 
-    const staffByStatus = await prisma.user.groupBy({
-      by: ['isActive'],
+    const totalDepartments = await prisma.department.count();
+
+    const coursesByDept = await prisma.course.groupBy({
+      by: ['departmentId'],
       _count: {
         _all: true,
       },
-      where: {
-        role: {
-          name: {
-            in: ['Admin', 'Faculty', 'HR', 'Teacher'],
-          },
+    });
+
+    const departments = await prisma.department.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    const departmentMap = departments.reduce((acc, dept) => {
+      acc[dept.id] = dept.name;
+      return acc;
+    }, {});
+
+    const coursesByDepartment = coursesByDept.map((c) => ({
+      name: departmentMap[c.departmentId],
+      count: c._count._all,
+    }));
+
+    const groups = await prisma.group.findMany({
+      include: {
+        _count: {
+          select: { students: true },
         },
       },
     });
+
+    const studentsPerGroup = groups.map((g) => ({
+      name: g.name,
+      count: g._count.students,
+    }));
 
     return NextResponse.json({
       totalStaff,
-      activeStaff,
-      onLeave,
-      newHires,
-      staffByDept: staffByDept.map((d) => ({ name: d.department, count: d._count._all })),
-      staffByStatus: staffByStatus.map((s) => ({ name: s.isActive ? 'Active' : 'Inactive', value: s._count._all })),
+      activeStaff: totalStaff, // Assuming all staff are active
+      onLeave: 0, // No 'on leave' status in the schema
+      newHires: 0, // No 'createdAt' field in the schema
+      staffByDept: [], // No department field on user
+      staffByStatus: staffByRole.map((s) => ({ name: s.role, value: s._count._all })),
+      totalDepartments,
+      coursesByDepartment,
+      studentsPerGroup,
     });
   } catch (error) {
     console.error('Failed to fetch HR dashboard data:', error);

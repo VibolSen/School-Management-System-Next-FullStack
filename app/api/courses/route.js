@@ -1,7 +1,23 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 
 const prisma = new PrismaClient();
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || "your-super-secret-key-that-is-long"
+);
+
+// Helper function to get user from token
+async function getUser(req) {
+  const token = req.cookies.get("token")?.value;
+  if (!token) return null;
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    return payload;
+  } catch (err) {
+    return null;
+  }
+}
 
 // GET function (no changes)
 export async function GET() {
@@ -28,8 +44,13 @@ export async function GET() {
   }
 }
 
-// POST function (no changes)
+// POST function (with authorization)
 export async function POST(req) {
+  const user = await getUser(req);
+  if (!user || (user.role !== "ADMIN" && user.role !== "FACULTY")) {
+    return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+  }
+
   try {
     const { name, departmentId, teacherId } = await req.json();
     if (!name || !departmentId) {
@@ -62,8 +83,13 @@ export async function POST(req) {
   }
 }
 
-// UPDATE function (THIS IS THE CORRECTED VERSION)
+// UPDATE function (with authorization)
 export async function PUT(req) {
+  const user = await getUser(req);
+  if (!user || (user.role !== "ADMIN" && user.role !== "FACULTY")) {
+    return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+  }
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
@@ -76,7 +102,6 @@ export async function PUT(req) {
       );
     }
 
-    // ✅ FIX IS HERE: Changed `departmentId` to the correct `department: { connect: ... }` syntax
     const dataToUpdate = {
       name,
       department: {
@@ -112,8 +137,13 @@ export async function PUT(req) {
   }
 }
 
-// DELETE function (no changes)
+// DELETE function (with authorization)
 export async function DELETE(req) {
+  const user = await getUser(req);
+  if (!user || (user.role !== "ADMIN" && user.role !== "FACULTY")) {
+    return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+  }
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
