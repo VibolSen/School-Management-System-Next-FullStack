@@ -47,7 +47,14 @@ const StudentDashboard = ({ loggedInUser }) => {
     return <div>No data available.</div>;
   }
 
-  const { myProfile, overallAttendance, borrowedBooks } = dashboardData;
+  const { myProfile, overallAttendance } = dashboardData;
+
+  const currentCourses = myProfile.enrollments.filter(
+    (enrollment) => enrollment.progress < 100
+  );
+  const pastCourses = myProfile.enrollments.filter(
+    (enrollment) => enrollment.progress === 100
+  );
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -58,10 +65,15 @@ const StudentDashboard = ({ loggedInUser }) => {
         Here's your personal dashboard and academic summary.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <DashboardCard
-          title="Enrolled Courses"
-          value={myProfile.courses.length.toString()}
+          title="Current Courses"
+          value={currentCourses.length.toString()}
+          icon={<BookOpenIcon />}
+        />
+        <DashboardCard
+          title="Past Courses"
+          value={pastCourses.length.toString()}
           icon={<BookOpenIcon />}
         />
         <DashboardCard
@@ -70,8 +82,8 @@ const StudentDashboard = ({ loggedInUser }) => {
           icon={<ChartBarIcon />}
         />
         <DashboardCard
-          title="Borrowed Books"
-          value={borrowedBooks.length.toString()}
+          title="My Groups"
+          value={myProfile.groups.length.toString()}
           icon={<UsersIcon />}
         />
       </div>
@@ -79,58 +91,88 @@ const StudentDashboard = ({ loggedInUser }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-semibold mb-4 text-slate-800">
-            My Enrolled Courses
+            My Groups
           </h2>
           <ul className="space-y-3">
-            {myProfile.courses.map((course) => (
+            {myProfile.groups.map((group) => (
               <li
-                key={course.id}
-                className="p-3 bg-slate-50 rounded-lg flex justify-between items-center"
+                key={group.id}
+                className="p-3 bg-slate-50 rounded-lg"
               >
-                <div>
-                  <p className="font-semibold text-slate-800">{course.name}</p>
-                  <p className="text-sm text-slate-500">{course.department.name}</p>
-                  <p className="text-sm text-slate-500">{course.teacher.firstName} {course.teacher.lastName}</p>
-                  <p className="text-sm text-slate-500">{course.groups.map(group => group.name).join(', ')}</p>
-                </div>
-                                <Link href={`/student/courses/${course.id}`}>
-                  <a className="px-2 py-1 text-xs font-semibold text-sky-800 bg-sky-100 rounded-full">
-                    {course.id}
-                  </a>
-                </Link>
+                <p className="font-semibold text-slate-800">{group.name}</p>
+                <ul className="space-y-1 mt-2">
+                  {group.students.map((student) => (
+                    <li key={student.id} className="text-sm text-slate-500">
+                      {student.firstName} {student.lastName}
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>
         </div>
-
         <div className="bg-white p-6 rounded-xl shadow-md">
           <h2 className="text-xl font-semibold mb-4 text-slate-800">
-            My Borrowed Books
+            My Courses
           </h2>
-          {borrowedBooks.length > 0 ? (
+          <div>
+            <h3 className="text-lg font-semibold mb-2 text-slate-700">
+              Current Courses
+            </h3>
             <ul className="space-y-3">
-              {borrowedBooks.map((book) => (
-                <li
-                  key={book.id}
-                  className="p-3 bg-slate-50 rounded-lg flex items-center space-x-4"
-                >
-                  <img
-                    src={book.coverImage}
-                    alt={book.title}
-                    className="w-12 h-16 object-cover rounded-md flex-shrink-0"
-                  />
-                  <div>
-                    <p className="font-semibold text-slate-800">{book.title}</p>
-                    <p className="text-sm text-slate-500">{book.author}</p>
-                  </div>
-                </li>
-              ))}
+              {currentCourses.map((enrollment) => {
+                const course = enrollment.course;
+                if (!course) return null;
+                return (
+                  <li
+                    key={course.id}
+                    className="p-3 bg-slate-50 rounded-lg flex justify-between items-center"
+                  >
+                    <div>
+                      <p className="font-semibold text-slate-800">{course.name}</p>
+                      <p className="text-sm text-slate-500">{course.department.name}</p>
+                      <p className="text-sm text-slate-500">{course.teacher.firstName} {course.teacher.lastName}</p>
+                      <p className="text-sm text-slate-500">{course.groups.map(group => group.name).join(', ')}</p>
+                    </div>
+                    <Link href={`/student/courses/${course.id}`}>
+                      <a className="px-2 py-1 text-xs font-semibold text-sky-800 bg-sky-100 rounded-full">
+                        {course.id}
+                      </a>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
-          ) : (
-            <p className="text-slate-500 text-center py-8">
-              You have no books currently borrowed.
-            </p>
-          )}
+          </div>
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-2 text-slate-700">
+              Past Courses
+            </h3>
+            <ul className="space-y-3">
+              {pastCourses.map((enrollment) => {
+                const course = enrollment.course;
+                if (!course) return null;
+                return (
+                  <li
+                    key={course.id}
+                    className="p-3 bg-slate-50 rounded-lg flex justify-between items-center"
+                  >
+                    <div>
+                      <p className="font-semibold text-slate-800">{course.name}</p>
+                      <p className="text-sm text-slate-500">{course.department.name}</p>
+                      <p className="text-sm text-slate-500">{course.teacher.firstName} {course.teacher.lastName}</p>
+                      <p className="text-sm text-slate-500">{course.groups.map(group => group.name).join(', ')}</p>
+                    </div>
+                    <Link href={`/student/courses/${course.id}`}>
+                      <a className="px-2 py-1 text-xs font-semibold text-sky-800 bg-sky-100 rounded-full">
+                        {course.id}
+                      </a>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       </div>
     </div>

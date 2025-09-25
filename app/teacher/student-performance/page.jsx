@@ -1,13 +1,5 @@
-// import StudentPerformanceView from "@/components/students/StudentPerformanceView";
-// import React from "react";
+import StudentPerformanceView from "@/components/students/StudentPerformanceView";
 
-// export default function StudentPerformanceViewPage() {
-//   return <StudentPerformanceView />;
-// }
-
-
-import NotFoundPage from "../../not-found";
-
-export default function SettingsPage() {
-  return <NotFoundPage />;
+export default function StudentPerformancePage() {
+  return <StudentPerformanceView />;
 }

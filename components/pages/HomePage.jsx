@@ -117,11 +117,11 @@ export default function HomePage() {
               <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-pink-400/20 rounded-3xl blur-3xl animate-pulse" />
               <div className="absolute inset-2 bg-gradient-to-r from-blue-300/15 via-purple-300/15 to-pink-300/15 rounded-2xl blur-2xl animate-pulse delay-500" />
 
-              <div className="relative bg-white/80 backdrop-blur-sm rounded-2xl p-3 shadow-xl border border-white/50">
+              <div>
                 <img
                   src="/illustration/Coding workshop.gif"
                   alt="Student learning online"
-                  className="w-full h-auto rounded-xl shadow-lg"
+                  // className="w-full h-auto rounded-xl shadow-lg"
                 />
               </div>
 

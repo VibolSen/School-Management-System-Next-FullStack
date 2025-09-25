@@ -16,7 +16,7 @@ export async function GET(request) {
   try {
     const studentProfile = await prisma.user.findUnique({
       where: { id: studentId },
-      include: { courses: { include: { department: true, teacher: true, groups: true } } },
+      include: { enrollments: { include: { course: { include: { department: true, teacher: true, groups: true } } } }, groups: { include: { students: true } } },
     });
 
     if (!studentProfile) {
@@ -29,11 +29,7 @@ export async function GET(request) {
       },
     });
 
-    const borrowedBooks = await prisma.libraryResource.findMany({
-      where: {
-        borrowedById: studentId,
-      },
-    });
+
 
     const presentCount = attendance.filter(
       (r) =>
@@ -63,7 +59,6 @@ export async function GET(request) {
     return NextResponse.json({
       myProfile: studentProfile,
       overallAttendance,
-      borrowedBooks,
       pendingAssignmentsCount,
       pendingExamsCount,
     });

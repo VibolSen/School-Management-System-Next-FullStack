@@ -7,12 +7,8 @@ const StudentDashboardPage = () => {
   const [loggedInUser, setLoggedInUser] = useState(null);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    if (!token) return;
 
-    fetch("/api/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch("/api/me")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.user) setLoggedInUser(data.user);
