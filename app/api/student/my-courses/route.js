@@ -17,30 +17,34 @@ export async function GET(req) {
       );
     }
 
-    // Find the student and include their courses
-    const student = await prisma.student.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: studentId },
       include: {
-        courses: {
+        groups: {
           include: {
-            department: true,
-            teacher: {
-              select: { id: true, firstName: true, lastName: true },
+            course: {
+              include: {
+                department: true,
+                teacher: {
+                  select: { id: true, firstName: true, lastName: true },
+                },
+              },
             },
           },
-          orderBy: { name: "asc" },
         },
       },
     });
 
-    if (!student) {
+    if (!user) {
       return NextResponse.json(
-        { error: "Student not found" },
+        { error: "User not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(student.courses);
+    const courses = user.groups.map(group => group.course).filter(Boolean);
+
+    return NextResponse.json(courses);
   } catch (error) {
     console.error("GET My Courses (Student) Error:", error);
     return NextResponse.json(

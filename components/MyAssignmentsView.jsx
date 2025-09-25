@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import AssignmentCard from "@/components/assignment/AssignmentCard";
 import Notification from "@/components/Notification"; // Assuming you have this component
 
 // Helper component to display a status badge
@@ -30,6 +32,7 @@ export default function MyAssignmentsView({ loggedInUser }) {
     message: "",
     type: "",
   });
+  const router = useRouter();
 
   const studentId = loggedInUser?.id;
 
@@ -76,7 +79,7 @@ export default function MyAssignmentsView({ loggedInUser }) {
         <h2 className="text-xl font-semibold text-slate-800 mb-4">
           Pending & Graded Work
         </h2>
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {isLoading ? (
             <p className="text-center py-8">Loading your assignments...</p>
           ) : submissions.length === 0 ? (
@@ -85,44 +88,13 @@ export default function MyAssignmentsView({ loggedInUser }) {
             </p>
           ) : (
             submissions.map(({ id, status, grade, assignment }) => (
-              // Each assignment is a link to a future submission page
-              <Link
+              <AssignmentCard
                 key={id}
-                href={`/student/assignments/${id}`}
-                className="block p-4 border rounded-lg hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-                  {/* Left Side: Details */}
-                  <div className="flex-grow">
-                    <div className="flex items-center gap-3 mb-2">
-                      <StatusBadge status={status} />
-                      <p className="font-semibold text-slate-800 text-lg">
-                        {assignment.title}
-                      </p>
-                    </div>
-                    <p className="text-sm text-slate-500">
-                      From: {assignment.teacher.firstName}{" "}
-                      {assignment.teacher.lastName} ({assignment.group.name})
-                    </p>
-                  </div>
-                  {/* Right Side: Grade and Due Date */}
-                  <div className="flex-shrink-0 text-left sm:text-right">
-                    {status === "GRADED" ? (
-                      <p className="text-lg font-bold text-green-600">
-                        {grade} / 100
-                      </p>
-                    ) : (
-                      <p className="text-sm text-slate-400">Not Graded Yet</p>
-                    )}
-                    <p className="text-xs text-slate-400 mt-1">
-                      Due:{" "}
-                      {assignment.dueDate
-                        ? new Date(assignment.dueDate).toLocaleDateString()
-                        : "N/A"}
-                    </p>
-                  </div>
-                </div>
-              </Link>
+                assignment={assignment}
+                status={status}
+                onNavigate={() => router.push(`/student/assignments/${id}`)}
+                showActions={false}
+              />
             ))
           )}
         </div>

@@ -2,25 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Notification from "@/components/Notification"; // Assuming you have this component
-
-// Helper component to display a status badge
-const StatusBadge = ({ status }) => {
-  const styles = {
-    PENDING: "bg-yellow-100 text-yellow-800",
-    SUBMITTED: "bg-blue-100 text-blue-800",
-    GRADED: "bg-green-100 text-green-800",
-  };
-  return (
-    <span
-      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-        styles[status] || "bg-gray-100 text-gray-800"
-      }`}
-    >
-      {status}
-    </span>
-  );
-};
+import ExamCard from "@/components/exam/ExamCard";
 
 export default function MyExamsView({ loggedInUser }) {
   const [submissions, setSubmissions] = useState([]);
@@ -30,6 +14,7 @@ export default function MyExamsView({ loggedInUser }) {
     message: "",
     type: "",
   });
+  const router = useRouter();
 
   const studentId = loggedInUser?.id;
 
@@ -76,7 +61,7 @@ export default function MyExamsView({ loggedInUser }) {
         <h2 className="text-xl font-semibold text-slate-800 mb-4">
           Pending & Graded Exams
         </h2>
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {isLoading ? (
             <p className="text-center py-8">Loading your exams...</p>
           ) : submissions.length === 0 ? (
@@ -85,39 +70,13 @@ export default function MyExamsView({ loggedInUser }) {
             </p>
           ) : (
             submissions.map(({ id, status, grade, exam }) => (
-              <Link
+              <ExamCard
                 key={id}
-                href={`/student/exams/${id}`}>
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-                  <div className="flex-grow">
-                    <div className="flex items-center gap-3 mb-2">
-                      <StatusBadge status={status} />
-                      <p className="font-semibold text-slate-800 text-lg">
-                        {exam.title}
-                      </p>
-                    </div>
-                    <p className="text-sm text-slate-500">
-                      From: {exam.teacher.firstName}{" "}
-                      {exam.teacher.lastName} ({exam.group.name})
-                    </p>
-                  </div>
-                  <div className="flex-shrink-0 text-left sm:text-right">
-                    {status === "GRADED" ? (
-                      <p className="text-lg font-bold text-green-600">
-                        {grade} / 100
-                      </p>
-                    ) : (
-                      <p className="text-sm text-slate-400">Not Graded Yet</p>
-                    )}
-                    <p className="text-xs text-slate-400 mt-1">
-                      Date:{" "}
-                      {exam.examDate
-                        ? new Date(exam.examDate).toLocaleDateString()
-                        : "N/A"}
-                    </p>
-                  </div>
-                </div>
-              </Link>
+                exam={exam}
+                status={status}
+                onNavigate={() => router.push(`/student/exams/${id}`)}
+                showActions={false}
+              />
             ))
           )}
         </div>
