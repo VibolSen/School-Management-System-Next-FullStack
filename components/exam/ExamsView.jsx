@@ -183,6 +183,7 @@ export default function ExamsView({ loggedInUser }) {
               }
               onEdit={() => handleEdit(exam)}
               onDelete={() => handleDelete(exam.id)}
+              showActions={true}
             />
           ))
         )}

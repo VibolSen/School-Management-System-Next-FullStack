@@ -93,7 +93,7 @@ export default function ExamDetailView({ initialExam }) {
 
   const handleGradeSubmission = async (submissionId, grade, feedback) => {
     try {
-      const res = await fetch(`/api/teacher/submissions/${submissionId}`, {
+      const res = await fetch(`/api/teacher/exam-submissions/${submissionId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ grade, feedback }),

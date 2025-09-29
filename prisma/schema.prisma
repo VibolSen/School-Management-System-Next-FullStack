@@ -41,7 +41,7 @@ model User {
   groups           Group[]     @relation(fields: [groupIds], references: [id])
   groupIds         String[]    @db.ObjectId
   ledCourses       Course[]    @relation("CourseLead")
-  headedDepartment Department? @relation("DepartmentHead")
+  headedDepartments Department[] @relation("DepartmentHead")
 
   createdAssignments Assignment[] @relation("AssignmentsCreated")
   submissions        Submission[] @relation("SubmissionsMade")
@@ -74,7 +74,7 @@ model Department {
   courses Course[]
   users   User[]
   head    User?    @relation("DepartmentHead", fields: [headId], references: [id])
-  headId  String?  @unique @db.ObjectId
+  headId  String?  @db.ObjectId
 }
 
 model Course {
@@ -158,7 +158,7 @@ model ExamSubmission {
 
   status ExamSubmissionStatus @default(PENDING)
 
-  exam      Exam   @relation(fields: [examId], references: [id])
+  exam      Exam   @relation(fields: [examId], references: [id], onDelete: Cascade)
   examId    String @db.ObjectId
   student   User   @relation("ExamSubmissionsMade", fields: [studentId], references: [id])
   studentId String @db.ObjectId

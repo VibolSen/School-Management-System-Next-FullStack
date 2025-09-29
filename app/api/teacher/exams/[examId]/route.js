@@ -5,7 +5,8 @@ import { NextResponse } from "next/server";
 const prisma = new PrismaClient();
 
 export async function GET(req, { params }) {
-  const { examId } = params;
+  const awaitedParams = await Promise.resolve(params);
+  const { examId } = awaitedParams;
 
   try {
     const exam = await prisma.exam.findUnique({
@@ -36,7 +37,8 @@ export async function GET(req, { params }) {
 }
 
 export async function PUT(req, { params }) {
-  const { examId } = params;
+  const awaitedParams = await Promise.resolve(params);
+  const { examId } = awaitedParams;
   const { title, description, examDate } = await req.json();
 
   try {
@@ -59,7 +61,8 @@ export async function PUT(req, { params }) {
 }
 
 export async function DELETE(req, { params }) {
-  const { examId } = params;
+  const awaitedParams = await Promise.resolve(params);
+  const { examId } = awaitedParams;
 
   try {
     await prisma.exam.delete({

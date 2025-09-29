@@ -1,8 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import GradingView from "./GradingView";
 import Link from "next/link";
 
-const prisma = new PrismaClient();
+
 
 // ✅ FIX #1: The function now accepts the whole `params` object
 async function getAssignmentData(params) {
