@@ -78,41 +78,7 @@ const FACULTY_NAV_ITEMS = [
     icon: <FiUser className="w-5 h-5" />,
     href: "/faculty/students",
   },
-  {
-    label: "Attendance",
-    icon: <FiCheckSquare className="w-5 h-5" />,
-    href: "/faculty/attendance",
-  },
-  {
-    label: "Course Analytics",
-    icon: <FiBarChart2 className="w-5 h-5" />,
-    href: "/faculty/course-analytics",
-  },
-  {
-    label: "Student Performance",
-    icon: <FiTrendingUp className="w-5 h-5" />,
-    href: "/faculty/student-performance",
-  },
-  {
-    label: "E-Library",
-    icon: <FiBookOpen className="w-5 h-5" />,
-    href: "/faculty/e-library",
-  },
-  {
-    label: "Leave",
-    icon: <FiSend className="w-5 h-5" />,
-    href: "/faculty/leave",
-  },
-  {
-    label: "Settings",
-    icon: <FiSettings className="w-5 h-5" />,
-    href: "/faculty/settings",
-  },
-  {
-    label: "Scan Attendance",
-    icon: <FiCode className="w-5 h-5" />,
-    href: "/staff/scan-attendance",
-  },
+
 ];
 
 export default function FacultySidebar({ isOpen, setIsOpen }) {

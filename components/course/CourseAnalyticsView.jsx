@@ -160,7 +160,7 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
 
       {!loading && !error && courseData && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <DashboardCard
               title="Enrolled Students"
               value={courseData.enrolledStudents.length.toString()}
@@ -168,127 +168,11 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
               subtitle="Total students enrolled"
             />
             <DashboardCard
-              title="Overall Attendance"
-              value={`${courseData.overallAttendanceRate}%`}
-              icon={<ChartBarIcon />}
-              subtitle={`${courseData.presentCount}/${courseData.totalRecords} sessions`}
-            />
-            <DashboardCard
               title="Completion Rate"
               value={`${courseData.completionRate}%`}
               icon={<ChartBarIcon />}
               subtitle="Based on progress"
             />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <div className="lg:col-span-3 bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-xl font-semibold mb-4 text-slate-800">
-                Attendance Trend (Last 10 Sessions)
-              </h2>
-              {courseData.attendanceTrend.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart
-                    data={courseData.attendanceTrend}
-                    margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" fontSize={12} />
-                    <YAxis
-                      domain={[0, 100]}
-                      tickFormatter={(value) => `${value}%`}
-                    />
-                    <Tooltip
-                      formatter={(value) => [`${value}%`, "Attendance Rate"]}
-                      labelFormatter={(label) => `Date: ${label}`}
-                    />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="Attendance Rate"
-                      stroke="#8884d8"
-                      strokeWidth={2}
-                      activeDot={{ r: 8 }}
-                      dot={{ r: 4 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="text-center py-16 text-slate-500">
-                  No attendance data available for this course yet.
-                </div>
-              )}
-            </div>
-
-            <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
-              <h2 className="text-xl font-semibold mb-4 text-slate-800">
-                Student Roster & Engagement
-              </h2>
-              <div className="overflow-y-auto max-h-[300px]">
-                <table className="w-full text-sm text-left text-slate-500">
-                  <thead className="text-xs text-slate-700 uppercase bg-slate-100 sticky top-0">
-                    <tr>
-                      <th className="px-4 py-3">Student Name</th>
-                      <th className="px-4 py-3 text-center">Attendance</th>
-                      <th className="px-4 py-3 text-center">Last Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {courseData.studentAttendance.length > 0 ? (
-                      courseData.studentAttendance
-                        .sort((a, b) => a.firstName.localeCompare(b.firstName))
-                        .map((student) => (
-                          <tr
-                            key={student.id}
-                            className="bg-white border-b hover:bg-slate-50"
-                          >
-                            <td className="px-4 py-3 font-medium text-slate-900">
-                              {`${student.firstName} ${student.lastName}`}
-                            </td>
-                            <td className="px-4 py-3 text-center font-semibold">
-                              <span
-                                className={
-                                  student.attendanceRate >= 80
-                                    ? "text-green-600"
-                                    : student.attendanceRate >= 60
-                                    ? "text-yellow-600"
-                                    : "text-red-600"
-                                }
-                              >
-                                {student.attendanceRate}%
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-center text-xs font-semibold">
-                              <span
-                                className={`px-2 py-1 rounded-full ${
-                                  student.lastStatus === "Present"
-                                    ? "bg-green-100 text-green-800"
-                                    : student.lastStatus === "Late"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : student.lastStatus === "Absent"
-                                    ? "bg-red-100 text-red-800"
-                                    : "bg-slate-100 text-slate-800"
-                                }`}
-                              >
-                                {student.lastStatus}
-                              </span>
-                            </td>
-                          </tr>
-                        ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan="3"
-                          className="text-center py-10 text-slate-500"
-                        >
-                          No students are currently enrolled in this course.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
           </div>
 
           {/* Additional Analytics Section */}
@@ -319,12 +203,6 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
                         "N/A"}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Total Sessions:</span>
-                    <span className="font-medium">
-                      {courseData.totalRecords}
-                    </span>
-                  </div>
                 </div>
               </div>
 
@@ -333,12 +211,6 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
                   Performance Metrics
                 </h3>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Average Attendance:</span>
-                    <span className="font-medium">
-                      {courseData.overallAttendanceRate}%
-                    </span>
-                  </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Students Enrolled:</span>
                     <span className="font-medium">

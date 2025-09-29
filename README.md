@@ -5,7 +5,7 @@ A comprehensive web application for managing school operations, built with Next.
 ## Features
 
 - Student, teacher, and staff management
-- Class scheduling and attendance tracking
+- Class scheduling
 - Grade and report management
 - User authentication and authorization
 - Responsive and user-friendly interface

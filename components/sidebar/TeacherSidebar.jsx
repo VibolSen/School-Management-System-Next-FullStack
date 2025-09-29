@@ -16,8 +16,6 @@ import {
   FiChevronRight,
   FiClipboard, // For Assignments
   FiFileText, // For Exams
-  FiCheckSquare, // For Attendance
-  FiCode,
 } from "react-icons/fi";
 
 // ✅ 2. Refactored NavLink to be a proper list item for semantic HTML
@@ -78,11 +76,6 @@ const TEACHER_NAV_ITEMS = [
     href: "/teacher/student-performance",
   },
   {
-    label: "Attendance",
-    icon: <FiCheckSquare className="w-5 h-5" />, // More specific for tracking
-    href: "/teacher/attendance",
-  },
-  {
     label: "E-Library",
     icon: <FiBookOpen className="w-5 h-5" />,
     href: "/teacher/e-library",
@@ -91,11 +84,6 @@ const TEACHER_NAV_ITEMS = [
     label: "Settings",
     icon: <FiSettings className="w-5 h-5" />,
     href: "/teacher/settings",
-  },
-  {
-    label: "Scan Attendance",
-    icon: <FiCode className="w-5 h-5" />,
-    href: "/staff/scan-attendance",
   },
 ];
 

@@ -16,7 +16,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { Department, Role, AttendanceStatus } from '@/lib/types';
+import { Department, Role } from '@/lib/types';
 import DashboardCard from '@/components/dashboard/DashboardCard';
 import UsersIcon from '@/components/icons/UsersIcon';
 import LibraryIcon from '@/components/icons/LibraryIcon';
@@ -32,33 +32,28 @@ const ReportsView = () => {
   const [error, setError] = useState(null);
   const [studentData, setStudentData] = useState([]);
   const [staffData, setStaffData] = useState([]);
-  const [attendanceData, setAttendanceData] = useState([]);
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [studentsRes, staffRes, attendanceRes, coursesRes] = await Promise.all([
+        const [studentsRes, staffRes, coursesRes] = await Promise.all([
           fetch('/api/students'),
           fetch('/api/staff'),
-          fetch('/api/attendances'),
           fetch('/api/courses'),
         ]);
 
         if (!studentsRes.ok) throw new Error('Failed to fetch students');
         if (!staffRes.ok) throw new Error('Failed to fetch staff');
-        if (!attendanceRes.ok) throw new Error('Failed to fetch attendance');
         if (!coursesRes.ok) throw new Error('Failed to fetch courses');
 
         const students = await studentsRes.json();
         const staff = await staffRes.json();
-        const attendance = await attendanceRes.json();
         const coursesData = await coursesRes.json();
 
         setStudentData(students);
         setStaffData(staff);
-        setAttendanceData(attendance);
         setCourses(coursesData);
       } catch (err) {
         setError(err.message);
@@ -97,46 +92,10 @@ const ReportsView = () => {
     }));
   }, [studentData]);
 
-  const attendanceTrend = useMemo(() => {
-    const attendanceByDate = {};
-    attendanceData.forEach((record) => {
-      if (!attendanceByDate[record.date]) {
-        attendanceByDate[record.date] = { present: 0, total: 0 };
-      }
-      attendanceByDate[record.date].total++;
-      if (
-        record.status === AttendanceStatus.PRESENT ||
-        record.status === AttendanceStatus.LATE
-      ) {
-        attendanceByDate[record.date].present++;
-      }
-    });
-
-    return Object.entries(attendanceByDate)
-      .map(([date, data]) => ({
-        date: new Date(date).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-        }),
-        'Attendance Rate': Math.round((data.present / data.total) * 100),
-      }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  }, [attendanceData]);
-
   const totalEnrolled = studentData.filter((s) => s.status === 'Enrolled').length;
   const totalStaff = staffData.length;
   const staffStudentRatio =
     totalStaff > 0 ? `1:${(totalEnrolled / totalStaff).toFixed(1)}` : 'N/A';
-  const overallAttendance = useMemo(() => {
-    const present = attendanceData.filter(
-      (r) =>
-        r.status === AttendanceStatus.PRESENT ||
-        r.status === AttendanceStatus.LATE
-    ).length;
-    return attendanceData.length > 0
-      ? `${((present / attendanceData.length) * 100).toFixed(1)}%`
-      : 'N/A';
-  }, [attendanceData]);
 
   const generateSummary = async () => {
     setIsLoading(true);
@@ -153,10 +112,8 @@ const ReportsView = () => {
         totalEnrolledStudents: totalEnrolled,
         totalStaff: totalStaff,
         staffStudentRatio: staffStudentRatio,
-        overallAttendanceRate: overallAttendance,
         enrollmentByDepartment: enrollmentByDept,
         staffDistributionByRole: staffByRole,
-        attendanceTrend: attendanceTrend,
         studentStatusBreakdown: studentByStatus,
       };
 
@@ -233,7 +190,7 @@ const ReportsView = () => {
         />
       )}
 
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
         <DashboardCard
           title='Staff-Student Ratio'
           value={staffStudentRatio}
@@ -248,11 +205,6 @@ const ReportsView = () => {
           title='Total Courses'
           value={courses.length.toString()}
           icon={<LibraryIcon />}
-        />
-        <DashboardCard
-          title='Overall Attendance'
-          value={overallAttendance}
-          icon={<ChartBarIcon />}
         />
       </div>
 
@@ -307,30 +259,6 @@ const ReportsView = () => {
               <Tooltip />
               <Legend />
             </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className='bg-white p-6 rounded-xl shadow-md'>
-          <h2 className='text-xl font-semibold mb-4 text-slate-800'>
-            Attendance Trend
-          </h2>
-          <ResponsiveContainer width='100%' height={300}>
-            <LineChart
-              data={attendanceTrend}
-              margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='date' fontSize={12} />
-              <YAxis unit='%' />
-              <Tooltip />
-              <Legend />
-              <Line
-                type='monotone'
-                dataKey='Attendance Rate'
-                stroke='#8884d8'
-                activeDot={{ r: 8 }}
-              />
-            </LineChart>
           </ResponsiveContainer>
         </div>
 

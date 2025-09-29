@@ -42,7 +42,6 @@ const StudentPerformanceView = () => {
           <thead>
             <tr>
               <th className="py-2 px-4 border-b">Name</th>
-              <th className="py-2 px-4 border-b">Attendance Rate</th>
               <th className="py-2 px-4 border-b">Average Grade</th>
             </tr>
           </thead>
@@ -50,7 +49,6 @@ const StudentPerformanceView = () => {
             {students.map((student) => (
               <tr key={student.id}>
                 <td className="py-2 px-4 border-b">{`${student.firstName} ${student.lastName}`}</td>
-                <td className="py-2 px-4 border-b">{student.attendanceRate}%</td>
                 <td className="py-2 px-4 border-b">{student.averageGrade}%</td>
               </tr>
             ))}

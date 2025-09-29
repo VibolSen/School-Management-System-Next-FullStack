@@ -1,4 +1,4 @@
-export type ViewType = 'Dashboard' | 'Staff' | 'Students' | 'Courses' | 'E-Library' | 'Attendance' | 'Reports' | 'Leave' | 'Settings' | 'Scan QR' | 'Assignments' | 'Course Analytics' | 'Student Performance';
+export type ViewType = 'Dashboard' | 'Staff' | 'Students' | 'Courses' | 'E-Library' | 'Reports' | 'Leave' | 'Settings' | 'Assignments' | 'Course Analytics' | 'Student Performance';
 
 export enum Role {
   ADMINISTRATOR = 'Administrator',
@@ -41,20 +41,6 @@ export interface Student {
   enrollmentDate: string;
   status: 'Enrolled' | 'Graduated' | 'Withdrawn';
   courses: Course[];
-}
-
-export enum AttendanceStatus {
-  PRESENT = 'Present',
-  ABSENT = 'Absent',
-  LATE = 'Late',
-}
-
-export interface AttendanceRecord {
-  id: string;
-  studentId: string;
-  courseId: string;
-  date: string; // YYYY-MM-DD format
-  status: AttendanceStatus;
 }
 
 export enum ResourceType {

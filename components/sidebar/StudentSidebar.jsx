@@ -70,11 +70,7 @@ const STUDENT_NAV_ITEMS = [
     icon: <FiBookOpen className="w-5 h-5" />,
     href: "/student/e-library",
   },
-  {
-    label: "Attendance",
-    icon: <FiClipboard className="w-5 h-5" />,
-    href: "/student/attendance",
-  },
+
   {
     label: "Scan QR",
     icon: <FiCode className="w-5 h-5" />,

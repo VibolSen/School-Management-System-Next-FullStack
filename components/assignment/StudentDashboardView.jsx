@@ -5,14 +5,12 @@ import DashboardCard from "@/components/dashboard/DashboardCard";
 import UsersIcon from "@/components/icons/UsersIcon";
 import BookOpenIcon from "@/components/icons/BookOpenIcon";
 import ChartBarIcon from "@/components/icons/ChartBarIcon";
-import { AttendanceStatus } from "@/lib/types";
 // V IMPORTANT: Import your authentication store's hook.
 // The path might be different in your project.
 import { useAuthStore } from "@/store/auth"; // <--- ADD THIS IMPORT
 
 const StudentDashboard = () => {
   const [myProfile, setMyProfile] = useState(null);
-  const [attendance, setAttendance] = useState([]);
   const [borrowedBooks, setBorrowedBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -50,13 +48,10 @@ const StudentDashboard = () => {
         const { user: me } = await meResponse.json();
         const studentId = me.id;
 
-        // Then, fetch the student's profile, attendance, and borrowed books
-        const [profileResponse, attendanceResponse, booksResponse] =
+        // Then, fetch the student's profile, and borrowed books
+        const [profileResponse, booksResponse] =
           await Promise.all([
             fetch(`/api/students/${studentId}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            }),
-            fetch(`/api/attendances?studentId=${studentId}`, {
               headers: { Authorization: `Bearer ${token}` },
             }),
             fetch(`/api/library?borrowedBy=${studentId}`, {
@@ -66,17 +61,13 @@ const StudentDashboard = () => {
 
         if (!profileResponse.ok)
           throw new Error("Failed to fetch student profile");
-        if (!attendanceResponse.ok)
-          throw new Error("Failed to fetch attendance data");
         if (!booksResponse.ok)
           throw new Error("Failed to fetch borrowed books");
 
         const profileData = await profileResponse.json();
-        const attendanceData = await attendanceResponse.json();
         const booksData = await booksResponse.json();
 
         setMyProfile(profileData);
-        setAttendance(attendanceData);
         setBorrowedBooks(booksData);
         setError(null); // Clear any previous errors
       } catch (err) {
@@ -88,18 +79,6 @@ const StudentDashboard = () => {
 
     fetchData();
   }, [token]); // <--- CRITICAL: Add `token` to the dependency array
-
-  const overallAttendance = useMemo(() => {
-    if (!myProfile) return "N/A";
-    const myRecords = attendance;
-    if (myRecords.length === 0) return "100%";
-    const presentCount = myRecords.filter(
-      (r) =>
-        r.status === AttendanceStatus.PRESENT ||
-        r.status === AttendanceStatus.LATE
-    ).length;
-    return `${Math.round((presentCount / myRecords.length) * 100)}%`;
-  }, [myProfile, attendance]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -115,16 +94,11 @@ const StudentDashboard = () => {
         Here's your personal dashboard and academic summary.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <DashboardCard
           title="Enrolled Courses"
           value={myProfile.courses.length.toString()}
           icon={<BookOpenIcon />}
-        />
-        <DashboardCard
-          title="Overall Attendance"
-          value={overallAttendance}
-          icon={<ChartBarIcon />}
         />
         <DashboardCard
           title="Borrowed Books"

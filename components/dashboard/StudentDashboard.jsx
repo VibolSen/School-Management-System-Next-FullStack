@@ -47,7 +47,7 @@ const StudentDashboard = ({ loggedInUser }) => {
     return <div>No data available.</div>;
   }
 
-  const { myProfile, overallAttendance } = dashboardData;
+  const { myProfile } = dashboardData;
 
   const currentCourses = myProfile.enrollments.filter(
     (enrollment) => enrollment.progress < 100
@@ -65,7 +65,7 @@ const StudentDashboard = ({ loggedInUser }) => {
         Here's your personal dashboard and academic summary.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <DashboardCard
           title="Current Courses"
           value={currentCourses.length.toString()}
@@ -75,11 +75,6 @@ const StudentDashboard = ({ loggedInUser }) => {
           title="Past Courses"
           value={pastCourses.length.toString()}
           icon={<BookOpenIcon />}
-        />
-        <DashboardCard
-          title="Overall Attendance"
-          value={overallAttendance}
-          icon={<ChartBarIcon />}
         />
         <DashboardCard
           title="My Groups"

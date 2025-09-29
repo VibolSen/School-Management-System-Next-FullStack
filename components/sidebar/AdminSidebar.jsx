@@ -16,7 +16,6 @@ import {
   FiGrid, // For Departments
   FiHash, // For Groups
   FiTag, // For Types
-  FiCheckSquare, // For Attendance
   FiFlag, // For Status
 } from "react-icons/fi";
 import { usePathname } from "next/navigation";
@@ -88,26 +87,7 @@ const ADMIN_NAV_ITEMS = [
     icon: <FiBookOpen className="w-5 h-5" />,
     href: "/admin/e-library",
   },
-  {
-    label: "Attendance",
-    icon: <FiCheckSquare className="w-5 h-5" />, // Icon for checking/tracking
-    href: "/admin/attendance",
-  },
-  {
-    label: "Reports",
-    icon: <FiBarChart2 className="w-5 h-5" />,
-    href: "/admin/reports",
-  },
-  {
-    label: "Status",
-    icon: <FiFlag className="w-5 h-5" />, // Icon for representing different states/statuses
-    href: "/admin/attendance-status",
-  },
-  {
-    label: "Staff Attendance",
-    icon: <FiCheckSquare className="w-5 h-5" />,
-    href: "/admin/staff-attendance",
-  },
+
   {
     label: "Settings",
     icon: <FiSettings className="w-5 h-5" />,

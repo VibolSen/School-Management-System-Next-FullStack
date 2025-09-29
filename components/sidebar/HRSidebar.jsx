@@ -59,21 +59,7 @@ const HR_NAV_ITEMS = [
     href: "/hr/staff",
   },
   { label: "Leave", icon: <FiSend className="w-5 h-5" />, href: "/hr/leave" },
-  {
-    label: "Attendance",
-    icon: <FiCalendar className="w-5 h-5" />,
-    href: "/hr/attendance",
-  },
-  {
-    label: "Reports",
-    icon: <FiBarChart2 className="w-5 h-5" />,
-    href: "/hr/reports",
-  },
-  {
-    label: "Scan Attendance",
-    icon: <FiCode className="w-5 h-5" />,
-    href: "/staff/scan-attendance",
-  },
+
 ];
 
 const HRSidebar = ({ isOpen, setIsOpen }) => {

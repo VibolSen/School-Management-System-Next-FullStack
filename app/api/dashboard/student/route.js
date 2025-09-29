@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { AttendanceStatus } from "@/lib/types";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -23,25 +22,6 @@ export async function GET(request) {
       return NextResponse.json({ error: "Student not found" }, { status: 404 });
     }
 
-    const attendance = await prisma.attendance.findMany({
-      where: {
-        userId: studentId, // ✅ use userId instead of studentId
-      },
-    });
-
-
-
-    const presentCount = attendance.filter(
-      (r) =>
-        r.status === AttendanceStatus.PRESENT ||
-        r.status === AttendanceStatus.LATE
-    ).length;
-
-    const overallAttendance =
-      attendance.length > 0
-        ? `${Math.round((presentCount / attendance.length) * 100)}%`
-        : "100%";
-
     const pendingAssignmentsCount = await prisma.submission.count({
       where: {
         studentId: studentId,
@@ -58,7 +38,6 @@ export async function GET(request) {
 
     return NextResponse.json({
       myProfile: studentProfile,
-      overallAttendance,
       pendingAssignmentsCount,
       pendingExamsCount,
     });
