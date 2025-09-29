@@ -78,6 +78,11 @@ const ADMIN_NAV_ITEMS = [
     href: "/admin/courses",
   },
   {
+    label: "Course Analytics",
+    icon: <FiBarChart2 className="w-5 h-5" />,
+    href: "/admin/course-analytics",
+  },
+  {
     label: "Groups",
     icon: <FiHash className="w-5 h-5" />, // Icon representing a group or channel
     href: "/admin/groups",

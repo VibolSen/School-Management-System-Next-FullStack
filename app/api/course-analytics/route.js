@@ -30,9 +30,17 @@ export async function GET(request) {
 
     const enrolledStudents = course.enrollments.map((e) => e.student);
 
+    const completedCount = course.enrollments.filter(
+      (e) => e.progress === 100
+    ).length;
+    const completionRate = enrolledStudents.length > 0
+      ? (completedCount / enrolledStudents.length) * 100
+      : 0;
+
     return NextResponse.json({
       course,
       enrolledStudents,
+      completionRate: completionRate.toFixed(0),
     });
   } catch (error) {
     console.error("Failed to fetch course analytics:", error);

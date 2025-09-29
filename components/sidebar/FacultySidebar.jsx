@@ -64,6 +64,11 @@ const FACULTY_NAV_ITEMS = [
     href: "/faculty/courses",
   },
   {
+    label: "Course Analytics",
+    icon: <FiBarChart2 className="w-5 h-5" />,
+    href: "/faculty/course-analytics",
+  },
+  {
     label: "Groups",
     icon: <FiHash className="w-5 h-5" />,
     href: "/faculty/groups",
