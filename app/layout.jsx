@@ -8,7 +8,7 @@ export const metadata = {
   description: "School Management System",
   // Add this 'icons' object back in, pointing to your PNG file
   icons: {
-    icon: "/logo/favicon.ico",
+    icon: "/logo/favicon2.ico",
   },
 };
 
