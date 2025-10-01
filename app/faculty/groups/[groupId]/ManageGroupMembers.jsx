@@ -93,7 +93,7 @@ export default function ManageGroupMembers({ initialGroup, allStudents }) {
       />
       <div>
         <Link
-          href="/admin/groups"
+          href="/faculty/groups"
           className="text-blue-600 hover:underline text-sm"
         >
           &larr; Back to All Groups

@@ -27,6 +27,24 @@ enum ExamSubmissionStatus {
   GRADED
 }
 
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+}
+
+model Attendance {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  date      DateTime
+  status    AttendanceStatus
+  student   User      @relation(fields: [studentId], references: [id])
+  studentId String    @db.ObjectId
+  group     Group     @relation(fields: [groupId], references: [id])
+  groupId   String    @db.ObjectId
+
+  @@unique([date, studentId, groupId], name: "attendance_unique")
+}
+
 model User {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
   firstName String
@@ -53,6 +71,7 @@ model User {
 
   // ✅ Back relation for Enrollment
   enrollments Enrollment[]
+  attendances Attendance[]
 }
 
 model LibraryResource {
@@ -100,6 +119,7 @@ model Group {
 
   assignments Assignment[]
   exams       Exam[]
+  attendances Attendance[]
 }
 
 model Assignment {

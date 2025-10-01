@@ -6,7 +6,7 @@ import GroupModal from "./GroupModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import Notification from "@/components/Notification";
 
-export default function GroupManagementView() {
+export default function GroupManagementView({ role }) {
   const [groups, setGroups] = useState([]);
   const [courses, setCourses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -131,6 +131,7 @@ export default function GroupManagementView() {
         onEdit={handleEditClick}
         onDelete={handleDeleteRequest}
         isLoading={isLoading}
+        role={role}
       />
       {isModalOpen && (
         <GroupModal

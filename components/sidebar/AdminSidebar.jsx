@@ -17,6 +17,7 @@ import {
   FiHash, // For Groups
   FiTag, // For Types
   FiFlag, // For Status
+  FiTrendingUp,
 } from "react-icons/fi";
 import { usePathname } from "next/navigation";
 
@@ -92,7 +93,11 @@ const ADMIN_NAV_ITEMS = [
     icon: <FiBookOpen className="w-5 h-5" />,
     href: "/admin/e-library",
   },
-
+  {
+    label: "Student Performance",
+    icon: <FiTrendingUp className="w-5 h-5" />,
+    href: "/admin/student-performance",
+  },
   {
     label: "Settings",
     icon: <FiSettings className="w-5 h-5" />,

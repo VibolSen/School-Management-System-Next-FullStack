@@ -83,7 +83,11 @@ const FACULTY_NAV_ITEMS = [
     icon: <FiUser className="w-5 h-5" />,
     href: "/faculty/students",
   },
-
+  {
+    label: "Student Performance",
+    icon: <FiTrendingUp className="w-5 h-5" />,
+    href: "/faculty/student-performance",
+  },
 ];
 
 export default function FacultySidebar({ isOpen, setIsOpen }) {

@@ -48,6 +48,7 @@ export default function GroupsTable({
   onEdit,
   onDelete,
   isLoading,
+  role,
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [courseFilter, setCourseFilter] = useState("All");
@@ -189,14 +190,25 @@ export default function GroupsTable({
                   </td>
                   <td className="px-6 py-4">{group.course?.name || "N/A"}</td>
                   <td className="px-6 py-4 text-center">
-                    <Link
-                      href={`/admin/groups/${group.id}`}
-                      className="hover:underline"
-                    >
-                      <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
-                        {group._count?.students ?? 0}
-                      </span>
-                    </Link>
+                    {role === "admin" ? (
+                      <Link
+                        href={`/admin/groups/${group.id}`}
+                        className="hover:underline"
+                      >
+                        <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                          {group._count?.students ?? 0}
+                        </span>
+                      </Link>
+                    ) : (
+                      <Link
+                        href={`/faculty/groups/${group.id}`}
+                        className="hover:underline"
+                      >
+                        <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                          {group._count?.students ?? 0}
+                        </span>
+                      </Link>
+                    )}
                   </td>
                   <td className="px-6 py-4 text-center space-x-2">
                     <button

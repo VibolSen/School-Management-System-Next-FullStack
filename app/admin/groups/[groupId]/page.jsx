@@ -28,7 +28,7 @@ async function getGroupData(groupId) {
 // ✅ THE DEFINITIVE FIX IS HERE
 export default async function ManageGroupPage({ params }) {
   // Accept `params` as a whole object first.
-  const groupId = params.groupId; // Then, access the `groupId` property on the next line.
+  const { groupId } = params;
 
   // The rest of the code remains the same.
   const { group, allStudents } = await getGroupData(groupId);

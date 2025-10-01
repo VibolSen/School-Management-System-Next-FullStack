@@ -28,7 +28,7 @@ async function getGroupData(groupId) {
 // ✅ THE DEFINITIVE FIX IS HERE
 export default async function ManageGroupPage({ params }) {
   // Accept `params` as a whole object first.
-  const groupId = params.groupId; // Then, access the `groupId` property on the next line.
+  const { groupId } = params;
 
   // The rest of the code remains the same.
   const { group, allStudents } = await getGroupData(groupId);
@@ -39,7 +39,7 @@ export default async function ManageGroupPage({ params }) {
         <h1 className="text-2xl font-bold">Group Not Found</h1>
         <p>The group you are looking for does not exist.</p>
         <Link
-          href="/admin/groups"
+          href="/faculty/groups"
           className="text-blue-600 hover:underline mt-4 inline-block"
         >
           &larr; Back to Groups
