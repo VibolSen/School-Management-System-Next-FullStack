@@ -13,6 +13,7 @@ import {
   FiSettings,
   FiChevronLeft,
   FiChevronRight,
+  FiCalendar,
 } from "react-icons/fi";
 import { usePathname } from "next/navigation";
 
@@ -64,6 +65,11 @@ const STUDENT_NAV_ITEMS = [
     label: "Exams",
     icon: <FiFileText className="w-5 h-5" />,
     href: "/student/exams",
+  },
+  {
+    label: "Attendance",
+    icon: <FiCalendar className="w-5 h-5" />,
+    href: "/student/attendance",
   },
   {
     label: "E-Library",
