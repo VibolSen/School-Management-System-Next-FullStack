@@ -1,7 +1,4 @@
-
 import React from 'react';
-
-
 
 const PlaceholderView = ({ title }) => {
   return (

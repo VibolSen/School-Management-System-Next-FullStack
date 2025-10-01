@@ -7,7 +7,7 @@ import Link from "next/link";
 // ✅ FIX #1: The function now accepts the whole `params` object
 async function getAssignmentData(params) {
   // Destructuring happens safely inside the function
-  const { assignmentId } = params;
+  const assignmentId = params.assignmentId;
 
   return await prisma.assignment.findUnique({
     where: { id: assignmentId },

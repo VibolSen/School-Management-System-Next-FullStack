@@ -21,7 +21,7 @@ async function getSubmissionData(submissionId) {
 
 // The main page component for this dynamic route
 export default async function SubmissionPage({ params }) {
-  const { submissionId } = params;
+  const submissionId = params.submissionId;
   const submission = await getSubmissionData(submissionId);
 
   if (!submission) {
