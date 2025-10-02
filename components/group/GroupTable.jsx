@@ -62,9 +62,9 @@ export default function GroupsTable({
     const filtered = groups.filter((group) => {
       const matchesSearch =
         group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        group.course?.name.toLowerCase().includes(searchTerm.toLowerCase());
+        group.courses?.some(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()));
       const matchesCourse =
-        courseFilter === "All" || group.courseId === courseFilter;
+        courseFilter === "All" || group.courses?.some(c => c.id === courseFilter);
       return matchesSearch && matchesCourse;
     });
 
@@ -75,8 +75,8 @@ export default function GroupsTable({
 
         // Handle nested properties for sorting (e.g., course.name)
         if (sortConfig.key === "course.name") {
-          aValue = a.course?.name || "";
-          bValue = b.course?.name || "";
+          aValue = a.courses?.map(c => c.name).join(", ") || "";
+          bValue = b.courses?.map(c => c.name).join(", ") || "";
         }
 
         if (aValue < bValue)
@@ -188,7 +188,15 @@ export default function GroupsTable({
                   <td className="px-6 py-4 font-medium text-slate-900">
                     {group.name}
                   </td>
-                  <td className="px-6 py-4">{group.course?.name || "N/A"}</td>
+                  <td className="px-6 py-4">
+                    {group.courses && group.courses.length > 3 ? (
+                      <span className="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
+                        {group.courses.length}
+                      </span>
+                    ) : (
+                      group.courses?.map((c) => c.name).join(", ") || "N/A"
+                    )}
+                  </td>
                   <td className="px-6 py-4 text-center">
                     {role === "admin" ? (
                       <Link

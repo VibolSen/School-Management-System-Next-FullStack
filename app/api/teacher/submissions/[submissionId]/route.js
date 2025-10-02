@@ -12,7 +12,11 @@ export async function GET(req, { params }) {
       include: {
         assignment: {
           include: {
-            course: true,
+            group: {
+              include: {
+                courses: true,
+              },
+            },
             teacher: true,
           },
         },

@@ -45,7 +45,7 @@ export async function GET(req) {
         },
         groups: {
           include: {
-            course: true,
+            courses: true,
             students: true,
           },
         },

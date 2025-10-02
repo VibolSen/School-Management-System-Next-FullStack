@@ -103,7 +103,8 @@ model Course {
   name         String       @unique
   department   Department   @relation(fields: [departmentId], references: [id])
   departmentId String       @db.ObjectId
-  groups       Group[]
+  groups       Group[]      @relation("CourseToGroup", fields: [groupIds], references: [id])
+  groupIds     String[]     @db.ObjectId
   teacher      User?        @relation("CourseLead", fields: [teacherId], references: [id])
   teacherId    String?      @db.ObjectId
 
@@ -115,8 +116,8 @@ model Group {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String @unique
 
-  course     Course?  @relation(fields: [courseId], references: [id])
-  courseId   String?  @db.ObjectId
+  courses    Course[] @relation("CourseToGroup", fields: [courseIds], references: [id])
+  courseIds  String[] @db.ObjectId
   students   User[]   @relation(fields: [studentIds], references: [id])
   studentIds String[] @db.ObjectId
 

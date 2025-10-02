@@ -9,7 +9,7 @@ async function getGroupData(groupId) {
   const group = await prisma.group.findUnique({
     where: { id: groupId },
     include: {
-      course: true,
+      courses: true,
       students: {
         select: { id: true, firstName: true, lastName: true, email: true },
       },

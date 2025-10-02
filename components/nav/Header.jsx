@@ -4,14 +4,12 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from 'js-cookie'; // Ensure js-cookie is installed
 
+import { useUser } from "@/context/UserContext";
+
 export default function Header({ toggleSidebar }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
-  const [user, setUser] = useState({
-    name: "Guest",
-    role: "Guest",
-    image: "/illustration/default.jpg",
-  });
+
 
   const router = useRouter();
 
@@ -26,53 +24,27 @@ export default function Header({ toggleSidebar }) {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch logged-in user
-  useEffect(() => {
-    const fetchUser = async () => {
-      // ✅ MODIFIED: Get token from cookies for consistency with middleware
-      const token = Cookies.get("token");
-      if (!token) {
-        // If no token, maybe redirect or just show guest state
-        return;
-      }
-
-      try {
-        // ✅ MODIFIED: The API now gets the token from the cookie, so we don't need to send it
-        const res = await fetch("/api/me");
-
-        if (!res.ok) {
-          // If the token is invalid (e.g., expired), log the user out
-          if (res.status === 401) {
-            handleLogout();
-          }
-          return;
-        }
-
-        const data = await res.json();
-        
-        // ✅ MODIFIED: Logic to handle the new user data structure
-        setUser({
-          name: `${data.user.firstName} ${data.user.lastName}` || "Guest User",
-          // Format the role for display (e.g., "ADMIN" -> "Admin")
-          role: data.user.role
-            ? data.user.role.charAt(0).toUpperCase() +
-              data.user.role.slice(1).toLowerCase()
-            : "Guest",
-          image: data.user.image || "/illustration/default.jpg", // Assuming image field might exist later
-        });
-      } catch (err) {
-        console.error("Error fetching user:", err);
-      }
-    };
-
-    fetchUser();
-  }, []);
+  const { user, loading } = useUser();
 
   const handleLogout = () => {
     // ✅ MODIFIED: Remove the cookie on logout
     Cookies.remove("token");
     router.push("/login");
   };
+
+  if (loading) {
+    return (
+      <header className="bg-white shadow-sm p-4 flex justify-between items-center z-10">
+        <div className="flex items-center">
+          <div className="h-9 w-9 rounded-full bg-slate-200 animate-pulse"></div>
+          <div className="hidden md:block ml-2">
+            <div className="h-4 w-24 bg-slate-200 rounded animate-pulse"></div>
+            <div className="h-3 w-16 bg-slate-200 rounded mt-1 animate-pulse"></div>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="bg-white shadow-sm p-4 flex justify-between items-center z-10">
@@ -110,17 +82,17 @@ export default function Header({ toggleSidebar }) {
           >
             <img
               className="h-9 w-9 rounded-full object-cover border border-slate-300"
-              src={user.image}
-              alt={user.name}
+              src={user?.image || "/illustration/default.jpg"}
+              alt={user?.name || "Guest"}
               onError={(e) =>
                 (e.currentTarget.src = "/illustration/default.jpg")
               }
             />
             <div className="hidden md:block text-left">
               <div className="font-semibold text-sm text-slate-700">
-                {user.name}
+                {user ? `${user.firstName} ${user.lastName}` : "Guest"}
               </div>
-              <div className="text-xs text-slate-500">{user.role}</div>
+              <div className="text-xs text-slate-500">{user ? user.role : "Guest"}</div>
             </div>
             <svg
               className={`w-4 h-4 text-slate-500 transition-transform ${
@@ -143,7 +115,7 @@ export default function Header({ toggleSidebar }) {
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
               <button
                 onClick={() =>
-                  router.push(`/${user.role.toLowerCase()}/profile`)
+                  user && router.push(`/${user.role.toLowerCase()}/profile`)
                 } // Dynamic profile link
                 className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
               >

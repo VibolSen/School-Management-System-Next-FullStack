@@ -169,7 +169,7 @@ export async function DELETE(req) {
         { status: 400 }
       );
 
-    const groupCount = await prisma.group.count({ where: { courseId: id } });
+    const groupCount = await prisma.group.count({ where: { courseIds: { has: id } } });
     if (groupCount > 0) {
       return NextResponse.json(
         {

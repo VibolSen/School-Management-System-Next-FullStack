@@ -10,7 +10,7 @@ export default function GroupModal({
   courses,
   isLoading,
 }) {
-  const [formData, setFormData] = useState({ name: "", courseId: "" });
+  const [formData, setFormData] = useState({ name: "", courseIds: [] });
   const [errors, setErrors] = useState({});
 
   const isEditMode = !!groupToEdit;
@@ -20,17 +20,26 @@ export default function GroupModal({
       if (groupToEdit) {
         setFormData({
           name: groupToEdit.name || "",
-          courseId: groupToEdit.courseId || "",
+          courseIds: groupToEdit.courseIds || [],
         });
       } else {
         setFormData({
           name: "",
-          courseId: courses?.[0]?.id || "",
+          courseIds: [],
         });
       }
       setErrors({});
     }
   }, [isOpen, groupToEdit, courses]);
+
+  const handleCourseChange = (courseId) => {
+    setFormData((prev) => {
+      const courseIds = prev.courseIds.includes(courseId)
+        ? prev.courseIds.filter((id) => id !== courseId)
+        : [...prev.courseIds, courseId];
+      return { ...prev, courseIds };
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,7 +50,6 @@ export default function GroupModal({
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Group name is required.";
-    if (!formData.courseId) newErrors.courseId = "A course must be selected.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -109,25 +117,21 @@ export default function GroupModal({
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Course
               </label>
-              <select
-                name="courseId"
-                value={formData.courseId}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md bg-white text-sm ${
-                  errors.courseId
-                    ? "border-red-500 ring-1 ring-red-500"
-                    : "border-slate-300"
-                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
-              >
-                <option value="">Select a Course</option>
+              <div className="grid grid-cols-2 gap-2">
                 {courses.map((course) => (
-                  <option key={course.id} value={course.id}>
-                    {course.name}
-                  </option>
+                  <label key={course.id} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.courseIds.includes(course.id)}
+                      onChange={() => handleCourseChange(course.id)}
+                      className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    />
+                    <span>{course.name}</span>
+                  </label>
                 ))}
-              </select>
-              {errors.courseId && (
-                <p className="text-xs text-red-500 mt-1">{errors.courseId}</p>
+              </div>
+              {errors.courseIds && (
+                <p className="text-xs text-red-500 mt-1">{errors.courseIds}</p>
               )}
             </div>
           </div>

@@ -11,7 +11,7 @@ export async function GET() {
       orderBy: { name: "asc" },
       // ✅ MODIFIED: Include related course and a count of students
       include: {
-        course: true,
+        courses: true,
         _count: {
           select: { students: true },
         },
@@ -30,19 +30,19 @@ export async function GET() {
 // CREATE a new group linked to a course
 export async function POST(req) {
   try {
-    // ✅ MODIFIED: Expect 'name' and 'courseId'
-    const { name, courseId } = await req.json();
-    if (!name || !courseId) {
+    // ✅ MODIFIED: Expect 'name' and 'courseIds'
+    const { name, courseIds } = await req.json();
+    if (!name || !courseIds || courseIds.length === 0) {
       return NextResponse.json(
-        { error: "Group name and course ID are required" },
+        { error: "Group name and at least one course ID are required" },
         { status: 400 }
       );
     }
     const newGroup = await prisma.group.create({
       data: {
         name,
-        course: {
-          connect: { id: courseId },
+        courses: {
+          connect: courseIds.map((id) => ({ id })),
         },
       },
     });
@@ -67,7 +67,7 @@ export async function PUT(req) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    const { name, courseId, studentIds } = await req.json(); // Can now accept studentIds
+    const { name, courseIds, studentIds } = await req.json(); // Can now accept studentIds
 
     if (!id) {
       return NextResponse.json(
@@ -80,7 +80,11 @@ export async function PUT(req) {
 
     // Update basic details if provided
     if (name) dataToUpdate.name = name;
-    if (courseId) dataToUpdate.courseId = courseId;
+    if (Array.isArray(courseIds)) {
+      dataToUpdate.courses = {
+        set: courseIds.map((courseId) => ({ id: courseId })),
+      };
+    }
 
     // ✅ THIS IS THE KEY LOGIC
     // If an array of studentIds is provided, update the relationship.

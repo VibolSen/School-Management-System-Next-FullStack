@@ -104,7 +104,7 @@ export default function ManageGroupMembers({ initialGroup, allStudents }) {
         <p className="text-slate-600">
           Assign students to{" "}
           <span className="font-semibold">{initialGroup.name}</span> (
-          {initialGroup.course.name})
+          {initialGroup.courses?.map((c) => c.name).join(", ") || "N/A"})
         </p>
       </div>
 
