@@ -5,9 +5,12 @@ import Link from "next/link";
 const prisma = new PrismaClient();
 
 async function getGroupData(groupId) {
+  // If your schema uses Int IDs, cast to Number
+  const id = isNaN(Number(groupId)) ? groupId : Number(groupId);
+
   // Fetch the specific group and its currently enrolled students
   const group = await prisma.group.findUnique({
-    where: { id: groupId },
+    where: { id },
     include: {
       course: true,
       students: {
@@ -25,12 +28,11 @@ async function getGroupData(groupId) {
   return { group, allStudents };
 }
 
-// ✅ THE DEFINITIVE FIX IS HERE
+// ✅ FIXED VERSION
 export default async function ManageGroupPage({ params }) {
-  // Accept `params` as a whole object first.
-  const { groupId } = params;
+  // Await params before accessing groupId
+  const { groupId } = await params;
 
-  // The rest of the code remains the same.
   const { group, allStudents } = await getGroupData(groupId);
 
   if (!group) {

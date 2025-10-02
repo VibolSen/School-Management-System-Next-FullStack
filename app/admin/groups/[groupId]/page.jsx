@@ -25,12 +25,11 @@ async function getGroupData(groupId) {
   return { group, allStudents };
 }
 
-// ✅ THE DEFINITIVE FIX IS HERE
+// ✅ FIXED VERSION
 export default async function ManageGroupPage({ params }) {
-  // Accept `params` as a whole object first.
-  const { groupId } = params;
+  // Await params before destructuring
+  const { groupId } = await params;
 
-  // The rest of the code remains the same.
   const { group, allStudents } = await getGroupData(groupId);
 
   if (!group) {
