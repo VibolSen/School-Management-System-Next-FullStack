@@ -17,6 +17,7 @@ import {
   FiClipboard, // For Assignments
   FiFileText, // For Exams
   FiCheckSquare,
+  FiCalendar,
 } from "react-icons/fi";
 
 // ✅ 2. Refactored NavLink to be a proper list item for semantic HTML
@@ -50,6 +51,11 @@ const TEACHER_NAV_ITEMS = [
     label: "Dashboard",
     icon: <FiHome className="w-5 h-5" />,
     href: "/teacher/dashboard",
+  },
+  {
+    label: "My Schedules",
+    icon: <FiCalendar className="w-5 h-5" />,
+    href: "/teacher/schedule",
   },
   {
     label: "My Students",

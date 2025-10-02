@@ -10,8 +10,6 @@ import Notification from "@/components/Notification";
 const ELibraryView = ({ loggedInUser }) => {
   const [resources, setResources] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [departmentFilter, setDepartmentFilter] = useState("All");
-  const [departments, setDepartments] = useState([]);
 
   const [selectedResource, setSelectedResource] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -31,47 +29,27 @@ const ELibraryView = ({ loggedInUser }) => {
     }, 3000);
   };
 
-  // Safe fetch resources
   const fetchResources = async () => {
-    console.log("Fetching resources...");
+    if (!loggedInUser?.departmentId) return;
     try {
-      const res = await fetch("/api/library", { cache: 'no-store' });
+      const res = await fetch(`/api/library?departmentId=${loggedInUser.departmentId}`, { cache: 'no-store' });
       if (!res.ok) {
         const errorText = await res.text();
-        console.error("Failed to fetch resources, response not OK:", res.status, errorText);
         throw new Error(res.statusText);
       }
       const text = await res.text();
       const data = text ? JSON.parse(text) : [];
-      console.log("Resources fetched successfully:", data);
       setResources(data);
     } catch (e) {
-      console.error("Failed to fetch resources in catch block:", e);
+      console.error("Failed to fetch resources:", e);
       setResources([]);
       showMessage("Failed to fetch resources", "error");
     }
   };
 
-
-  // Safe fetch departments
-  const fetchDepartments = async () => {
-    try {
-      const res = await fetch("/api/departments");
-      if (!res.ok) throw new Error(res.statusText);
-      const text = await res.text();
-      const data = text ? JSON.parse(text) : [];
-      setDepartments(data.map((dep) => dep.name));
-    } catch (e) {
-      console.error("Failed to fetch departments:", e);
-      setDepartments([]);
-      showMessage("Failed to fetch departments", "error");
-    }
-  };
-
   useEffect(() => {
     fetchResources();
-    fetchDepartments();
-  }, []);
+  }, [loggedInUser]);
 
   const handleAddClick = () => {
     setEditingResource(null);
@@ -90,10 +68,7 @@ const ELibraryView = ({ loggedInUser }) => {
       });
       if (!res.ok) throw new Error("Failed to delete resource");
 
-      // Remove the resource from state
       setResources(resources.filter((r) => r.id !== resource.id));
-
-      // Close the modal
       setResourceToDelete(null);
       showMessage("Resource deleted successfully!");
     } catch (e) {
@@ -102,13 +77,8 @@ const ELibraryView = ({ loggedInUser }) => {
     }
   };
 
-  const handleCancelDelete = () => {
-    setResourceToDelete(null);
-  };
-
   const handleSaveResource = async (resourceData) => {
     if (!loggedInUser) {
-      console.error("No logged-in user!");
       showMessage("You must be logged in to save a resource.", "error");
       return;
     }
@@ -117,31 +87,16 @@ const ELibraryView = ({ loggedInUser }) => {
       const formData = new FormData();
       formData.append("title", resourceData.title);
       formData.append("uploadedById", loggedInUser.id);
+      formData.append("department", loggedInUser.departmentId);
 
-      // ✅ FIX: include author
       if (resourceData.author) formData.append("author", resourceData.author);
-
-      if (resourceData.department)
-        formData.append("department", resourceData.department);
-      if (resourceData.description)
-        formData.append("description", resourceData.description);
-      if (resourceData.coverImage)
-        formData.append("coverImage", resourceData.coverImage);
-
-      // Make sure publicationYear is a valid number
-      if (
-        resourceData.publicationYear &&
-        !isNaN(resourceData.publicationYear)
-      ) {
-        formData.append(
-          "publicationYear",
-          String(resourceData.publicationYear)
-        );
+      if (resourceData.description) formData.append("description", resourceData.description);
+      if (resourceData.coverImage) formData.append("coverImage", resourceData.coverImage);
+      if (resourceData.publicationYear && !isNaN(resourceData.publicationYear)) {
+        formData.append("publicationYear", String(resourceData.publicationYear));
       }
 
-      const url = editingResource
-        ? `/api/library?id=${editingResource.id}`
-        : "/api/library";
+      const url = editingResource ? `/api/library?id=${editingResource.id}` : "/api/library";
       const method = editingResource ? "PUT" : "POST";
 
       const res = await fetch(url, { method, body: formData });
@@ -160,15 +115,13 @@ const ELibraryView = ({ loggedInUser }) => {
     }
   };
 
-  // ✅ Filter by department and type
   const filteredResources = useMemo(() => {
     return resources.filter(
       (r) =>
-        (r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          r.description?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (departmentFilter === "All" || r.department === departmentFilter)
+        r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        r.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [resources, searchTerm, departmentFilter]);
+  }, [resources, searchTerm]);
 
   return (
     <div className="space-y-6">
@@ -196,20 +149,6 @@ const ELibraryView = ({ loggedInUser }) => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border px-3 py-2 rounded"
         />
-
-        {/* Department Filter */}
-        <select
-          value={departmentFilter}
-          onChange={(e) => setDepartmentFilter(e.target.value)}
-          className="border px-3 py-2 rounded"
-        >
-          <option value="All">All Departments</option>
-          {departments.map((dep) => (
-            <option key={dep} value={dep}>
-              {dep}
-            </option>
-          ))}
-        </select>
       </div>
 
       <ELibraryGrid
@@ -224,7 +163,7 @@ const ELibraryView = ({ loggedInUser }) => {
         onClose={() => setIsEditModalOpen(false)}
         onSaveResource={handleSaveResource}
         resourceToEdit={editingResource}
-        departments={departments}
+        loggedInUser={loggedInUser}
       />
 
       <ConfirmationDialog

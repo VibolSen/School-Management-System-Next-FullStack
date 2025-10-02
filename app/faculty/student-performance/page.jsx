@@ -1,5 +1,5 @@
-import PlaceholderView from '@/components/PlaceholderView';
+import StudentPerformanceView from "@/components/students/StudentPerformanceView";
 
-export default function Page() {
-  return <PlaceholderView title="Student Performance" />;
+export default function StudentPerformancePage() {
+  return <StudentPerformanceView />;
 }

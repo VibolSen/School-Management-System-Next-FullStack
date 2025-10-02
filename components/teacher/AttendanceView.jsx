@@ -1,21 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import StatusMessage from '@/components/StatusMessage';
+import { useState, useEffect } from "react";
+import StatusMessage from "@/components/StatusMessage";
+import AttendanceControls from "./attendance/AttendanceControls";
+import StudentList from "./attendance/StudentList";
 
 export default function AttendanceView() {
   const [groups, setGroups] = useState([]);
-  const [selectedGroup, setSelectedGroup] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState("");
   const [students, setStudents] = useState([]);
   const [attendance, setAttendance] = useState({});
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
 
   useEffect(() => {
     const fetchGroups = async () => {
-      const res = await fetch('/api/teacher/groups');
+      const res = await fetch("/api/teacher/groups");
       const data = await res.json();
       setGroups(data);
     };
@@ -26,7 +28,9 @@ export default function AttendanceView() {
     if (selectedGroup) {
       const fetchStudents = async () => {
         setIsLoading(true);
-        const res = await fetch(`/api/teacher/groups/${selectedGroup}/students`);
+        const res = await fetch(
+          `/api/teacher/groups/${selectedGroup}/students`
+        );
         const data = await res.json();
         setStudents(data);
         setIsLoading(false);
@@ -38,7 +42,9 @@ export default function AttendanceView() {
   useEffect(() => {
     if (selectedGroup && date) {
       const fetchAttendance = async () => {
-        const res = await fetch(`/api/teacher/groups/${selectedGroup}/attendance?date=${date}`);
+        const res = await fetch(
+          `/api/teacher/groups/${selectedGroup}/attendance?date=${date}`
+        );
         const data = await res.json();
         const attendanceMap = {};
         data.forEach((att) => {
@@ -63,94 +69,166 @@ export default function AttendanceView() {
     }));
 
     try {
-      const res = await fetch(`/api/teacher/groups/${selectedGroup}/attendance`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, attendances }),
-      });
+      const res = await fetch(
+        `/api/teacher/groups/${selectedGroup}/attendance`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date, attendances }),
+        }
+      );
 
       if (res.ok) {
-        setStatusMessage({ type: 'success', message: 'Attendance saved successfully.' });
+        setStatusMessage({
+          type: "success",
+          message: "Attendance saved successfully!",
+        });
       } else {
         const errorData = await res.json();
-        setStatusMessage({ type: 'error', message: errorData.error || 'Failed to save attendance.' });
+        setStatusMessage({
+          type: "error",
+          message: errorData.error || "Failed to save attendance.",
+        });
       }
     } catch (error) {
-      setStatusMessage({ type: 'error', message: 'An unexpected error occurred.' });
+      setStatusMessage({
+        type: "error",
+        message: "An unexpected error occurred.",
+      });
     } finally {
       setIsSaving(false);
     }
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "PRESENT":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "ABSENT":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "LATE":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      default:
+        return "bg-gray-100 text-gray-600 border-gray-200";
+    }
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case "PRESENT":
+        return "Present";
+      case "ABSENT":
+        return "Absent";
+      case "LATE":
+        return "Late";
+      default:
+        return "Not Set";
+    }
+  };
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Attendance</h1>
-      {statusMessage && <StatusMessage type={statusMessage.type} message={statusMessage.message} />}
-      <div className="my-4">
-        <label htmlFor="group-select">Select a group:</label>
-        <select
-          id="group-select"
-          value={selectedGroup}
-          onChange={(e) => setSelectedGroup(e.target.value)}
-        >
-          <option value="">-- Select a group --</option>
-          {groups.map((group) => (
-            <option key={group.id} value={group.id}>
-              {group.name}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="my-4">
-        <label htmlFor="date-select">Select a date:</label>
-        <input
-          id="date-select"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-8 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            Attendance Management
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Track and manage student attendance with ease
+          </p>
+        </div>
+
+        {/* Status Message */}
+        {statusMessage && (
+          <div className="mb-6">
+            <StatusMessage
+              type={statusMessage.type}
+              message={statusMessage.message}
+            />
+          </div>
+        )}
+
+        <AttendanceControls
+          groups={groups}
+          selectedGroup={selectedGroup}
+          setSelectedGroup={setSelectedGroup}
+          date={date}
+          setDate={setDate}
+          handleSaveAttendance={handleSaveAttendance}
+          isSaving={isSaving}
+          students={students}
         />
+
+        {/* Students Table */}
+        {isLoading ? (
+          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+            </div>
+            <p className="text-gray-600 text-lg font-medium">
+              Loading students...
+            </p>
+          </div>
+        ) : selectedGroup && students.length > 0 ? (
+          <StudentList
+            students={students}
+            attendance={attendance}
+            handleAttendanceChange={handleAttendanceChange}
+            getStatusColor={getStatusColor}
+            getStatusText={getStatusText}
+          />
+        ) : selectedGroup ? (
+          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+            <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+              <svg
+                className="w-10 h-10 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">
+              No Students Found
+            </h3>
+            <p className="text-gray-500">
+              There are no students in this group yet.
+            </p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+            <div className="w-24 h-24 mx-auto mb-4 bg-blue-50 rounded-full flex items-center justify-center">
+              <svg
+                className="w-10 h-10 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">
+              Select a Group
+            </h3>
+            <p className="text-gray-500">
+              Choose a group from the dropdown above to view and manage
+              attendance.
+            </p>
+          </div>
+        )}
       </div>
-      {isLoading ? (
-        <p>Loading students...</p>
-      ) : (
-        <>
-          <table className="w-full text-sm text-left text-slate-500">
-            <thead className="text-xs text-slate-700 uppercase bg-slate-100">
-              <tr>
-                <th className="px-6 py-3">Name</th>
-                <th className="px-6 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {students.map((student) => (
-                <tr key={student.id}>
-                  <td className="px-6 py-4 font-medium text-gray-900">{`${student.firstName} ${student.lastName}`}</td>
-                  <td className="px-6 py-4">
-                    <select
-                      value={attendance[student.id] || ''}
-                      onChange={(e) =>
-                        handleAttendanceChange(student.id, e.target.value)
-                      }
-                    >
-                      <option value="">-- Select --</option>
-                      <option value="PRESENT">Present</option>
-                      <option value="ABSENT">Absent</option>
-                      <option value="LATE">Late</option>
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button
-            className="my-4 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-blue-300"
-            onClick={handleSaveAttendance}
-            disabled={isSaving}
-          >
-            {isSaving ? 'Saving...' : 'Save Attendance'}
-          </button>
-        </>
-      )}
     </div>
   );
 }

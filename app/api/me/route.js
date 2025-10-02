@@ -32,6 +32,7 @@ export async function GET(req) {
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       include: {
+        department: true,
         ledCourses: {
           include: {
             department: true,

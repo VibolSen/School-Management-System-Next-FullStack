@@ -20,6 +20,7 @@ import {
   FiCheckSquare,
   FiSend,
   FiCode,
+  FiCalendar,
 } from "react-icons/fi";
 
 // ✅ 1. The `title` attribute for the tooltip is now handled directly inside NavLink.
@@ -52,6 +53,11 @@ const FACULTY_NAV_ITEMS = [
     label: "Dashboard",
     icon: <FiHome className="w-5 h-5" />,
     href: "/faculty/dashboard",
+  },
+  {
+    label: "Schedule Management",
+    icon: <FiCalendar className="w-5 h-5" />,
+    href: "/faculty/schedule",
   },
   {
     label: "Departments",
@@ -87,6 +93,16 @@ const FACULTY_NAV_ITEMS = [
     label: "Student Performance",
     icon: <FiTrendingUp className="w-5 h-5" />,
     href: "/faculty/student-performance",
+  },
+  {
+    label: "Reports & Analytics",
+    icon: <FiBarChart2 className="w-5 h-5" />,
+    href: "/faculty/reports",
+  },
+  {
+    label: "E-Library",
+    icon: <FiBookOpen className="w-5 h-5" />,
+    href: "/faculty/e-library",
   },
 ];
 

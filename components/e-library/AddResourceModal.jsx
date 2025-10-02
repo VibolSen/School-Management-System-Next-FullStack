@@ -7,7 +7,7 @@ const AddResourceModal = ({
     onClose,
     onSaveResource,
     resourceToEdit,
-    departments = [], // from parent
+    loggedInUser,
   }) => {  const isEditMode = !!resourceToEdit;
 
   const [formData, setFormData] = useState({
@@ -15,7 +15,7 @@ const AddResourceModal = ({
     author: '',
     coverImage: null,
     publicationYear: new Date().getFullYear(),
-    department: departments[0]?.name || departments[0] || '',
+    department: loggedInUser?.department?.name || '',
     description: '',
   });
 
@@ -30,7 +30,7 @@ const AddResourceModal = ({
         author: resourceToEdit.author || '',
         coverImage: resourceToEdit.coverImage || null,
         publicationYear: resourceToEdit.publicationYear || new Date().getFullYear(),
-        department: resourceToEdit.department || departments[0]?.name || departments[0] || '',
+        department: resourceToEdit.department || loggedInUser?.department?.name || '',
         description: resourceToEdit.description || '',
       });
     } else {
@@ -39,13 +39,13 @@ const AddResourceModal = ({
         author: '',
         coverImage: null,
         publicationYear: new Date().getFullYear(),
-        department: departments[0]?.name || departments[0] || '',
+        department: loggedInUser?.department?.name || '',
         description: '',
       });
     }
 
     setErrors({});
-  }, [isOpen, resourceToEdit, departments]);
+  }, [isOpen, resourceToEdit, loggedInUser]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -167,20 +167,15 @@ const AddResourceModal = ({
             {/* Department */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Department</label>
-              <select
+              <input
+                type="text"
                 name="department"
                 value={formData.department}
                 onChange={handleChange}
                 className={`w-full px-3 py-2 border rounded-md text-sm ${errors.department ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300'} focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 required
-              >
-                <option value="">Select Department</option>
-                {departments.map(dep => (
-                  <option key={dep.id || dep} value={dep.name || dep}>
-                    {dep.name || dep}
-                  </option>
-                ))}
-              </select>
+                disabled
+              />
               {errors.department && <p className="text-xs text-red-500 mt-1">{errors.department}</p>}
             </div>
 

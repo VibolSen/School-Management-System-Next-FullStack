@@ -1,25 +1,21 @@
-// app/faculty/e-library/page.jsx
 "use client";
-import React, { useState, useEffect } from "react";
+
+import { useState, useEffect } from "react";
 import ELibraryView from "@/components/e-library/ELibraryView";
 
-export default function ELibraryPage() {
-  const [loggedInUser, setLoggedInUser] = useState(null);
+export default function Page() {
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-    if (!token) return;
-
-    fetch("/api/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => res.ok ? res.text() : null)
-      .then(text => {
-        const data = text ? JSON.parse(text) : null;
-        if (data?.user) setLoggedInUser(data.user);
-      })
-      .catch(console.error);
+    const fetchUser = async () => {
+      const res = await fetch("/api/me");
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data);
+      }
+    };
+    fetchUser();
   }, []);
 
-  return <ELibraryView loggedInUser={loggedInUser} />;
+  return <ELibraryView loggedInUser={user} />;
 }

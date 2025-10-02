@@ -27,16 +27,19 @@ const NavLink = ({
   <li>
     <Link
       href={href}
-      className={`flex items-center p-3 my-1 rounded-lg transition-colors duration-200 w-full text-left ${
+      className={`flex items-center p-3 my-1 rounded-lg transition-colors duration-200 w-full text-left group relative ${
         isActive
           ? "bg-blue-600 text-white shadow-md"
           : "text-slate-200 hover:bg-blue-800 hover:text-white"
       }`}
+      title={isCollapsed ? label : ""}
     >
       {icon}
       <span
-        className={`ml-3 transition-opacity duration-300 ${
-          isCollapsed ? "opacity-0 md:opacity-100" : ""
+        className={`ml-3 transition-all duration-300 ${
+          isCollapsed
+            ? "opacity-0 absolute left-full ml-2 bg-blue-900 text-white px-2 py-1 rounded text-sm invisible group-hover:visible group-hover:opacity-100 z-50"
+            : "opacity-100 relative"
         }`}
       >
         {label}
@@ -50,6 +53,11 @@ const STUDENT_NAV_ITEMS = [
     label: "Dashboard",
     icon: <FiHome className="w-5 h-5" />,
     href: "/student/dashboard",
+  },
+  {
+    label: "My Schedules",
+    icon: <FiCalendar className="w-5 h-5" />,
+    href: "/student/schedule",
   },
   {
     label: "Courses",

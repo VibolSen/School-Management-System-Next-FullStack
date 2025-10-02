@@ -72,6 +72,9 @@ model User {
   // ✅ Back relation for Enrollment
   enrollments Enrollment[]
   attendances Attendance[]
+
+  createdSchedules           Schedule[] @relation("SchedulesCreated")
+  schedulesAssignedToTeacher Schedule[] @relation("SchedulesAssignedToTeacher")
 }
 
 model LibraryResource {
@@ -120,6 +123,7 @@ model Group {
   assignments Assignment[]
   exams       Exam[]
   attendances Attendance[]
+  schedules   Schedule[] @relation("SchedulesAssignedToGroup")
 }
 
 model Assignment {
@@ -196,4 +200,21 @@ model Enrollment {
   progress Int @default(0) // 0–100 percentage
 
   @@unique([studentId, courseId])
+}
+
+model Schedule {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  startTime   DateTime
+  endTime     DateTime
+  date        DateTime
+
+  creator     User      @relation("SchedulesCreated", fields: [creatorId], references: [id])
+  creatorId   String    @db.ObjectId
+
+  assignedToTeacher   User?   @relation("SchedulesAssignedToTeacher", fields: [assignedToTeacherId], references: [id])
+  assignedToTeacherId String? @db.ObjectId
+
+  assignedToGroup   Group?   @relation("SchedulesAssignedToGroup", fields: [assignedToGroupId], references: [id])
+  assignedToGroupId String? @db.ObjectId
 }

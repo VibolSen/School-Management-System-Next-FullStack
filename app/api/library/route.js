@@ -5,9 +5,13 @@ import { writeFile } from "fs/promises";
 import { join } from "path";
 
 // GET all resources
-export async function GET() {
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const departmentId = searchParams.get("departmentId");
+
   try {
     const resources = await prisma.libraryResource.findMany({
+      where: departmentId ? { department: departmentId } : {},
       include: {
         uploadedBy: true,
       },
