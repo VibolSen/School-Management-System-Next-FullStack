@@ -32,6 +32,7 @@ export default function AssignmentModal({
   useEffect(() => {
     if (isOpen) {
       setIsClosing(false);
+      console.log("AssignmentModal: teacherGroups prop", teacherGroups);
       if (isEditMode) {
         // Populate form with existing assignment data
         setFormData({

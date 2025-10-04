@@ -61,9 +61,12 @@ export async function GET(req) {
 // CREATE a new assignment and generate pending submissions for all students in the group
 export async function POST(req) {
   try {
-    const { title, description, dueDate, groupId, teacherId } =
+    const { title, description, dueDate, groupId, teacherId, points } =
       await req.json();
+    console.log("Incoming assignment data:", { title, description, dueDate, groupId, teacherId, points });
+
     if (!title || !groupId || !teacherId) {
+      console.error("Validation Error: Missing title, groupId, or teacherId");
       return NextResponse.json(
         { error: "Title, Group ID, and Teacher ID are required" },
         { status: 400 }
@@ -74,8 +77,10 @@ export async function POST(req) {
       where: { id: groupId },
       select: { studentIds: true },
     });
+    console.log("Found group:", group);
 
     if (!group) {
+      console.error("Validation Error: Group not found for groupId:", groupId);
       return NextResponse.json({ error: "Group not found" }, { status: 404 });
     }
 
@@ -84,20 +89,24 @@ export async function POST(req) {
         title,
         description,
         dueDate: dueDate ? new Date(dueDate) : null,
+        points: points ? parseInt(points, 10) : null, // Add points here
         teacher: { connect: { id: teacherId } },
         group: { connect: { id: groupId } },
       },
     });
+    console.log("New assignment created:", newAssignment);
 
     // Now, create the submissions for each student in the group
     if (newAssignment && group.studentIds.length > 0) {
+      const submissionsData = group.studentIds.map((studentId) => ({
+        assignmentId: newAssignment.id,
+        studentId: studentId,
+        status: "PENDING",
+      }));
       await prisma.submission.createMany({
-        data: group.studentIds.map((studentId) => ({
-          assignmentId: newAssignment.id,
-          studentId: studentId,
-          status: "PENDING",
-        })),
+        data: submissionsData,
       });
+      console.log(`Created ${submissionsData.length} pending submissions.`);
     }
 
     return NextResponse.json(newAssignment, { status: 201 });

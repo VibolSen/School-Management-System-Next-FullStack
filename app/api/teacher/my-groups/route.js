@@ -13,18 +13,29 @@ export async function GET(req) {
         { status: 400 }
       );
 
-    // Find all courses led by the teacher, then get their groups
-    const courses = await prisma.course.findMany({
-      where: { teacherId },
-      include: {
+    console.log("Fetching groups for teacherId:", teacherId);
+
+    // Find all courses led by this teacher
+    const coursesLedByTeacher = await prisma.course.findMany({
+      where: {
+        leadById: teacherId,
+      },
+      select: {
         groups: {
           select: { id: true, name: true },
         },
       },
     });
 
-    // Flatten the array of groups
-    const teacherGroups = courses.flatMap((course) => course.groups);
+    // Extract unique groups from these courses
+    const teacherGroups = coursesLedByTeacher.flatMap(course => course.groups);
+    const uniqueTeacherGroups = Array.from(new Map(teacherGroups.map(group => [group.id, group])).values());
+
+    console.log("Teacher's groups returned:", uniqueTeacherGroups);
+
+    return NextResponse.json(uniqueTeacherGroups);
+
+    console.log("Teacher's groups returned:", teacherGroups);
 
     return NextResponse.json(teacherGroups);
   } catch (error) {

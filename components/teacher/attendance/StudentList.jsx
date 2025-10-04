@@ -5,7 +5,6 @@ export default function StudentList({
   attendance,
   handleAttendanceChange,
   getStatusColor,
-  getStatusText,
 }) {
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
@@ -41,8 +40,8 @@ export default function StudentList({
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
                       <span className="font-semibold text-blue-600 text-sm">
-                        {student.firstName[0]}
-                        {student.lastName[0]}
+                        {student.firstName?.[0] ?? ''}
+                        {student.lastName?.[0] ?? ''}
                       </span>
                     </div>
                     <div>
@@ -73,15 +72,6 @@ export default function StudentList({
                       Late
                     </option>
                   </select>
-                  {attendance[student.id] && (
-                    <div
-                      className={`mt-2 px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                        attendance[student.id]
-                      )}`}
-                    >
-                      {getStatusText(attendance[student.id])}
-                    </div>
-                  )}
                 </td>
               </tr>
             ))}

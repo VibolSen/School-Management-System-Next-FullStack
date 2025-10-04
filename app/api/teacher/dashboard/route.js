@@ -13,7 +13,7 @@ export async function GET(req) {
 
   try {
     const courses = await prisma.course.findMany({
-      where: { teacherId },
+      where: { leadById: teacherId },
       include: {
         groups: { include: { students: true } },
       },

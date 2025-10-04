@@ -131,6 +131,7 @@ model Assignment {
   title       String
   description String?
   dueDate     DateTime?
+  points      Int?
 
   teacher     User         @relation("AssignmentsCreated", fields: [teacherId], references: [id])
   teacherId   String       @db.ObjectId

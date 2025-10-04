@@ -25,3 +25,20 @@ export async function PUT(req, { params }) {
     );
   }
 }
+
+export async function DELETE(req, { params }) {
+  const { assignmentId } = params;
+
+  try {
+    await prisma.assignment.delete({
+      where: { id: assignmentId },
+    });
+    return NextResponse.json({ message: "Assignment deleted successfully" });
+  } catch (error) {
+    console.error("[API/TEACHER/ASSIGNMENTS] Error deleting assignment:", error);
+    return NextResponse.json(
+      { error: "Failed to delete assignment", details: error.message },
+      { status: 500 }
+    );
+  }
+}

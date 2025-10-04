@@ -7,6 +7,10 @@ export default function MyCoursesView({ loggedInUser }) {
   const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [departments, setDepartments] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [sortCriteria, setSortCriteria] = useState("name"); // e.g., "name", "department", "groups", "students"
+  const [sortOrder, setSortOrder] = useState("asc"); // "asc" or "desc"
 
   const teacherId = loggedInUser?.id;
 
@@ -27,19 +31,70 @@ export default function MyCoursesView({ loggedInUser }) {
     }
   }, [teacherId]);
 
+  // Fetch departments on component mount
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const res = await fetch("/api/departments");
+        if (res.ok) {
+          const data = await res.json();
+          setDepartments(data);
+        } else {
+          console.error("Failed to fetch departments:", res.status);
+        }
+      } catch (err) {
+        console.error("Error fetching departments:", err);
+      }
+    };
+    fetchDepartments();
+  }, []);
+
   // Fetch data on component mount
   useEffect(() => {
     fetchMyCourses();
   }, [fetchMyCourses]);
 
-  // Memoized filtering for the search input
-  const filteredCourses = useMemo(() => {
-    return courses.filter(
+  // Memoized filtering and sorting for the search input and department filter
+  const sortedAndFilteredCourses = useMemo(() => {
+    let tempCourses = courses.filter(
       (course) =>
-        course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        course.department?.name.toLowerCase().includes(searchTerm.toLowerCase())
+        (course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          course.department?.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (selectedDepartment === "" || course.department?.id === selectedDepartment)
     );
-  }, [courses, searchTerm]);
+
+    tempCourses.sort((a, b) => {
+      let valA, valB;
+
+      switch (sortCriteria) {
+        case "name":
+          valA = a.name.toLowerCase();
+          valB = b.name.toLowerCase();
+          break;
+        case "department":
+          valA = a.department?.name.toLowerCase() || "";
+          valB = b.department?.name.toLowerCase() || "";
+          break;
+        case "groups":
+          valA = a.groupCount;
+          valB = b.groupCount;
+          break;
+        case "students":
+          valA = a.studentCount;
+          valB = b.studentCount;
+          break;
+        default:
+          valA = a.name.toLowerCase();
+          valB = b.name.toLowerCase();
+      }
+
+      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return tempCourses;
+  }, [courses, searchTerm, selectedDepartment, sortCriteria, sortOrder]);
 
   return (
     <div className="space-y-6">
@@ -57,6 +112,36 @@ export default function MyCoursesView({ loggedInUser }) {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full md:w-64 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
+          <select
+            value={selectedDepartment}
+            onChange={(e) => setSelectedDepartment(e.target.value)}
+            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">All Departments</option>
+            {departments.map((dept) => (
+              <option key={dept.id} value={dept.id}>
+                {dept.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={sortCriteria}
+            onChange={(e) => setSortCriteria(e.target.value)}
+            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="name">Sort by Name</option>
+            <option value="department">Sort by Department</option>
+            <option value="groups">Sort by Groups</option>
+            <option value="students">Sort by Students</option>
+          </select>
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="w-full md:w-32 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left text-slate-500">
@@ -75,17 +160,17 @@ export default function MyCoursesView({ loggedInUser }) {
                     Loading your courses...
                   </td>
                 </tr>
-              ) : filteredCourses.length === 0 ? (
+              ) : sortedAndFilteredCourses.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="text-center py-8 text-gray-500">
                     You are not assigned to any courses.
                   </td>
                 </tr>
               ) : (
-                filteredCourses.map((course) => (
+                sortedAndFilteredCourses.map((course) => (
                   <tr
                     key={course.id}
-                    className="bg-white border-b hover:bg-slate-50"
+                    className="bg-white border-b hover:bg-slate-50 border-slate-200"
                   >
                     <td className="px-6 py-4 font-medium text-gray-900">
                       {course.name}
@@ -93,7 +178,7 @@ export default function MyCoursesView({ loggedInUser }) {
                     <td className="px-6 py-4 text-gray-500">
                       {course.department?.name || "N/A"}
                     </td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-6 py-4 text-center">\
                       <span className="px-2 py-1 text-xs font-semibold text-purple-800 bg-purple-100 rounded-full">
                         {course.groupCount}
                       </span>

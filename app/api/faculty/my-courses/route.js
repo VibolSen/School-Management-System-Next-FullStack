@@ -19,7 +19,7 @@ export async function GET(req) {
 
     // 1. Find all courses led by this teacher
     const coursesLedByTeacher = await prisma.course.findMany({
-      where: { teacherId },
+      where: { leadById: teacherId },
       include: {
         department: true, // Include the department's data
         groups: {

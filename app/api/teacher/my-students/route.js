@@ -18,7 +18,7 @@ export async function GET(req) {
 
     // A multi-level query to find all students associated with a teacher's courses
     const coursesLedByTeacher = await prisma.course.findMany({
-      where: { teacherId },
+      where: { leadById: teacherId },
       include: {
         groups: {
           // Find all groups within those courses

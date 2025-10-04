@@ -11,22 +11,27 @@ export async function GET(request) {
   }
 
   try {
+    console.log("Fetching groups for user:", loggedInUser);
+
     const courses = await prisma.course.findMany({
       where: {
-        teacherId: loggedInUser.id,
+        leadById: loggedInUser.id,
       },
       include: {
         groups: true,
       },
     });
 
-    const groups = courses.flatMap((course) => course.groups);
+    console.log("Found courses for user:", courses);
 
-    console.log("Found courses:", courses);
+    const allGroups = courses.flatMap((course) => course.groups);
+    console.log("All groups from courses:", allGroups);
 
-    console.log("Found groups:", groups);
+    const uniqueGroups = Array.from(new Map(allGroups.map(group => [group.id, group])).values());
 
-    return NextResponse.json(groups);
+    console.log("Unique groups returned:", uniqueGroups);
+
+    return NextResponse.json(uniqueGroups);
   } catch (error) {
     console.error("Error fetching teacher groups:", error);
     return NextResponse.json(

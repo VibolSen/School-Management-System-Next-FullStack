@@ -18,14 +18,16 @@ export async function GET(req) {
 
     // 1. Find all courses led by this teacher
     const coursesLedByTeacher = await prisma.course.findMany({
-      where: { teacherId },
+      where: { leadById: teacherId },
       include: {
-        department: true, // Include the department's data
+        courseDepartments: {
+          include: {
+            department: true,
+          },
+        },
         groups: {
-          // Include the groups within the course
           include: {
             _count: {
-              // For each group, count the students
               select: { students: true },
             },
           },
@@ -41,11 +43,12 @@ export async function GET(req) {
         (sum, group) => sum + group._count.students,
         0
       );
+      const department = course.courseDepartments[0]?.department;
 
       return {
         id: course.id,
         name: course.name,
-        department: course.department,
+        department: department,
         groupCount,
         studentCount,
       };

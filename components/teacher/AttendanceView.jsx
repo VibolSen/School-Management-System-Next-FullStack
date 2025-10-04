@@ -17,9 +17,19 @@ export default function AttendanceView() {
 
   useEffect(() => {
     const fetchGroups = async () => {
-      const res = await fetch("/api/teacher/groups");
-      const data = await res.json();
-      setGroups(data);
+      try {
+        const res = await fetch("/api/teacher/groups");
+        if (res.ok) {
+          const data = await res.json();
+          setGroups(data);
+        } else {
+          console.error("Failed to fetch groups:", res.status);
+          setGroups([]);
+        }
+      } catch (error) {
+        console.error("Error fetching groups:", error);
+        setGroups([]);
+      }
     };
     fetchGroups();
   }, []);
@@ -113,18 +123,6 @@ export default function AttendanceView() {
     }
   };
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case "PRESENT":
-        return "Present";
-      case "ABSENT":
-        return "Absent";
-      case "LATE":
-        return "Late";
-      default:
-        return "Not Set";
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-8 px-4">
@@ -176,7 +174,6 @@ export default function AttendanceView() {
             attendance={attendance}
             handleAttendanceChange={handleAttendanceChange}
             getStatusColor={getStatusColor}
-            getStatusText={getStatusText}
           />
         ) : selectedGroup ? (
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
