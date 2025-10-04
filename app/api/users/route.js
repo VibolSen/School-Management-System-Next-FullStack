@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getLoggedInUser } from '@/lib/auth';
+import bcrypt from 'bcrypt';
 
 export async function GET(request) {
   try {
@@ -24,7 +25,7 @@ export async function GET(request) {
       department: { select: { name: true } },
     };
 
-    if (loggedInUser.role === 'ADMIN') {
+    if (loggedInUser.role === 'ADMIN' || loggedInUser.role === 'FACULTY') {
       if (roleFilter) {
         users = await prisma.user.findMany({
           where: { role: roleFilter },
@@ -35,8 +36,8 @@ export async function GET(request) {
           select: selectFields,
         });
       }
-    } else if (loggedInUser.role === 'FACULTY' || loggedInUser.role === 'TEACHER') {
-      // For faculty/teacher, return students in their department
+    } else if (loggedInUser.role === 'TEACHER') {
+      // For teacher, return students in their department
       if (loggedInUser.departmentId) {
         users = await prisma.user.findMany({
           where: {
@@ -46,7 +47,7 @@ export async function GET(request) {
           select: selectFields,
         });
       } else {
-        // If faculty/teacher has no department, they see no students
+        // If teacher has no department, they see no students
         users = [];
       }
     } else if (loggedInUser.role === 'STUDENT') {
@@ -63,6 +64,61 @@ export async function GET(request) {
     return NextResponse.json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function POST(request) {
+  try {
+    const loggedInUser = await getLoggedInUser();
+
+    if (!loggedInUser || (loggedInUser.role !== 'ADMIN' && loggedInUser.role !== 'FACULTY')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { firstName, lastName, email, password, role, departmentId } = body;
+
+    if (loggedInUser.role === 'FACULTY' && role !== 'STUDENT') {
+      return NextResponse.json({ error: 'Faculty can only create students' }, { status: 403 });
+    }
+
+    if (!firstName || !lastName || !email || !password || !role) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      return NextResponse.json({ error: 'User with this email already exists' }, { status: 409 });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await prisma.user.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        role,
+        departmentId,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        departmentId: true,
+      },
+    });
+
+    return NextResponse.json(newUser, { status: 201 });
+  } catch (error) {
+    console.error('Error creating user:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

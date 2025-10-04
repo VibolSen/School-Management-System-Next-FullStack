@@ -13,6 +13,9 @@ import {
   UserCheck,
   Sparkles,
   TrendingUp,
+  BarChart3,
+  Activity,
+  Shield,
 } from "lucide-react";
 
 export default function AdministratorDashboard() {
@@ -50,12 +53,18 @@ export default function AdministratorDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-lg font-semibold text-muted-foreground animate-pulse">
-            Loading your dashboard...
-          </p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center space-y-6">
+          <div className="relative">
+            <div className="w-20 h-20 border-4 border-blue-100 rounded-full"></div>
+            <div className="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-xl font-semibold text-gray-700">
+              Loading Dashboard
+            </p>
+            <p className="text-gray-500">Preparing your analytics...</p>
+          </div>
         </div>
       </div>
     );
@@ -63,14 +72,26 @@ export default function AdministratorDashboard() {
 
   if (!dashboardData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-destructive/20 rounded-full flex items-center justify-center">
-            <span className="text-2xl">⚠️</span>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center space-y-6 max-w-md mx-auto p-8">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+            <Shield className="w-10 h-10 text-red-500" />
           </div>
-          <p className="text-lg font-semibold text-destructive">
-            Failed to load dashboard data
-          </p>
+          <div className="space-y-3">
+            <h3 className="text-2xl font-bold text-gray-800">
+              Data Unavailable
+            </h3>
+            <p className="text-gray-600">
+              We're unable to load your dashboard data at the moment. Please try
+              again later.
+            </p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -81,128 +102,137 @@ export default function AdministratorDashboard() {
     : "Admin";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      {/* Animated background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float"></div>
-        <div
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-secondary/5 rounded-full blur-3xl animate-float"
-          style={{ animationDelay: "2s" }}
-        ></div>
-        <div
-          className="absolute top-3/4 left-1/2 w-64 h-64 bg-accent/5 rounded-full blur-3xl animate-float"
-          style={{ animationDelay: "4s" }}
-        ></div>
-      </div>
-
-      <div className="relative z-10 p-6 md:p-8 lg:p-12">
-        <div className="max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen bg-gray-50">
+      {/* Main Content */}
+      <div className="p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto space-y-8">
           {/* Enhanced Header */}
-          <div className="relative overflow-hidden">
-            <div className="bg-gradient-to-r from-primary via-primary to-secondary p-8 md:p-12 rounded-3xl shadow-2xl shadow-primary/20 text-primary-foreground relative">
-              {/* Header background pattern */}
-              <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-white rounded-full -translate-y-20 translate-x-20"></div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-white rounded-full translate-y-16 -translate-x-16"></div>
-                <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-white rounded-full -translate-x-12 -translate-y-12"></div>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-500 rounded-lg">
+                  <BarChart3 className="w-6 h-6 text-white" />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
               </div>
-
-              <div className="relative z-10 flex items-center justify-between">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
-                    <h1 className="text-3xl md:text-5xl font-black tracking-tight">
-                      Welcome back, {welcomeName}!
-                    </h1>
-                  </div>
-                  <p className="text-lg md:text-xl text-primary-foreground/90 font-medium max-w-2xl">
-                    Here's a comprehensive overview of your school's performance
-                    metrics and system status.
-                  </p>
-                  <div className="flex items-center gap-2 text-primary-foreground/80">
-                    <TrendingUp className="w-5 h-5" />
-                    <span className="text-sm font-semibold">
-                      Real-time Analytics Dashboard
-                    </span>
-                  </div>
-                </div>
-
-                {/* Decorative element */}
-                <div className="hidden lg:block">
-                  <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
-                    <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
-                      <Building2 className="w-10 h-10 text-white" />
-                    </div>
-                  </div>
-                </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-semibold text-gray-800">
+                  Welcome back, {welcomeName}!
+                </h2>
+                <p className="text-gray-600 max-w-2xl">
+                  Here's an overview of your school's performance metrics and
+                  system status.
+                </p>
               </div>
             </div>
-          </div>
 
-          {/* Enhanced Grid layout with staggered animations */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="animate-fade-in" style={{ animationDelay: "0.1s" }}>
-              <DashboardCard
-                title="Total Students"
-                value={dashboardData.studentCount}
-                icon={<Users className="w-6 h-6" />}
-                gradient="from-blue-600/20 via-blue-500/15 to-cyan-600/20"
-              />
-            </div>
-
-            <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              <DashboardCard
-                title="Total Teachers"
-                value={dashboardData.teacherCount}
-                icon={<UserCheck className="w-6 h-6" />}
-                gradient="from-emerald-600/20 via-green-500/15 to-teal-600/20"
-              />
-            </div>
-
-            <div className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
-              <DashboardCard
-                title="Total Staff"
-                value={dashboardData.staffCount}
-                icon={<Briefcase className="w-6 h-6" />}
-                gradient="from-purple-600/20 via-violet-500/15 to-indigo-600/20"
-              />
-            </div>
-
-            <div className="animate-fade-in" style={{ animationDelay: "0.4s" }}>
-              <DashboardCard
-                title="Total Departments"
-                value={dashboardData.departmentCount}
-                icon={<Building2 className="w-6 h-6" />}
-                gradient="from-amber-600/20 via-yellow-500/15 to-orange-600/20"
-              />
-            </div>
-
-            <div className="animate-fade-in" style={{ animationDelay: "0.5s" }}>
-              <DashboardCard
-                title="Total Courses"
-                value={dashboardData.courseCount}
-                icon={<Library className="w-6 h-6" />}
-                gradient="from-sky-600/20 via-blue-500/15 to-indigo-600/20"
-              />
-            </div>
-
-            <div className="animate-fade-in" style={{ animationDelay: "0.6s" }}>
-              <DashboardCard
-                title="Total Groups"
-                value={dashboardData.groupCount}
-                icon={<Group className="w-6 h-6" />}
-                gradient="from-pink-600/20 via-rose-500/15 to-red-600/20"
-              />
-            </div>
-          </div>
-
-          {/* Additional fancy footer section */}
-          <div className="mt-16 text-center">
-            <div className="inline-flex items-center gap-2 px-6 py-3 bg-muted/50 backdrop-blur-sm rounded-full border border-border/50">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-muted-foreground">
-                System Status: All services operational
+            {/* Stats Overview */}
+            <div className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-2">
+                <Activity className="w-5 h-5 text-green-500" />
+                <span className="text-sm font-medium text-gray-700">
+                  System Status
+                </span>
+              </div>
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm text-gray-600">
+                All Systems Operational
               </span>
+            </div>
+          </div>
+
+          {/* Enhanced Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <DashboardCard
+              title="Total Students"
+              value={dashboardData.studentCount}
+              icon={<Users className="w-6 h-6" />}
+              trend="+12%"
+              description="Active enrolled students"
+              gradient="from-blue-500 to-blue-600"
+              delay="0"
+            />
+
+            <DashboardCard
+              title="Total Teachers"
+              value={dashboardData.teacherCount}
+              icon={<UserCheck className="w-6 h-6" />}
+              trend="+5%"
+              description="Teaching staff"
+              gradient="from-green-500 to-green-600"
+              delay="100"
+            />
+
+            <DashboardCard
+              title="Total Staff"
+              value={dashboardData.staffCount}
+              icon={<Briefcase className="w-6 h-6" />}
+              trend="+3%"
+              description="Administrative staff"
+              gradient="from-purple-500 to-purple-600"
+              delay="200"
+            />
+
+            <DashboardCard
+              title="Total Departments"
+              value={dashboardData.departmentCount}
+              icon={<Building2 className="w-6 h-6" />}
+              description="Academic departments"
+              gradient="from-orange-500 to-orange-600"
+              delay="300"
+            />
+
+            <DashboardCard
+              title="Total Courses"
+              value={dashboardData.courseCount}
+              icon={<Library className="w-6 h-6" />}
+              trend="+8%"
+              description="Available courses"
+              gradient="from-indigo-500 to-indigo-600"
+              delay="400"
+            />
+
+            <DashboardCard
+              title="Total Groups"
+              value={dashboardData.groupCount}
+              icon={<Group className="w-6 h-6" />}
+              description="Student groups"
+              gradient="from-pink-500 to-pink-600"
+              delay="500"
+            />
+          </div>
+
+          {/* Quick Actions Section */}
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Quick Actions
+              </h3>
+              <TrendingUp className="w-5 h-5 text-gray-400" />
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: "Manage Users", icon: Users, color: "blue" },
+                { label: "View Reports", icon: BarChart3, color: "green" },
+                { label: "Settings", icon: Shield, color: "purple" },
+                { label: "Analytics", icon: Activity, color: "orange" },
+              ].map((action, index) => (
+                <button
+                  key={index}
+                  className="flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group"
+                >
+                  <div
+                    className={`p-3 rounded-lg bg-${action.color}-100 group-hover:bg-${action.color}-200 transition-colors`}
+                  >
+                    <action.icon
+                      className={`w-6 h-6 text-${action.color}-600`}
+                    />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 text-center">
+                    {action.label}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
         </div>

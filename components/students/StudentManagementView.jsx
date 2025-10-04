@@ -31,7 +31,7 @@ export default function StudentManagementView() {
   const fetchStudents = useCallback(async () => {
     setIsLoading(true);
     try {
-      const resUsers = await fetch("/api/users");
+      const resUsers = await fetch("/api/users?role=STUDENT");
       if (!resUsers.ok)
         throw new Error(`HTTP error! status: ${resUsers.status}`);
       const allUsers = await resUsers.json();
