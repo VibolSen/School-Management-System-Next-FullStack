@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export default function GroupModal({
   isOpen,
@@ -23,10 +24,7 @@ export default function GroupModal({
           courseIds: groupToEdit.courseIds || [],
         });
       } else {
-        setFormData({
-          name: "",
-          courseIds: [],
-        });
+        setFormData({ name: "", courseIds: [] });
       }
       setErrors({});
     }
@@ -63,9 +61,9 @@ export default function GroupModal({
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg animate-fade-in-scale">
+  const modalContent = (
+    <div className="fixed inset-0 w-screen h-screen bg-black bg-opacity-50 z-50 flex justify-center items-center">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl animate-fade-in-scale">
         <div className="p-6 border-b">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-slate-800">
@@ -92,8 +90,10 @@ export default function GroupModal({
             </button>
           </div>
         </div>
+
         <form onSubmit={handleSubmit} noValidate>
           <div className="p-6 space-y-4">
+            {/* Group Name */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Group Name
@@ -113,20 +113,25 @@ export default function GroupModal({
                 <p className="text-xs text-red-500 mt-1">{errors.name}</p>
               )}
             </div>
+
+            {/* Course Selection */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Course
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2 p-2 border rounded-md bg-white h-32 overflow-y-auto">
                 {courses.map((course) => (
-                  <label key={course.id} className="flex items-center space-x-2">
+                  <label
+                    key={course.id}
+                    className="flex items-center space-x-2"
+                  >
                     <input
                       type="checkbox"
                       checked={formData.courseIds.includes(course.id)}
                       onChange={() => handleCourseChange(course.id)}
                       className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                     />
-                    <span>{course.name}</span>
+                    <span className="text-sm">{course.name}</span>
                   </label>
                 ))}
               </div>
@@ -135,6 +140,8 @@ export default function GroupModal({
               )}
             </div>
           </div>
+
+          {/* Footer Buttons */}
           <div className="p-6 bg-slate-50 border-t rounded-b-xl flex justify-end items-center gap-4">
             <button
               type="button"
@@ -160,4 +167,6 @@ export default function GroupModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

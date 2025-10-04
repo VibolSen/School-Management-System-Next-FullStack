@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 const AddResourceModal = ({ 
   isOpen, 
@@ -20,6 +21,11 @@ const AddResourceModal = ({
   });
 
   const [errors, setErrors] = useState({});
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -89,9 +95,9 @@ const AddResourceModal = ({
     onSaveResource(resourceData);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-full overflow-y-auto animate-fade-in-scale">
         <div className="p-6 border-b flex justify-between items-center">
@@ -217,6 +223,8 @@ const AddResourceModal = ({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default AddResourceModal;

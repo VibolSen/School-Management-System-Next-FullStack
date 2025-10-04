@@ -3,6 +3,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export default function StudentAssignmentModal({
   isOpen,
@@ -25,6 +26,11 @@ export default function StudentAssignmentModal({
   const [courses, setCourses] = useState([]);
   const [groups, setGroups] = useState([]);
   const [statuses, setStatuses] = useState([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -116,9 +122,9 @@ export default function StudentAssignmentModal({
     onSave(payload);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
@@ -254,4 +260,6 @@ export default function StudentAssignmentModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

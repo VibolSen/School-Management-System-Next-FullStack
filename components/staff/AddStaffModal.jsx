@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export default function AddStaffModal({
   isOpen,
@@ -18,8 +19,13 @@ export default function AddStaffModal({
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const [mounted, setMounted] = useState(false);
 
   const isEditMode = !!staffToEdit;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -76,9 +82,9 @@ export default function AddStaffModal({
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-full overflow-y-auto animate-fade-in-scale">
         <div className="p-6 border-b">
@@ -258,4 +264,6 @@ export default function AddStaffModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

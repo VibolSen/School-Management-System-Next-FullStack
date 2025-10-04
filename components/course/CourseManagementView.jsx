@@ -34,14 +34,15 @@ export default function CourseManagementView() {
       const [coursesRes, deptsRes, teachersRes] = await Promise.all([
         fetch("/api/courses"),
         fetch("/api/departments"),
-        fetch("/api/users?role=TEACHER"),
+        fetch("/api/teacher"),
       ]);
 
       if (!coursesRes.ok) throw new Error("Failed to fetch courses.");
       if (!deptsRes.ok) throw new Error("Failed to fetch departments.");
       if (!teachersRes.ok) throw new Error("Failed to fetch teachers.");
 
-      setCourses(await coursesRes.json());
+      const coursesData = await coursesRes.json();
+      setCourses(coursesData);
       setDepartments(await deptsRes.json());
       setTeachers(await teachersRes.json());
     } catch (err) {

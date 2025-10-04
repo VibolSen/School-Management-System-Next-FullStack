@@ -3,10 +3,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 const SubmissionModal = ({ isOpen, onClose, onSubmit, currentSubmission }) => {
   const [content, setContent] = useState("");
   const [fileUrl, setFileUrl] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     // Pre-fill the form with the current submission if it exists
@@ -21,9 +27,9 @@ const SubmissionModal = ({ isOpen, onClose, onSubmit, currentSubmission }) => {
     onSubmit({ content, fileUrl });
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center p-4">
       <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
         <div className="flex justify-between items-center border-b pb-3 mb-4">
@@ -96,6 +102,8 @@ const SubmissionModal = ({ isOpen, onClose, onSubmit, currentSubmission }) => {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default SubmissionModal;

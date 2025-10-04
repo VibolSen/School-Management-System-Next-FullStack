@@ -61,19 +61,22 @@ export default function CoursesTable({
     return courses.filter((course) => {
       const matchesSearch =
         course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (course.department?.name &&
-          course.department.name
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())) ||
-        (course.teacher &&
-          `${course.teacher.firstName} ${course.teacher.lastName}`
+        (course.courseDepartments &&
+          course.courseDepartments.some((cd) =>
+            cd.department.name.toLowerCase().includes(searchTerm.toLowerCase())
+          )) ||
+        (course.leadBy &&
+          `${course.leadBy.firstName} ${course.leadBy.lastName}`
             .toLowerCase()
             .includes(searchTerm.toLowerCase()));
 
-      const matchesDepartment =
-        departmentFilter === "All" || course.departmentId === departmentFilter;
-      const matchesTeacher =
-        teacherFilter === "All" || course.teacherId === teacherFilter;
+                const matchesDepartment =
+                  departmentFilter === "All" ||
+                  (course.courseDepartments &&
+                    course.courseDepartments.some(
+                      (cd) => cd.departmentId === departmentFilter
+                    ));      const matchesTeacher =
+        teacherFilter === "All" || course.leadById === teacherFilter;
 
       return matchesSearch && matchesDepartment && matchesTeacher;
     });
@@ -181,13 +184,13 @@ export default function CoursesTable({
               </th>
               <th
                 className="px-6 py-3 cursor-pointer"
-                onClick={() => handleSort("teacher.firstName")}
+                onClick={() => handleSort("leadBy.firstName")}
               >
                 <div className="flex items-center gap-1.5">
                   Lead Teacher
                   <SortIndicator
                     direction={
-                      sortConfig.key === "teacher.firstName"
+                      sortConfig.key === "leadBy.firstName"
                         ? sortConfig.direction
                         : null
                     }
@@ -218,11 +221,13 @@ export default function CoursesTable({
                     {course.name}
                   </td>
                   <td className="px-6 py-4">
-                    {course.department?.name || "N/A"}
+                    {course.courseDepartments && course.courseDepartments.length > 0
+                      ? course.courseDepartments.map(cd => cd.department.name).join(", ")
+                      : "N/A"}
                   </td>
                   <td className="px-6 py-4">
-                    {course.teacher ? (
-                      `${course.teacher.firstName} ${course.teacher.lastName}`
+                    {course.leadBy ? (
+                      `${course.leadBy.firstName} ${course.leadBy.lastName}`
                     ) : (
                       <span className="italic text-slate-400">Unassigned</span>
                     )}

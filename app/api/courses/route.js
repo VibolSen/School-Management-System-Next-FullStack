@@ -19,6 +19,8 @@ async function getUser(req) {
   }
 }
 
+export const revalidate = 0;
+
 // GET function (no changes)
 export async function GET(req) {
   try {
@@ -41,8 +43,12 @@ export async function GET(req) {
       where: whereClause,
       orderBy: { name: "asc" },
       include: {
-        department: true,
-        teacher: {
+        courseDepartments: {
+          include: {
+            department: true,
+          },
+        },
+        leadBy: {
           select: { id: true, firstName: true, lastName: true },
         },
         _count: {
@@ -68,8 +74,9 @@ export async function POST(req) {
   }
 
   try {
-    const { name, departmentId, teacherId } = await req.json();
-    if (!name || !departmentId) {
+      const { name, departmentIds, teacherId } = await req.json();
+    console.log("--- Creating Course ---", { name, departmentIds, teacherId });
+    if (!name || !departmentIds || departmentIds.length === 0) {
       return NextResponse.json(
         { error: "Course name and department ID are required" },
         { status: 400 }
@@ -77,12 +84,22 @@ export async function POST(req) {
     }
     const dataToCreate = {
       name,
-      department: { connect: { id: departmentId } },
+
     };
     if (teacherId) {
-      dataToCreate.teacher = { connect: { id: teacherId } };
+      dataToCreate.leadBy = { connect: { id: teacherId } };
     }
     const newCourse = await prisma.course.create({ data: dataToCreate });
+
+    if (departmentIds && departmentIds.length > 0) {
+      await prisma.courseDepartment.createMany({
+        data: departmentIds.map((deptId) => ({
+          courseId: newCourse.id,
+          departmentId: deptId,
+        })),
+      });
+    }
+
     return NextResponse.json(newCourse, { status: 201 });
   } catch (error) {
     if (error.code === "P2002") {
@@ -109,9 +126,9 @@ export async function PUT(req) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    const { name, departmentId, teacherId } = await req.json();
+    const { name, departmentIds, teacherId } = await req.json();
 
-    if (!id || !name || !departmentId) {
+    if (!id || !name || !departmentIds) {
       return NextResponse.json(
         { error: "Course ID, name, and department ID are required" },
         { status: 400 }
@@ -120,23 +137,34 @@ export async function PUT(req) {
 
     const dataToUpdate = {
       name,
-      department: {
-        connect: {
-          id: departmentId,
-        },
-      },
     };
 
+    // Delete existing CourseDepartment entries for this course
+    await prisma.courseDepartment.deleteMany({
+      where: { courseId: id },
+    });
+
     if (teacherId) {
-      dataToUpdate.teacher = { connect: { id: teacherId } };
+      dataToUpdate.leadBy = { connect: { id: teacherId } };
     } else {
-      dataToUpdate.teacher = { disconnect: true };
+      dataToUpdate.leadBy = { disconnect: true };
     }
 
     const updatedCourse = await prisma.course.update({
       where: { id },
       data: dataToUpdate,
     });
+
+    // Create new CourseDepartment entries
+    if (departmentIds && departmentIds.length > 0) {
+      await prisma.courseDepartment.createMany({
+        data: departmentIds.map((deptId) => ({
+          courseId: updatedCourse.id,
+          departmentId: deptId,
+        })),
+      });
+    }
+
     return NextResponse.json(updatedCourse);
   } catch (error) {
     if (error.code === "P2002") {
@@ -169,15 +197,7 @@ export async function DELETE(req) {
         { status: 400 }
       );
 
-    const groupCount = await prisma.group.count({ where: { courseIds: { has: id } } });
-    if (groupCount > 0) {
-      return NextResponse.json(
-        {
-          error: `Cannot delete course because it has ${groupCount} associated group(s).`,
-        },
-        { status: 409 }
-      );
-    }
+    await prisma.courseDepartment.deleteMany({ where: { courseId: id } });
 
     await prisma.course.delete({ where: { id } });
     return new NextResponse(null, { status: 204 });

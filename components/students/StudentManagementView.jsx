@@ -35,11 +35,7 @@ export default function StudentManagementView() {
       if (!resUsers.ok)
         throw new Error(`HTTP error! status: ${resUsers.status}`);
       const allUsers = await resUsers.json();
-
-      const studentsOnly = allUsers.filter(
-        (user) => user.role === STUDENT_ROLE
-      );
-      setStudents(studentsOnly);
+      setStudents(allUsers);
     } catch (err) {
       showMessage(`Failed to load student data: ${err.message}`, "error");
     } finally {

@@ -1,12 +1,19 @@
 // components/e-library/ResourceDetailModal.jsx
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 const ResourceDetailModal = ({ isOpen, onClose, resource }) => {
-  if (!isOpen || !resource) return null;
+  const [mounted, setMounted] = useState(false);
 
-  return (
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !resource || !mounted) return null;
+
+  const modalContent = (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-full overflow-y-auto animate-fade-in-scale">
         <div className="p-6 border-b flex justify-between items-center">
@@ -38,6 +45,8 @@ const ResourceDetailModal = ({ isOpen, onClose, resource }) => {
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default ResourceDetailModal;

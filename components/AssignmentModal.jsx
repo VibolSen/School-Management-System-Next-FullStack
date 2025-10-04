@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export default function AssignmentModal({
   isOpen,
@@ -20,8 +21,13 @@ export default function AssignmentModal({
   });
   const [error, setError] = useState("");
   const [isClosing, setIsClosing] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const isEditMode = Boolean(assignment);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -86,9 +92,9 @@ export default function AssignmentModal({
     onSave(formData);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const modalContent = (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${
         isClosing ? "animate-fadeOut" : "animate-fadeIn"
@@ -461,4 +467,6 @@ export default function AssignmentModal({
       `}</style>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

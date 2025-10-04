@@ -92,7 +92,7 @@ model LibraryResource {
 model Department {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
   name    String   @unique
-  courses Course[]
+  departmentCourses CourseDepartment[]
   users   User[]
   head    User?    @relation("DepartmentHead", fields: [headId], references: [id])
   headId  String?  @db.ObjectId
@@ -101,15 +101,14 @@ model Department {
 model Course {
   id           String       @id @default(auto()) @map("_id") @db.ObjectId
   name         String       @unique
-  department   Department   @relation(fields: [departmentId], references: [id])
-  departmentId String       @db.ObjectId
   groups       Group[]      @relation("CourseToGroup", fields: [groupIds], references: [id])
   groupIds     String[]     @db.ObjectId
-  teacher      User?        @relation("CourseLead", fields: [teacherId], references: [id])
-  teacherId    String?      @db.ObjectId
+  leadBy       User?        @relation("CourseLead", fields: [leadById], references: [id])
+  leadById     String?      @db.ObjectId
 
   // ✅ Back relation for Enrollment
   enrollments Enrollment[]
+  courseDepartments CourseDepartment[]
 }
 
 model Group {
@@ -218,4 +217,15 @@ model Schedule {
 
   assignedToGroup   Group?   @relation("SchedulesAssignedToGroup", fields: [assignedToGroupId], references: [id])
   assignedToGroupId String? @db.ObjectId
+}
+
+model CourseDepartment {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  courseId     String   @db.ObjectId
+  departmentId String   @db.ObjectId
+
+  course       Course   @relation(fields: [courseId], references: [id])
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  @@unique([courseId, departmentId])
 }

@@ -35,7 +35,11 @@ export async function GET(req) {
         department: true,
         ledCourses: {
           include: {
-            department: true,
+            courseDepartments: {
+              include: {
+                department: true,
+              },
+            },
             groups: {
               include: {
                 students: true,

@@ -80,7 +80,7 @@ export default function DepartmentsTable({
                   </td>
                   <td className="px-6 py-4 text-center">
                     <span className="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
-                      {dept._count?.courses ?? 0}
+                      {dept._count?.departmentCourses ?? 0}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium space-x-2 text-center">

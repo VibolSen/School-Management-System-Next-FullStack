@@ -193,13 +193,13 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
                   <div className="flex justify-between">
                     <span className="text-slate-600">Department:</span>
                     <span className="font-medium">
-                      {selectedCourse.department.name || "N/A"}
+                      {selectedCourse.courseDepartments?.[0]?.department?.name || "N/A"}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Instructor:</span>
                     <span className="font-medium">
-                      {`${selectedCourse.teacher.firstName} ${selectedCourse.teacher.lastName}` ||
+                      {`${selectedCourse.leadBy?.firstName} ${selectedCourse.leadBy?.lastName}` ||
                         "N/A"}
                     </span>
                   </div>

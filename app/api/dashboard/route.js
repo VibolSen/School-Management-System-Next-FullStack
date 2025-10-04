@@ -24,10 +24,11 @@ export async function GET() {
       prisma.course.count(),
       prisma.group.count(),
       prisma.user.count({ where: { role: "TEACHER" } }),
-      prisma.course.groupBy({
-        by: ["departmentId"],
-        _count: {
-          _all: true,
+      prisma.courseDepartment.findMany({
+        include: {
+          department: {
+            select: { id: true, name: true },
+          },
         },
       }),
       prisma.group.findMany({
@@ -51,9 +52,15 @@ export async function GET() {
       return acc;
     }, {});
 
-    const coursesByDepartment = coursesByDept.map((c) => ({
-      name: departmentMap[c.departmentId],
-      count: c._count._all,
+    const coursesByDepartmentMap = coursesByDept.reduce((acc, cd) => {
+      const deptName = cd.department.name;
+      acc[deptName] = (acc[deptName] || 0) + 1;
+      return acc;
+    }, {});
+
+    const coursesByDepartment = Object.keys(coursesByDepartmentMap).map((name) => ({
+      name,
+      count: coursesByDepartmentMap[name],
     }));
 
     const studentsPerGroup = groups.map((g) => ({
