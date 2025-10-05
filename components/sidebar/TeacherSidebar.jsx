@@ -83,6 +83,11 @@ const TEACHER_NAV_ITEMS = [
     href: "/teacher/exam",
   },
   {
+    label: "Gradebook",
+    icon: <FiBook className="w-5 h-5" />,
+    href: "/teacher/gradebook",
+  },
+  {
     label: "Student Performance",
     icon: <FiTrendingUp className="w-5 h-5" />,
     href: "/teacher/student-performance",
