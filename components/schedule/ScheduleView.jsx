@@ -5,6 +5,7 @@ import ScheduleModal from './ScheduleModal';
 import ScheduleCard from './ScheduleCard';
 import ScheduleCalendarView from './ScheduleCalendarView';
 import { useUser } from '@/context/UserContext';
+import Notification from '@/components/Notification';
 
 export default function ScheduleView() {
   const { user } = useUser();
@@ -13,6 +14,20 @@ export default function ScheduleView() {
   const [currentSchedule, setCurrentSchedule] = useState(null);
   const [view, setView] = useState('card'); // 'card' or 'calendar'
   const [selectedSchedules, setSelectedSchedules] = useState([]);
+  const [notification, setNotification] = useState({
+    show: false,
+    message: '',
+    type: 'info',
+  });
+
+  useEffect(() => {
+    if (notification.show) {
+      const timer = setTimeout(() => {
+        setNotification({ ...notification, show: false });
+      }, 3000); // Notification disappears after 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const fetchSchedules = async () => {
     try {
@@ -46,13 +61,28 @@ export default function ScheduleView() {
     try {
       if (currentSchedule) {
         await axios.put(`/api/schedule/${currentSchedule.id}`, scheduleData);
+        setNotification({
+          show: true,
+          message: 'Schedule updated successfully!',
+          type: 'success',
+        });
       } else {
         await axios.post('/api/schedule', scheduleData);
+        setNotification({
+          show: true,
+          message: 'Schedule created successfully!',
+          type: 'success',
+        });
       }
       fetchSchedules();
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error saving schedule:', error);
+      setNotification({
+        show: true,
+        message: `Error saving schedule: ${error.message}`,
+        type: 'error',
+      });
     }
   };
 
@@ -60,8 +90,18 @@ export default function ScheduleView() {
     try {
       await axios.delete(`/api/schedule/${id}`);
       fetchSchedules();
+      setNotification({
+        show: true,
+        message: 'Schedule deleted successfully!',
+        type: 'success',
+      });
     } catch (error) {
       console.error('Error deleting schedule:', error);
+      setNotification({
+        show: true,
+        message: `Error deleting schedule: ${error.message}`,
+        type: 'error',
+      });
     }
   };
 
@@ -76,8 +116,18 @@ export default function ScheduleView() {
       await axios.delete('/api/schedule', { data: { ids: selectedSchedules } });
       fetchSchedules();
       setSelectedSchedules([]);
+      setNotification({
+        show: true,
+        message: 'Selected schedules deleted successfully!',
+        type: 'success',
+      });
     } catch (error) {
       console.error('Error deleting selected schedules:', error);
+      setNotification({
+        show: true,
+        message: `Error deleting selected schedules: ${error.message}`,
+        type: 'error',
+      });
     }
   };
 
@@ -138,6 +188,13 @@ export default function ScheduleView() {
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveSchedule}
         schedule={currentSchedule}
+      />
+
+      <Notification
+        show={notification.show}
+        message={notification.message}
+        type={notification.type}
+        onClose={() => setNotification({ ...notification, show: false })}
       />
     </div>
   );

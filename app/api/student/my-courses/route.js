@@ -22,10 +22,10 @@ export async function GET(req) {
       include: {
         groups: {
           include: {
-            course: {
+            courses: {
               include: {
-                department: true,
-                teacher: {
+                courseDepartments: { include: { department: true } },
+                leadBy: {
                   select: { id: true, firstName: true, lastName: true },
                 },
               },
@@ -42,7 +42,7 @@ export async function GET(req) {
       );
     }
 
-    const courses = user.groups.map(group => group.course).filter(Boolean);
+    const courses = user.groups.flatMap(group => group.courses).filter(Boolean);
 
     return NextResponse.json(courses);
   } catch (error) {

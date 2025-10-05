@@ -49,12 +49,16 @@ const StudentDashboard = ({ loggedInUser }) => {
 
   const { myProfile } = dashboardData;
 
+  console.log("myProfile:", myProfile);
+
   const currentCourses = myProfile.enrollments.filter(
     (enrollment) => enrollment.progress < 100
   );
   const pastCourses = myProfile.enrollments.filter(
     (enrollment) => enrollment.progress === 100
   );
+
+  console.log("currentCourses:", currentCourses);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -125,8 +129,8 @@ const StudentDashboard = ({ loggedInUser }) => {
                   >
                     <div>
                       <p className="font-semibold text-slate-800">{course.name}</p>
-                      <p className="text-sm text-slate-500">{course.department.name}</p>
-                      <p className="text-sm text-slate-500">{course.teacher.firstName} {course.teacher.lastName}</p>
+                      <p className="text-sm text-slate-500">{course.courseDepartments[0]?.department?.name || 'N/A'}</p>
+                      <p className="text-sm text-slate-500">{course.leadBy?.firstName} {course.leadBy?.lastName}</p>
                       <p className="text-sm text-slate-500">{course.groups.map(group => group.name).join(', ')}</p>
                     </div>
                     <Link href={`/student/courses/${course.id}`}>
@@ -154,8 +158,8 @@ const StudentDashboard = ({ loggedInUser }) => {
                   >
                     <div>
                       <p className="font-semibold text-slate-800">{course.name}</p>
-                      <p className="text-sm text-slate-500">{course.department.name}</p>
-                      <p className="text-sm text-slate-500">{course.teacher.firstName} {course.teacher.lastName}</p>
+                      <p className="text-sm text-slate-500">{course.courseDepartments[0]?.department?.name || 'N/A'}</p>
+                      <p className="text-sm text-slate-500">{course.leadBy?.firstName} {course.leadBy?.lastName}</p>
                       <p className="text-sm text-slate-500">{course.groups.map(group => group.name).join(', ')}</p>
                     </div>
                     <Link href={`/student/courses/${course.id}`}>

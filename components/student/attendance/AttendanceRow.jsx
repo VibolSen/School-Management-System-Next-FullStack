@@ -7,7 +7,7 @@ const AttendanceRow = ({ record }) => {
         {new Date(record.date).toLocaleDateString()}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        {record.group.course.name}
+        {record.group.name}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">{record.group.name}</td>
       <td className="px-6 py-4 whitespace-nowrap">

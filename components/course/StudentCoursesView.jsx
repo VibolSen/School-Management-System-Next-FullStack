@@ -31,11 +31,11 @@ export default function StudentCoursesView({ loggedInUser }) {
     return courses.filter(
       (course) =>
         course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        course.department?.name
+        course.courseDepartments[0]?.department?.name
           .toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
-        (course.teacher &&
-          `${course.teacher.firstName} ${course.teacher.lastName}`
+        (course.leadBy &&
+          `${course.leadBy.firstName} ${course.leadBy.lastName}`
             .toLowerCase()
             .includes(searchTerm.toLowerCase()))
     );
@@ -86,11 +86,11 @@ export default function StudentCoursesView({ loggedInUser }) {
                       {course.name}
                     </td>
                     <td className="px-6 py-4">
-                      {course.department?.name || "N/A"}
+                      {course.courseDepartments[0]?.department?.name || "N/A"}
                     </td>
                     <td className="px-6 py-4">
-                      {course.teacher ? (
-                        `${course.teacher.firstName} ${course.teacher.lastName}`
+                      {course.leadBy ? (
+                        `${course.leadBy.firstName} ${course.leadBy.lastName}`
                       ) : (
                         <span className="italic text-slate-400">
                           Unassigned

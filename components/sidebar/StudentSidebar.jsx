@@ -85,11 +85,6 @@ const STUDENT_NAV_ITEMS = [
     href: "/student/e-library",
   },
 
-  {
-    label: "Scan QR",
-    icon: <FiCode className="w-5 h-5" />,
-    href: "/student/scan-qr",
-  },
 ];
 
 const StudentSidebar = ({

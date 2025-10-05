@@ -20,11 +20,6 @@ export async function GET(req) {
         group: {
           select: {
             name: true,
-            course: {
-              select: {
-                name: true,
-              },
-            },
           },
         },
       },

@@ -178,7 +178,7 @@ export default function MyCoursesView({ loggedInUser }) {
                     <td className="px-6 py-4 text-gray-500">
                       {course.department?.name || "N/A"}
                     </td>
-                    <td className="px-6 py-4 text-center">\
+                    <td className="px-6 py-4 text-center">
                       <span className="px-2 py-1 text-xs font-semibold text-purple-800 bg-purple-100 rounded-full">
                         {course.groupCount}
                       </span>
