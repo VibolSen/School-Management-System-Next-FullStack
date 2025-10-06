@@ -122,3 +122,55 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function PUT(request) {
+  try {
+    const loggedInUser = await getLoggedInUser();
+
+    if (!loggedInUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { oldPassword, newPassword, confirmNewPassword } = body;
+
+    if (!oldPassword || !newPassword || !confirmNewPassword) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      return NextResponse.json({ error: 'New password and confirmation do not match' }, { status: 400 });
+    }
+
+    if (newPassword.length < 6) {
+      return NextResponse.json({ error: 'New password must be at least 6 characters long' }, { status: 400 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: loggedInUser.id },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+
+    if (!passwordMatch) {
+      return NextResponse.json({ error: 'Incorrect old password' }, { status: 401 });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: loggedInUser.id },
+      data: { password: hashedPassword },
+    });
+
+    return NextResponse.json({ message: 'Password updated successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('Error updating password:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+

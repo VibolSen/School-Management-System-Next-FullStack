@@ -27,6 +27,13 @@ export default function ProfilePageContent() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Password change states
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+
   // Helper function to get a cookie by name
   const getCookie = (name) => {
     if (typeof document === "undefined") return null;
@@ -106,6 +113,46 @@ export default function ProfilePageContent() {
     } catch (err) {
       console.error(err);
       setError("Update failed");
+    }
+  };
+
+  const handleChangePassword = async () => {
+    setPasswordError("");
+    setPasswordSuccess("");
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError("New password and confirmation do not match");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError("New password must be at least 6 characters long");
+      return;
+    }
+
+    try {
+      const token = getCookie("token");
+      if (!token) return;
+
+      const res = await fetch("/api/users", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ oldPassword, newPassword, confirmNewPassword }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setPasswordError(data.error || "Failed to update password");
+      } else {
+        setPasswordSuccess("Password updated successfully!");
+        setOldPassword("");
+        setNewPassword("");
+        setConfirmNewPassword("");
+      }
+    } catch (err) {
+      console.error(err);
+      setPasswordError("Failed to update password");
     }
   };
 
@@ -288,6 +335,68 @@ export default function ProfilePageContent() {
                 Today, 14:32
               </span>
             </div>
+          </div>
+        </div>
+
+        {/* Change Password Section */}
+        <div className="bg-white/80 backdrop-blur-sm border border-white/60 rounded-xl shadow-lg p-6 mt-4">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            Change Password
+          </h2>
+          {passwordError && (
+            <div className="bg-red-100 border border-red-200 text-red-700 px-3 py-2 rounded-md mb-4 text-xs">
+              {passwordError}
+            </div>
+          )}
+          {passwordSuccess && (
+            <div className="bg-green-100 border border-green-200 text-green-700 px-3 py-2 rounded-md mb-4 text-xs">
+              {passwordSuccess}
+            </div>
+          )}
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
+                Old Password
+              </label>
+              <input
+                type="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                placeholder="Enter your old password"
+                className="w-full bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-1.5 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder:text-gray-500 text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
+                New Password
+              </label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter your new password"
+                className="w-full bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-1.5 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder:text-gray-500 text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
+                Confirm New Password
+              </label>
+              <input
+                type="password"
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                placeholder="Confirm your new password"
+                className="w-full bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-1.5 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder:text-gray-500 text-sm"
+              />
+            </div>
+            <button
+              onClick={handleChangePassword}
+              className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 text-white py-2.5 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-1.5 hover:from-indigo-700 hover:to-indigo-600 shadow-md hover:shadow-lg"
+            >
+              <Shield className="w-4 h-4" />
+              Change Password
+            </button>
           </div>
         </div>
 
