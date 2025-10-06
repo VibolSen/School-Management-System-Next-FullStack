@@ -35,11 +35,17 @@ export async function POST(req) {
       },
     });
 
+    const newProfile = await prisma.profile.create({
+      data: {
+        userId: newUser.id,
+      },
+    });
+
     const { password: _, ...userWithoutPassword } = newUser;
     return new Response(
       JSON.stringify({
         message: "User registered successfully",
-        user: userWithoutPassword,
+        user: { ...userWithoutPassword, profile: newProfile },
       }),
       { status: 201 }
     );

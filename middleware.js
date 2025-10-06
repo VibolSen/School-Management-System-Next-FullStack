@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "your-super-secret-key-that-is-long"
+  process.env.JWT_SECRET || "your-super-secret-key-that-is-long" // Ensure this secret is consistent with /api/login/route.js and /api/profile/update/route.js
 );
 
 // Define all the valid paths for each role

@@ -82,17 +82,17 @@ export default function Header({ toggleSidebar }) {
           >
             <img
               className="h-9 w-9 rounded-full object-cover border border-slate-300"
-              src={user?.image || "/illustration/default.jpg"}
+              src={user?.profile?.avatar || "/default-cover.jpg"}
               alt={user?.name || "Guest"}
               onError={(e) =>
-                (e.currentTarget.src = "/illustration/default.jpg")
+                (e.currentTarget.src = "/default-cover.jpg")
               }
             />
             <div className="hidden md:block text-left">
               <div className="font-semibold text-sm text-slate-700">
                 {user ? `${user.firstName} ${user.lastName}` : "Guest"}
               </div>
-              <div className="text-xs text-slate-500">{user ? user.role : "Guest"}</div>
+              <div className="text-xs text-slate-500">{user ? user.role?.name : "Guest"}</div>
             </div>
             <svg
               className={`w-4 h-4 text-slate-500 transition-transform ${
@@ -115,7 +115,7 @@ export default function Header({ toggleSidebar }) {
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
               <button
                 onClick={() =>
-                  user && router.push(`/${user.role.toLowerCase()}/profile`)
+                  user && router.push(`/${user.role.name.toLowerCase()}/profile`)
                 } // Dynamic profile link
                 className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
               >

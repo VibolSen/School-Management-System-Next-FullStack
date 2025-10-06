@@ -29,8 +29,12 @@ export const UserProvider = ({ children }) => {
     fetchUser();
   }, []);
 
+  const updateUser = (newUser) => {
+    setUser(newUser);
+  };
+
   return (
-    <UserContext.Provider value={{ user, loading }}>
+    <UserContext.Provider value={{ user, loading, updateUser }}>
       {children}
     </UserContext.Provider>
   );

@@ -1,10 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 import fs from "fs";
 import path from "path";
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || "supersecret";
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || "your-super-secret-key-that-is-long"
+);
 
 export const runtime = "nodejs";
 
@@ -15,11 +17,12 @@ export async function PUT(req) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
 
     const token = authHeader.replace("Bearer ", "");
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const { payload: decoded } = await jwtVerify(token, JWT_SECRET);
 
     // Parse multipart form data
     const formData = await req.formData();
-    const name = formData.get("name")?.toString();
+    const firstName = formData.get("firstName")?.toString();
+    const lastName = formData.get("lastName")?.toString();
     const imageFile = formData.get("image"); // File object
 
     let imagePath;
@@ -36,16 +39,31 @@ export async function PUT(req) {
     const updatedUser = await prisma.user.update({
       where: { id: decoded.userId },
       data: {
-        ...(name && { name }),
-        ...(imagePath && { image: imagePath }),
+        ...(firstName && { firstName }),
+        ...(lastName && { lastName }),
       },
-      include: { role: true },
     });
 
-    const { password: _, ...userWithoutPassword } = updatedUser;
+    if (imagePath) {
+      await prisma.profile.upsert({
+        where: { userId: decoded.userId },
+        update: { avatar: imagePath },
+        create: {
+          userId: decoded.userId,
+          avatar: imagePath,
+        },
+      });
+    }
+
+    const userWithProfile = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      include: { profile: true },
+    });
+
+    const { password: _, ...userWithoutPassword } = userWithProfile;
     return new Response(JSON.stringify({ user: userWithoutPassword }), { status: 200 });
   } catch (err) {
-    console.error(err);
+    console.error("Error updating profile:", err);
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
 }
