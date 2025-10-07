@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 
 // GET a single user by ID
 export async function GET(request, { params }) {
+  const { id } = params;
   try {
     const loggedInUser = await getLoggedInUser();
     if (!loggedInUser) {
@@ -27,8 +28,12 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Authorization: ADMIN can get any user, FACULTY can get STUDENTs
-    if (loggedInUser.role === 'ADMIN' || (loggedInUser.role === 'FACULTY' && user.role === 'STUDENT')) {
+    // Authorization: ADMIN can get any user, HR can get any non-student, FACULTY can get STUDENTs
+    if (
+      loggedInUser.role === "ADMIN" ||
+      (loggedInUser.role === "HR" && user.role !== "STUDENT") ||
+      (loggedInUser.role === "FACULTY" && user.role === "STUDENT")
+    ) {
       return NextResponse.json(user);
     }
 
@@ -41,6 +46,7 @@ export async function GET(request, { params }) {
 
 // PUT to update a user
 export async function PUT(request, { params }) {
+  const { id } = params;
   try {
     const loggedInUser = await getLoggedInUser();
     if (!loggedInUser) {
@@ -55,9 +61,13 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Authorization: ADMIN can update any user, FACULTY can update STUDENTs
-    if (loggedInUser.role !== 'ADMIN' && !(loggedInUser.role === 'FACULTY' && userToUpdate.role === 'STUDENT')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    // Authorization: ADMIN can update any user, HR can update any non-student, FACULTY can update STUDENTs
+    if (
+      loggedInUser.role !== "ADMIN" &&
+      !(loggedInUser.role === "HR" && userToUpdate.role !== "STUDENT") &&
+      !(loggedInUser.role === "FACULTY" && userToUpdate.role === "STUDENT")
+    ) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = await request.json();
@@ -102,6 +112,7 @@ export async function PUT(request, { params }) {
 
 // DELETE a user
 export async function DELETE(request, { params }) {
+  const { id } = params;
   try {
     const loggedInUser = await getLoggedInUser();
     if (!loggedInUser) {
@@ -116,9 +127,13 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Authorization: ADMIN can delete any user, FACULTY can delete STUDENTs
-    if (loggedInUser.role !== 'ADMIN' && !(loggedInUser.role === 'FACULTY' && userToDelete.role === 'STUDENT')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    // Authorization: ADMIN can delete any user, HR can delete any non-student, FACULTY can delete STUDENTs
+    if (
+      loggedInUser.role !== "ADMIN" &&
+      !(loggedInUser.role === "HR" && userToDelete.role !== "STUDENT") &&
+      !(loggedInUser.role === "FACULTY" && userToDelete.role === "STUDENT")
+    ) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     await prisma.user.delete({
