@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 
 // Helper component for sort direction arrows for a cleaner look
 const SortIndicator = ({ direction }) => {
@@ -48,6 +49,7 @@ export default function UserTable({
   onDeleteClick,
   allRoles = [],
   isLoading = false,
+  currentUserRole,
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("All");
@@ -212,6 +214,16 @@ export default function UserTable({
                     >
                       Edit
                     </button>
+                    {currentUserRole && (
+                      <Link href={`/${currentUserRole.toLowerCase()}/users/${user.id}`}>
+                        <button
+                          className="text-blue-600 hover:text-blue-900"
+                          disabled={isLoading}
+                        >
+                          View Profile
+                        </button>
+                      </Link>
+                    )}
                     <button
                       onClick={() => onDeleteClick(user.id)}
                       className="text-red-600 hover:text-red-900"

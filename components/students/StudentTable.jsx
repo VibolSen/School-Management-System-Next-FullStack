@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 
 export default function StudentTable({
   students = [],
@@ -8,6 +9,7 @@ export default function StudentTable({
   onEditClick,
   onDeleteClick,
   isLoading = false,
+  currentUserRole,
 }) {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -94,6 +96,15 @@ export default function StudentTable({
                     >
                       Edit
                     </button>
+                    {currentUserRole && (
+                      <Link href={`/${currentUserRole.toLowerCase()}/students/${student.id}`}>
+                        <button
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          View Profile
+                        </button>
+                      </Link>
+                    )}
                     <button
                       onClick={() => onDeleteClick(student.id)}
                       className="text-red-600 hover:text-red-900"

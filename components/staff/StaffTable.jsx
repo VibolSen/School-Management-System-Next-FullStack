@@ -48,6 +48,7 @@ export default function StaffTable({
   onDeleteClick,
   allRoles = [],
   isLoading = false,
+  currentUserRole,
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("All");
@@ -92,6 +93,7 @@ export default function StaffTable({
     HR: "bg-blue-100 text-blue-800",
     FACULTY: "bg-green-100 text-green-800",
     TEACHER: "bg-amber-100 text-amber-800",
+    STUDENT: "bg-pink-100 text-pink-800",
   };
 
   return (
@@ -211,14 +213,16 @@ export default function StaffTable({
                     >
                       Edit
                     </button>
-                    <Link href={`/hr/staff/${staff.id}`}>
-                      <button
-                        className="text-blue-600 hover:text-blue-900"
-                        disabled={isLoading}
-                      >
-                        View Profile
-                      </button>
-                    </Link>
+                    {currentUserRole && (
+                      <Link href={`/${currentUserRole.toLowerCase()}/staff/${staff.id}`}>
+                        <button
+                          className="text-blue-600 hover:text-blue-900"
+                          disabled={isLoading}
+                        >
+                          View Profile
+                        </button>
+                      </Link>
+                    )}
                     <button
                       onClick={() => onDeleteClick(staff.id)}
                       className="text-red-600 hover:text-red-900"

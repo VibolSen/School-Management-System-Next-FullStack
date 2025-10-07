@@ -7,8 +7,7 @@ import AddStaffModal from "./AddStaffModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import Notification from "@/components/Notification";
 
-// Static list of roles available for staff, excluding 'STUDENT'.
-const STAFF_ROLES = ["ADMIN", "HR", "FACULTY", "TEACHER"];
+const ALL_ROLES = ["ADMIN", "HR", "FACULTY", "TEACHER", "STUDENT"];
 
 export default function StaffManagementView() {
   const { user, loading: userLoading } = useUser();
@@ -24,10 +23,13 @@ export default function StaffManagementView() {
   });
 
   const availableStaffRoles = useMemo(() => {
-    if (user?.role === "HR") {
-      return STAFF_ROLES.filter((role) => role !== "ADMIN");
+    if (user?.role === "ADMIN") {
+      return ALL_ROLES;
     }
-    return STAFF_ROLES;
+    if (user?.role === "HR") {
+      return ALL_ROLES.filter((role) => role !== "ADMIN" && role !== "STUDENT");
+    }
+    return [];
   }, [user?.role]);
 
   const showMessage = (message, type = "success") => {
@@ -38,7 +40,6 @@ export default function StaffManagementView() {
     );
   };
 
-  // Fetches all users, then filters out students.
   const fetchStaff = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -46,15 +47,18 @@ export default function StaffManagementView() {
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       const allUsers = await res.json();
 
-      // Filter out users with the role of "STUDENT"
-      const staffOnly = allUsers.filter((user) => user.role !== "STUDENT");
-      setStaffList(staffOnly);
+      if (user?.role === "ADMIN") {
+        setStaffList(allUsers);
+      } else {
+        const staffOnly = allUsers.filter((user) => user.role !== "STUDENT");
+        setStaffList(staffOnly);
+      }
     } catch (err) {
       showMessage(`Failed to load staff data: ${err.message}`, "error");
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user?.role]);
 
   useEffect(() => {
     fetchStaff();
@@ -149,6 +153,7 @@ export default function StaffManagementView() {
         onEditClick={handleEditClick}
         onDeleteClick={handleDeleteRequest}
         isLoading={isLoading || userLoading}
+        currentUserRole={user?.role}
       />
 
       {isModalOpen && (

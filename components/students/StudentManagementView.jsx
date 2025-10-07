@@ -6,9 +6,12 @@ import StudentTable from "./StudentTable";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import Notification from "@/components/Notification";
 
+import { useUser } from "@/context/UserContext";
+
 const STUDENT_ROLE = "STUDENT";
 
 export default function StudentManagementView() {
+  const { user: currentUser } = useUser();
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
@@ -139,6 +142,7 @@ export default function StudentManagementView() {
         onEditClick={handleEditClick}
         onDeleteClick={handleDeleteRequest}
         isLoading={isLoading}
+        currentUserRole={currentUser?.role}
       />
 
       {isModalOpen && (

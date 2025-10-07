@@ -7,9 +7,12 @@ import ConfirmationDialog from "../ConfirmationDialog";
 import Notification from "@/components/Notification";
 
 // ✅ MODIFIED: Roles are now a static list based on your Prisma Enum
+import { useUser } from "@/context/UserContext";
+
 const ROLES = ["ADMIN", "HR", "FACULTY", "TEACHER", "STUDENT"];
 
 export default function UserManagementView() {
+  const { user: currentUser } = useUser();
   const [users, setUsers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -151,6 +154,7 @@ export default function UserManagementView() {
         onEditClick={handleEditClick}
         onDeleteClick={handleDeleteClick}
         isLoading={isLoading} // Simplified loading state
+        currentUserRole={currentUser?.role}
       />
       {isModalOpen && (
         <UserModal
