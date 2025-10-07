@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useUser } from "@/context/UserContext";
 import StaffTable from "./StaffTable";
 import AddStaffModal from "./AddStaffModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
@@ -10,6 +11,7 @@ import Notification from "@/components/Notification";
 const STAFF_ROLES = ["ADMIN", "HR", "FACULTY", "TEACHER"];
 
 export default function StaffManagementView() {
+  const { user, loading: userLoading } = useUser();
   const [staffList, setStaffList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState(null);
@@ -20,6 +22,13 @@ export default function StaffManagementView() {
     message: "",
     type: "info",
   });
+
+  const availableStaffRoles = useMemo(() => {
+    if (user?.role === "HR") {
+      return STAFF_ROLES.filter((role) => role !== "ADMIN");
+    }
+    return STAFF_ROLES;
+  }, [user?.role]);
 
   const showMessage = (message, type = "success") => {
     setNotification({ show: true, message, type });
@@ -135,11 +144,11 @@ export default function StaffManagementView() {
 
       <StaffTable
         staffList={staffList}
-        allRoles={STAFF_ROLES}
+        allRoles={availableStaffRoles}
         onAddStaffClick={handleAddClick}
         onEditClick={handleEditClick}
         onDeleteClick={handleDeleteRequest}
-        isLoading={isLoading}
+        isLoading={isLoading || userLoading}
       />
 
       {isModalOpen && (
@@ -148,8 +157,8 @@ export default function StaffManagementView() {
           onClose={handleCloseModal}
           onSave={handleSaveStaff}
           staffToEdit={editingStaff}
-          roles={STAFF_ROLES}
-          isLoading={isLoading}
+          roles={availableStaffRoles}
+          isLoading={isLoading || userLoading}
         />
       )}
 

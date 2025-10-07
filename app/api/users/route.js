@@ -25,7 +25,7 @@ export async function GET(request) {
       department: { select: { name: true } },
     };
 
-    if (loggedInUser.role === 'ADMIN' || loggedInUser.role === 'FACULTY') {
+    if (loggedInUser.role === 'ADMIN' || loggedInUser.role === 'FACULTY' || loggedInUser.role === 'HR') {
       if (roleFilter) {
         users = await prisma.user.findMany({
           where: { role: roleFilter },
