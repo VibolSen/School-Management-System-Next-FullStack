@@ -28,7 +28,7 @@ export async function GET() {
 
     const totalDepartments = await prisma.department.count();
 
-    const coursesByDept = await prisma.course.groupBy({
+    const coursesByDept = await prisma.courseDepartment.groupBy({
       by: ['departmentId'],
       _count: {
         _all: true,
