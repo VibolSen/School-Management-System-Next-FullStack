@@ -63,9 +63,14 @@ const TEACHER_NAV_ITEMS = [
     href: "/teacher/students",
   },
   {
-    label: "Attendance",
+    label: "My Attendance",
     icon: <FiCheckSquare className="w-5 h-5" />,
-    href: "/teacher/attendance",
+    href: "/teacher/my-attendance",
+  },
+  {
+    label: "Student Attendance",
+    icon: <FiCheckSquare className="w-5 h-5" />,
+    href: "/teacher/student-attendance",
   },
   {
     label: "My Courses",
