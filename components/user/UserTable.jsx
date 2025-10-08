@@ -116,11 +116,13 @@ export default function UserTable({
             className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
           >
             <option value="All">All Roles</option>
-            {allRoles.map((role) => (
-              <option key={role} value={role}>
-                {role}
-              </option>
-            ))}
+            {allRoles
+              .filter((role) => role !== "ADMIN")
+              .map((role) => (
+                <option key={role} value={role}>
+                  {role}
+                </option>
+              ))}
           </select>
           <button
             onClick={onAddUserClick}

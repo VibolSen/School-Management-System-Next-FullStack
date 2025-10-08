@@ -201,11 +201,13 @@ export default function UserModal({
                 <option value="" disabled>
                   Select Role
                 </option>
-                {(roles || []).map((role) => (
-                  <option key={role} value={role}>
-                    {role}
-                  </option>
-                ))}
+                {(roles || [])
+                  .filter((role) => role !== "ADMIN")
+                  .map((role) => (
+                    <option key={role} value={role}>
+                      {role}
+                    </option>
+                  ))}
               </select>
               {errors.role && (
                 <p className="text-xs text-red-500 mt-1">{errors.role}</p>
