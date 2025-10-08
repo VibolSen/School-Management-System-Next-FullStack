@@ -131,46 +131,93 @@ export async function PUT(request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('id');
+
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID is required for PUT request' }, { status: 400 });
+    }
+
     const body = await request.json();
-    const { oldPassword, newPassword, confirmNewPassword } = body;
+    const { firstName, lastName, email, password, role, departmentId } = body;
 
-    if (!oldPassword || !newPassword || !confirmNewPassword) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    // Check permissions for updating other users
+    if (loggedInUser.id !== userId && loggedInUser.role !== 'ADMIN' && loggedInUser.role !== 'HR') {
+      return NextResponse.json({ error: 'Forbidden: You can only update your own profile or you do not have permission to update other users' }, { status: 403 });
     }
 
-    if (newPassword !== confirmNewPassword) {
-      return NextResponse.json({ error: 'New password and confirmation do not match' }, { status: 400 });
+    const updateData = {};
+    if (firstName) updateData.firstName = firstName;
+    if (lastName) updateData.lastName = lastName;
+    if (email) updateData.email = email;
+    if (role) updateData.role = role;
+    if (departmentId) updateData.departmentId = departmentId;
+
+    // Handle password update separately if provided
+    if (password) {
+      if (password.length < 6) {
+        return NextResponse.json({ error: 'Password must be at least 6 characters long' }, { status: 400 });
+      }
+      updateData.password = await bcrypt.hash(password, 10);
     }
 
-    if (newPassword.length < 6) {
-      return NextResponse.json({ error: 'New password must be at least 6 characters long' }, { status: 400 });
+    // Prevent ADMIN from changing their own role to something else or changing other ADMINs roles
+    if (loggedInUser.id === userId && loggedInUser.role === 'ADMIN' && role && role !== 'ADMIN') {
+      return NextResponse.json({ error: 'ADMIN users cannot change their own role' }, { status: 403 });
+    }
+    if (loggedInUser.role !== 'ADMIN' && role === 'ADMIN') {
+      return NextResponse.json({ error: 'Only ADMIN can assign ADMIN role' }, { status: 403 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: loggedInUser.id },
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        departmentId: true,
+      },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    const passwordMatch = await bcrypt.compare(oldPassword, user.password);
-
-    if (!passwordMatch) {
-      return NextResponse.json({ error: 'Incorrect old password' }, { status: 401 });
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    await prisma.user.update({
-      where: { id: loggedInUser.id },
-      data: { password: hashedPassword },
-    });
-
-    return NextResponse.json({ message: 'Password updated successfully' }, { status: 200 });
+    return NextResponse.json(updatedUser, { status: 200 });
   } catch (error) {
-    console.error('Error updating password:', error);
+    console.error('Error updating user:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function DELETE(request) {
+  try {
+    const loggedInUser = await getLoggedInUser();
+
+    if (!loggedInUser || (loggedInUser.role !== 'ADMIN' && loggedInUser.role !== 'HR')) {
+      return NextResponse.json({ error: 'Unauthorized or Forbidden' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('id');
+
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID is required for DELETE request' }, { status: 400 });
+    }
+
+    // Prevent ADMIN from deleting themselves
+    if (loggedInUser.id === userId && loggedInUser.role === 'ADMIN') {
+      return NextResponse.json({ error: 'ADMIN users cannot delete their own account' }, { status: 403 });
+    }
+
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    return NextResponse.json({ message: 'User deleted successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
 

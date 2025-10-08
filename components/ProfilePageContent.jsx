@@ -353,7 +353,7 @@ export default function ProfilePageContent({
                 <input
                   type={showNewPassword ? "text" : "password"}
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target..value)}
+                  onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter your new password"
                   className="w-full bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-1.5 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder:text-gray-500 text-sm"
                 />
