@@ -81,13 +81,16 @@ model User {
 }
 
 model StaffAttendance {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  date      DateTime
-  status    AttendanceStatus
-  user      User      @relation(fields: [userId], references: [id])
-  userId    String    @db.ObjectId
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  checkInTime  DateTime
+  checkOutTime DateTime?
+  status       AttendanceStatus
+  lateMinutes  Int?
+  note         String?
+  user         User      @relation(fields: [userId], references: [id])
+  userId       String    @db.ObjectId
 
-  @@unique([date, userId], name: "staff_attendance_unique")
+  @@unique([checkInTime, userId], name: "staff_attendance_unique")
 }
 
 model Profile {

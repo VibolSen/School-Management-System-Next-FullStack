@@ -6,13 +6,19 @@ import Notification from "@/components/Notification";
 
 export default function TeacherAttendancePage() {
   const { user } = useUser();
-  const [attendanceStatus, setAttendanceStatus] = useState(null); // 'CHECK_IN', 'CHECK_OUT', or null
+  const [attendanceRecord, setAttendanceRecord] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState({
     show: false,
     message: "",
     type: "",
   });
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000); // Update every minute
+    return () => clearInterval(timer);
+  }, []);
 
   const showMessage = (message, type = "success") => {
     setNotification({ show: true, message, type });
@@ -31,12 +37,7 @@ export default function TeacherAttendancePage() {
         throw new Error("Failed to fetch attendance status.");
       }
       const data = await response.json();
-      // Assuming the API returns the last action for the day
-      if (data && data.status) {
-        setAttendanceStatus(data.status);
-      } else {
-        setAttendanceStatus(null); // No attendance recorded for today
-      }
+      setAttendanceRecord(data);
     } catch (error) {
       console.error("Error fetching attendance status:", error);
       showMessage(error.message, "error");
@@ -67,8 +68,9 @@ export default function TeacherAttendancePage() {
         throw new Error(errorData.error || `Failed to ${actionType}.`);
       }
 
+      const updatedRecord = await response.json();
+      setAttendanceRecord(updatedRecord);
       showMessage(`Successfully ${actionType.replace("_", " ").toLowerCase()}!`);
-      setAttendanceStatus(actionType);
     } catch (error) {
       console.error(`Error during ${actionType}:`, error);
       showMessage(error.message, "error");
@@ -77,8 +79,8 @@ export default function TeacherAttendancePage() {
     }
   };
 
-  const isCheckedIn = attendanceStatus === "CHECK_IN";
-  const isCheckedOut = attendanceStatus === "CHECK_OUT";
+  const canCheckIn = !attendanceRecord?.checkInTime && currentTime.getHours() < 17;
+  const canCheckOut = attendanceRecord?.checkInTime && !attendanceRecord?.checkOutTime;
 
   return (
     <div className="space-y-6">
@@ -94,48 +96,45 @@ export default function TeacherAttendancePage() {
         <p className="text-lg text-slate-700 mb-4">
           Welcome, {user?.firstName} {user?.lastName}!
         </p>
-        <p className="text-md text-slate-600 mb-6">
-          Current Status:{" "}
-          <span
-            className={`font-semibold ${
-              isCheckedIn
-                ? "text-green-600"
-                : isCheckedOut
-                ? "text-red-600"
-                : "text-gray-500"
-            }`}
-          >
-            {isCheckedIn
-              ? "Checked In"
-              : isCheckedOut
-              ? "Checked Out"
-              : "No action recorded today"}
-          </span>
-        </p>
 
-        <div className="flex gap-4">
-          <button
-            onClick={() => handleAction("CHECK_IN")}
-            disabled={isLoading || isCheckedIn}
-            className={`px-6 py-3 rounded-md text-white font-semibold transition-colors ${
-              isLoading || isCheckedIn
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700"
-            }`}
-          >
-            {isLoading && attendanceStatus !== "CHECK_IN" ? "Checking In..." : "Check In"}
-          </button>
-          <button
-            onClick={() => handleAction("CHECK_OUT")}
-            disabled={isLoading || !isCheckedIn || isCheckedOut}
-            className={`px-6 py-3 rounded-md text-white font-semibold transition-colors ${
-              isLoading || !isCheckedIn || isCheckedOut
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-red-600 hover:bg-red-700"
-            }`}
-          >
-            {isLoading && attendanceStatus === "CHECK_IN" ? "Checking Out..." : "Check Out"}
-          </button>
+        <div className="text-md text-slate-600 mb-6">
+          <p>Check-in Time: {attendanceRecord?.checkInTime ? new Date(attendanceRecord.checkInTime).toLocaleTimeString() : 'N/A'}</p>
+          <p>Check-out Time: {attendanceRecord?.checkOutTime ? new Date(attendanceRecord.checkOutTime).toLocaleTimeString() : 'N/A'}</p>
+          {attendanceRecord?.status === 'LATE' && (
+            <p className="text-red-500">Status: {attendanceRecord.note}</p>
+          )}
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div>
+            <button
+              onClick={() => handleAction("CHECK_IN")}
+              disabled={isLoading || !canCheckIn}
+              className={`px-6 py-3 rounded-md text-white font-semibold transition-colors ${
+                isLoading || !canCheckIn
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
+            >
+              {isLoading ? "Checking In..." : "Check In"}
+            </button>
+            {!canCheckIn && !attendanceRecord?.checkInTime && (
+              <p className="text-sm text-red-500 mt-2">Check-in is not available after 5:00 PM.</p>
+            )}
+          </div>
+          {canCheckOut && (
+            <button
+              onClick={() => handleAction("CHECK_OUT")}
+              disabled={isLoading}
+              className={`px-6 py-3 rounded-md text-white font-semibold transition-colors ${
+                isLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-red-600 hover:bg-red-700"
+              }`}
+            >
+              {isLoading ? "Checking Out..." : "Check Out"}
+            </button>
+          )}
         </div>
       </div>
     </div>
