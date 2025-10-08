@@ -23,6 +23,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import Link from "next/link";
 
 export default function FacultyDashboard({ loggedInUser }) {
   const [dashboardData, setDashboardData] = useState(null);
@@ -142,14 +143,20 @@ export default function FacultyDashboard({ loggedInUser }) {
 
               {/* Quick Actions */}
               <div className="flex flex-wrap gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors">
+                <Link
+                  href="/faculty/schedule"
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"
+                >
                   <Calendar className="w-4 h-4" />
                   <span className="font-medium">Schedule</span>
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors">
+                </Link>
+                <Link
+                  href="#"
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"
+                >
                   <Bell className="w-4 h-4" />
                   <span className="font-medium">Alerts</span>
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -158,18 +165,24 @@ export default function FacultyDashboard({ loggedInUser }) {
         {/* Navigation Tabs */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 p-2">
           <div className="flex space-x-1">
-            {["overview", "analytics", "courses", "students"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
+            {[
+              { name: "overview", href: "#" },
+              { name: "analytics", href: "#" },
+              { name: "courses", href: "/faculty/courses" },
+              { name: "students", href: "/faculty/students" },
+            ].map((tab) => (
+              <Link
+                key={tab.name}
+                href={tab.href}
+                onClick={() => setActiveTab(tab.name)}
                 className={`flex-1 md:flex-none px-4 py-3 rounded-xl font-medium transition-all ${
-                  activeTab === tab
+                  activeTab === tab.name
                     ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
                     : "text-slate-600 hover:text-slate-800 hover:bg-slate-100/50"
                 }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
+                {tab.name.charAt(0).toUpperCase() + tab.name.slice(1)}
+              </Link>
             ))}
           </div>
         </div>
@@ -178,42 +191,54 @@ export default function FacultyDashboard({ loggedInUser }) {
         <div className="space-y-8">
           {/* System Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <DashboardCard
-              title="Total Students"
-              value={dashboardData.studentCount}
-              icon={<Users className="w-6 h-6" />}
-              gradient="from-blue-500/20 to-blue-600/10"
-            />
-            <DashboardCard
-              title="Total Teachers"
-              value={dashboardData.teacherCount}
-              icon={<UserCheck className="w-6 h-6" />}
-              gradient="from-emerald-500/20 to-emerald-600/10"
-            />
-            <DashboardCard
-              title="Total Staff"
-              value={dashboardData.staffCount}
-              icon={<Briefcase className="w-6 h-6" />}
-              gradient="from-purple-500/20 to-purple-600/10"
-            />
-            <DashboardCard
-              title="Total Departments"
-              value={dashboardData.departmentCount}
-              icon={<Building2 className="w-6 h-6" />}
-              gradient="from-amber-500/20 to-amber-600/10"
-            />
-            <DashboardCard
-              title="Total Courses"
-              value={dashboardData.courseCount}
-              icon={<Library className="w-6 h-6" />}
-              gradient="from-sky-500/20 to-sky-600/10"
-            />
-            <DashboardCard
-              title="Total Groups"
-              value={dashboardData.groupCount}
-              icon={<Group className="w-6 h-6" />}
-              gradient="from-rose-500/20 to-rose-600/10"
-            />
+            <Link href="/faculty/students">
+              <DashboardCard
+                title="Total Students"
+                value={dashboardData.studentCount}
+                icon={<Users className="w-6 h-6" />}
+                gradient="from-blue-500/20 to-blue-600/10"
+              />
+            </Link>
+            <Link href="/faculty/teacher">
+              <DashboardCard
+                title="Total Teachers"
+                value={dashboardData.teacherCount}
+                icon={<UserCheck className="w-6 h-6" />}
+                gradient="from-emerald-500/20 to-emerald-600/10"
+              />
+            </Link>
+            <Link href="/faculty/staff">
+              <DashboardCard
+                title="Total Staff"
+                value={dashboardData.staffCount}
+                icon={<Briefcase className="w-6 h-6" />}
+                gradient="from-purple-500/20 to-purple-600/10"
+              />
+            </Link>
+            <Link href="/faculty/departments">
+              <DashboardCard
+                title="Total Departments"
+                value={dashboardData.departmentCount}
+                icon={<Building2 className="w-6 h-6" />}
+                gradient="from-amber-500/20 to-amber-600/10"
+              />
+            </Link>
+            <Link href="/faculty/courses">
+              <DashboardCard
+                title="Total Courses"
+                value={dashboardData.courseCount}
+                icon={<Library className="w-6 h-6" />}
+                gradient="from-sky-500/20 to-sky-600/10"
+              />
+            </Link>
+            <Link href="/faculty/groups">
+              <DashboardCard
+                title="Total Groups"
+                value={dashboardData.groupCount}
+                icon={<Group className="w-6 h-6" />}
+                gradient="from-rose-500/20 to-rose-600/10"
+              />
+            </Link>
           </div>
 
           {/* Charts Section */}
