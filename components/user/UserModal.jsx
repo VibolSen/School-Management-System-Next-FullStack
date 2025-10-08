@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function UserModal({
   isOpen,
@@ -21,6 +22,7 @@ export default function UserModal({
   });
   const [errors, setErrors] = useState({});
   const [mounted, setMounted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const isEditMode = !!userToEdit;
 
@@ -215,12 +217,12 @@ export default function UserModal({
             </div>
 
             {/* Password */}
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 relative">
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Password {isEditMode ? "(Optional)" : ""}
               </label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder={
                   isEditMode
@@ -235,6 +237,17 @@ export default function UserModal({
                     : "border-slate-300"
                 } focus:outline-none focus:ring-1 focus:ring-blue-500`}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 px-3 flex items-center text-sm leading-5"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5 text-gray-400" />
+                ) : (
+                  <Eye className="h-5 w-5 text-gray-400" />
+                )}
+              </button>
               {errors.password && (
                 <p className="text-xs text-red-500 mt-1">{errors.password}</p>
               )}

@@ -1,11 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Mail, Shield, Edit3, Save, X, Camera } from "lucide-react";
+import {
+  User,
+  Mail,
+  Shield,
+  Edit3,
+  Save,
+  X,
+  Camera,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
 import { useUser } from "../context/UserContext";
 
-export default function ProfilePageContent({ user: initialUser, isCurrentUser, onUpdateProfile }) {
+export default function ProfilePageContent({
+  user: initialUser,
+  isCurrentUser,
+  onUpdateProfile,
+}) {
   const [user, setUser] = useState(initialUser || {});
   const [loading, setLoading] = useState(!initialUser);
   const [editMode, setEditMode] = useState(false);
@@ -26,8 +40,9 @@ export default function ProfilePageContent({ user: initialUser, isCurrentUser, o
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState("");
-
-
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
   const handleChange = (e) => {
     if (e.target.name === "imageFile") {
@@ -132,7 +147,9 @@ export default function ProfilePageContent({ user: initialUser, isCurrentUser, o
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold text-gray-800">Profile</h1>
             <p className="text-sm text-gray-600 mt-1">
-              {isCurrentUser ? "Manage your account information" : "View user information"}
+              {isCurrentUser
+                ? "Manage your account information"
+                : "View user information"}
             </p>
           </div>
 
@@ -152,7 +169,11 @@ export default function ProfilePageContent({ user: initialUser, isCurrentUser, o
             {/* Profile Image */}
             <div className="relative">
               <img
-                src={imagePreview || user.profile?.avatar || "/default-cover.jpg"}
+                src={
+                  imagePreview ||
+                  user.profile?.avatar ||
+                  "/default-cover.jpg"
+                }
                 alt={
                   user.firstName && user.lastName
                     ? `${user.firstName} ${user.lastName}`
@@ -302,41 +323,76 @@ export default function ProfilePageContent({ user: initialUser, isCurrentUser, o
               </div>
             )}
             <div className="space-y-4">
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 relative">
                 <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
                   Old Password
                 </label>
                 <input
-                  type="password"
+                  type={showOldPassword ? "text" : "password"}
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
                   placeholder="Enter your old password"
                   className="w-full bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-1.5 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder:text-gray-500 text-sm"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowOldPassword(!showOldPassword)}
+                  className="absolute inset-y-0 right-0 px-3 flex items-center text-sm leading-5"
+                >
+                  {showOldPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
+                </button>
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 relative">
                 <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
                   New Password
                 </label>
                 <input
-                  type="password"
+                  type={showNewPassword ? "text" : "password"}
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={(e) => setNewPassword(e.target..value)}
                   placeholder="Enter your new password"
                   className="w-full bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-1.5 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder:text-gray-500 text-sm"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute inset-y-0 right-0 px-3 flex items-center text-sm leading-5"
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
+                </button>
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 relative">
                 <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
                   Confirm New Password
                 </label>
                 <input
-                  type="password"
+                  type={showConfirmNewPassword ? "text" : "password"}
                   value={confirmNewPassword}
                   onChange={(e) => setConfirmNewPassword(e.target.value)}
                   placeholder="Confirm your new password"
                   className="w-full bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-1.5 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder:text-gray-500 text-sm"
                 />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmNewPassword(!showConfirmNewPassword)
+                  }
+                  className="absolute inset-y-0 right-0 px-3 flex items-center text-sm leading-5"
+                >
+                  {showConfirmNewPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
+                </button>
               </div>
               <button
                 onClick={handleChangePassword}
@@ -355,7 +411,9 @@ export default function ProfilePageContent({ user: initialUser, isCurrentUser, o
             <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-2">
               <Shield className="w-4 h-4 text-indigo-600" />
             </div>
-            <span className="text-xs font-medium text-gray-700">Security</span>
+            <span className="text-xs font-medium text-gray-700">
+              Security
+            </span>
           </button>
 
           <button className="bg-white/80 backdrop-blur-sm border border-white/60 rounded-xl shadow-lg p-4 text-center hover:bg-white transition-colors">
