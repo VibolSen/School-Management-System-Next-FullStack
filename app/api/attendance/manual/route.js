@@ -1,0 +1,52 @@
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { getLoggedInUser } from '@/lib/auth';
+
+export async function POST(request) {
+  try {
+    const loggedInUser = await getLoggedInUser();
+
+    if (!loggedInUser || (loggedInUser.role !== 'ADMIN' && loggedInUser.role !== 'HR')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { userId, date, status } = body;
+
+    if (!userId || !date || !status) {
+      return NextResponse.json({ error: 'Missing required fields: userId, date, and status' }, { status: 400 });
+    }
+
+    const targetDate = new Date(date);
+    targetDate.setHours(0, 0, 0, 0);
+
+    // Validate status against AttendanceStatus enum
+    const validStatuses = ['PRESENT', 'ABSENT', 'LATE'];
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json({ error: 'Invalid attendance status' }, { status: 400 });
+    }
+
+    const updatedAttendance = await prisma.staffAttendance.upsert({
+      where: {
+        staff_attendance_unique: {
+          userId: userId,
+          date: targetDate,
+        },
+      },
+      update: {
+        status: status,
+        date: new Date(), // Update timestamp to current time of manual change
+      },
+      create: {
+        userId: userId,
+        status: status,
+        date: new Date(), // Use current time for creation
+      },
+    });
+
+    return NextResponse.json(updatedAttendance, { status: 200 });
+  } catch (error) {
+    console.error('Error manually updating staff attendance:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

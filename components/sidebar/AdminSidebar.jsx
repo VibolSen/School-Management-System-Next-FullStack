@@ -18,6 +18,7 @@ import {
   FiTag, // For Types
   FiFlag, // For Status
   FiTrendingUp,
+  FiCalendar,
 } from "react-icons/fi";
 import { usePathname } from "next/navigation";
 
@@ -97,6 +98,11 @@ const ADMIN_NAV_ITEMS = [
     label: "Student Performance",
     icon: <FiTrendingUp className="w-5 h-5" />,
     href: "/admin/student-performance",
+  },
+  {
+    label: "Attendance",
+    icon: <FiCalendar className="w-5 h-5" />,
+    href: "/admin/attendance",
   },
   {
     label: "Settings",

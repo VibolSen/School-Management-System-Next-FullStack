@@ -72,11 +72,22 @@ model User {
   // ✅ Back relation for Enrollment
   enrollments Enrollment[]
   attendances Attendance[]
+  staffAttendances StaffAttendance[]
 
   createdSchedules           Schedule[] @relation("SchedulesCreated")
   schedulesAssignedToTeacher Schedule[] @relation("SchedulesAssignedToTeacher")
 
   profile   Profile?
+}
+
+model StaffAttendance {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  date      DateTime
+  status    AttendanceStatus
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String    @db.ObjectId
+
+  @@unique([date, userId], name: "staff_attendance_unique")
 }
 
 model Profile {

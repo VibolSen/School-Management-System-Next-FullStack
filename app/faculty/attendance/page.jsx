@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import Notification from "@/components/Notification";
 
-export default function TeacherAttendancePage() {
+export default function FacultyAttendancePage() {
   const { user } = useUser();
   const [attendanceStatus, setAttendanceStatus] = useState(null); // 'CHECK_IN', 'CHECK_OUT', or null
   const [isLoading, setIsLoading] = useState(false);

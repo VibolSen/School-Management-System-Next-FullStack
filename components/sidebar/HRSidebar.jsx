@@ -59,6 +59,16 @@ const HR_NAV_ITEMS = [
     href: "/hr/staff",
   },
   { label: "Leave", icon: <FiSend className="w-5 h-5" />, href: "/hr/leave" },
+  {
+    label: "Attendance",
+    icon: <FiCalendar className="w-5 h-5" />,
+    href: "/hr/attendance",
+  },
+  {
+    label: "Manage Staff Attendance",
+    icon: <FiUsers className="w-5 h-5" />,
+    href: "/hr/manage-attendance",
+  },
 
 ];
 

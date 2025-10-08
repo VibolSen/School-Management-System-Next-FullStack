@@ -14,6 +14,7 @@ export async function GET(request) {
     let users = [];
     const { searchParams } = new URL(request.url);
     const roleFilter = searchParams.get('role');
+    const roleTypeFilter = searchParams.get('roleType');
 
     const selectFields = {
       id: true,
@@ -29,6 +30,15 @@ export async function GET(request) {
       if (roleFilter) {
         users = await prisma.user.findMany({
           where: { role: roleFilter },
+          select: selectFields,
+        });
+      } else if (roleTypeFilter === 'nonStudent') {
+        users = await prisma.user.findMany({
+          where: {
+            role: {
+              not: 'STUDENT',
+            },
+          },
           select: selectFields,
         });
       } else {

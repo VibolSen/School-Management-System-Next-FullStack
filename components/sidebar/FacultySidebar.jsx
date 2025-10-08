@@ -104,6 +104,11 @@ const FACULTY_NAV_ITEMS = [
     icon: <FiBookOpen className="w-5 h-5" />,
     href: "/faculty/e-library",
   },
+  {
+    label: "Attendance",
+    icon: <FiCalendar className="w-5 h-5" />,
+    href: "/faculty/attendance",
+  },
 ];
 
 export default function FacultySidebar({ isOpen, setIsOpen }) {
