@@ -6,6 +6,13 @@ const prisma = new PrismaClient();
 export async function GET(req) {
   try {
     const departments = await prisma.department.findMany({
+      include: {
+        _count: {
+          select: {
+            departmentCourses: true,
+          },
+        },
+      },
       orderBy: { name: "asc" },
     });
     return NextResponse.json(departments);
