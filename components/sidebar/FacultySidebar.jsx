@@ -113,9 +113,26 @@ const FACULTY_NAV_ITEMS = [
 
 ];
 
-export default function FacultySidebar({ isOpen, setIsOpen }) {
+import { useState, useEffect } from "react";
+export default function FacultySidebar({ initialOpen = true }) {
+  const [isOpen, setIsOpen] = useState(initialOpen);
   const isCollapsed = !isOpen;
   const pathname = usePathname();
+
+  useEffect(() => {
+    const savedState = localStorage.getItem("facultySidebarState");
+    if (savedState !== null) {
+      setIsOpen(JSON.parse(savedState));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("facultySidebarState", JSON.stringify(isOpen));
+  }, [isOpen]);
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
 
   return (
     <>
