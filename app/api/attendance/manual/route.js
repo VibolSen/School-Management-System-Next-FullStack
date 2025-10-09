@@ -30,17 +30,18 @@ export async function POST(request) {
       where: {
         staff_attendance_unique: {
           userId: userId,
-          date: targetDate,
+          checkInTime: targetDate, // Use checkInTime for unique constraint
         },
       },
       update: {
         status: status,
-        date: new Date(), // Update timestamp to current time of manual change
+        // No need to update checkInTime here, as it's part of the unique constraint
+        // date: new Date(), // Remove this line
       },
       create: {
         userId: userId,
         status: status,
-        date: new Date(), // Use current time for creation
+        checkInTime: targetDate, // Use targetDate for checkInTime
       },
     });
 

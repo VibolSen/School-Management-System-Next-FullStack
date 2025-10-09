@@ -65,7 +65,7 @@ const HR_NAV_ITEMS = [
     href: "/hr/attendance",
   },
   {
-    label: "Manage Staff Attendance",
+    label: "Manage Attendance",
     icon: <FiUsers className="w-5 h-5" />,
     href: "/hr/manage-attendance",
   },

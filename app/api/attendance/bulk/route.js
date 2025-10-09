@@ -27,7 +27,7 @@ export async function POST(request) {
         userId: {
           in: userIds,
         },
-        date: {
+        checkInTime: {
           gte: targetDate,
           lt: nextDay,
         },
@@ -35,13 +35,13 @@ export async function POST(request) {
       select: {
         userId: true,
         status: true,
-        date: true,
+        checkInTime: true, // Select checkInTime instead of date
       },
     });
 
     // Format the records into an object for easier lookup on the frontend
     const formattedRecords = attendanceRecords.reduce((acc, record) => {
-      acc[record.userId] = { status: record.status, date: record.date };
+      acc[record.userId] = { status: record.status, date: record.checkInTime.toISOString().split('T')[0] }; // Convert to YYYY-MM-DD string
       return acc;
     }, {});
 
