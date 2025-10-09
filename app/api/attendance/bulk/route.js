@@ -35,13 +35,19 @@ export async function POST(request) {
       select: {
         userId: true,
         status: true,
-        checkInTime: true, // Select checkInTime instead of date
+        checkInTime: true,
+        checkOutTime: true, // Add checkOutTime
       },
     });
 
     // Format the records into an object for easier lookup on the frontend
     const formattedRecords = attendanceRecords.reduce((acc, record) => {
-      acc[record.userId] = { status: record.status, date: record.checkInTime.toISOString().split('T')[0] }; // Convert to YYYY-MM-DD string
+      acc[record.userId] = {
+        status: record.status,
+        date: record.checkInTime.toISOString().split('T')[0],
+        checkInTime: record.checkInTime ? record.checkInTime.toISOString() : null,
+        checkOutTime: record.checkOutTime ? record.checkOutTime.toISOString() : null,
+      };
       return acc;
     }, {});
 

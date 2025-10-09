@@ -11,7 +11,7 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { userId, date, status } = body;
+    const { userId, date, status, checkOutTime } = body;
 
     if (!userId || !date || !status) {
       return NextResponse.json({ error: 'Missing required fields: userId, date, and status' }, { status: 400 });
@@ -35,13 +35,13 @@ export async function POST(request) {
       },
       update: {
         status: status,
-        // No need to update checkInTime here, as it's part of the unique constraint
-        // date: new Date(), // Remove this line
+        checkOutTime: checkOutTime ? new Date(checkOutTime) : null,
       },
       create: {
         userId: userId,
         status: status,
-        checkInTime: targetDate, // Use targetDate for checkInTime
+        checkInTime: targetDate,
+        checkOutTime: checkOutTime ? new Date(checkOutTime) : null,
       },
     });
 
