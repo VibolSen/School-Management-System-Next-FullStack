@@ -26,6 +26,10 @@ export async function GET() {
       },
     });
 
+    const totalTeachers = staffByRole.find(
+      (roleCount) => roleCount.role === Role.TEACHER
+    )?._count._all || 0;
+
     const totalDepartments = await prisma.department.count();
 
     const coursesByDept = await prisma.courseDepartment.groupBy({
@@ -67,6 +71,7 @@ export async function GET() {
 
     return NextResponse.json({
       totalStaff,
+      totalTeachers,
       activeStaff: totalStaff, // Assuming all staff are active
       onLeave: 0, // No 'on leave' status in the schema
       newHires: 0, // No 'createdAt' field in the schema
