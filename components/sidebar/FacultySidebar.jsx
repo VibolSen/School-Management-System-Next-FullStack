@@ -17,10 +17,10 @@ import {
   FiHash,
   FiBriefcase,
   FiUser,
-  FiCheckSquare,
   FiSend,
   FiCode,
   FiCalendar,
+  FiCheckSquare,
 } from "react-icons/fi";
 
 // ✅ 1. The `title` attribute for the tooltip is now handled directly inside NavLink.
@@ -104,11 +104,13 @@ const FACULTY_NAV_ITEMS = [
     icon: <FiBookOpen className="w-5 h-5" />,
     href: "/faculty/e-library",
   },
+
   {
-    label: "Attendance",
+    label: "My Attendance",
     icon: <FiCalendar className="w-5 h-5" />,
-    href: "/faculty/attendance",
+    href: "/faculty/my-attendance",
   },
+
 ];
 
 export default function FacultySidebar({ isOpen, setIsOpen }) {
