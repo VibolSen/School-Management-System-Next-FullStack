@@ -69,7 +69,11 @@ const HR_NAV_ITEMS = [
     icon: <FiUsers className="w-5 h-5" />,
     href: "/hr/manage-attendance",
   },
-
+  {
+    label: "Reports & Analytics",
+    icon: <FiBarChart2 className="w-5 h-5" />,
+    href: "/hr/reports",
+  },
 ];
 
 const HRSidebar = ({ isOpen, setIsOpen }) => {

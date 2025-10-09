@@ -1,5 +1,9 @@
-import ReportsView from "@/components/ReportsView";
+"use client";
+import React from "react";
+import StaffAttendanceReports from "@/components/StaffAttendanceReports";
 
-export default function ReportsPage() {
-  return <ReportsView />;
-}
+const ReportsPage = () => {
+  return <StaffAttendanceReports />;
+};
+
+export default ReportsPage;
