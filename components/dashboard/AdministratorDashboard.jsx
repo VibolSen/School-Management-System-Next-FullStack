@@ -1,9 +1,9 @@
-// AdministratorDashboard.jsx
+// app/admin/dashboard/page.jsx or AdministratorDashboard.jsx
 "use client";
 
 import { useEffect, useState } from "react";
 import DashboardCard from "@/components/dashboard/DashboardCard";
-
+import Link from "next/link";
 import {
   Users,
   Briefcase,
@@ -11,12 +11,12 @@ import {
   Library,
   Group,
   UserCheck,
-  Sparkles,
-  TrendingUp,
   BarChart3,
   Activity,
   Shield,
+  TrendingUp,
 } from "lucide-react";
+import AnalyticsChart from "./AnalyticsChart";
 
 export default function AdministratorDashboard() {
   const [dashboardData, setDashboardData] = useState(null);
@@ -54,17 +54,9 @@ export default function AdministratorDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center space-y-6">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-blue-100 rounded-full"></div>
-            <div className="w-20 h-20 border-4 border-blue-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
-          </div>
-          <div className="space-y-2">
-            <p className="text-xl font-semibold text-gray-700">
-              Loading Dashboard
-            </p>
-            <p className="text-gray-500">Preparing your analytics...</p>
-          </div>
+        <div className="text-center space-y-3">
+          <div className="animate-spin w-10 h-10 border-4 border-gray-300 border-t-blue-500 rounded-full mx-auto" />
+          <p className="text-gray-600 font-medium">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -72,170 +64,150 @@ export default function AdministratorDashboard() {
 
   if (!dashboardData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center space-y-6 max-w-md mx-auto p-8">
-          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-            <Shield className="w-10 h-10 text-red-500" />
-          </div>
-          <div className="space-y-3">
-            <h3 className="text-2xl font-bold text-gray-800">
-              Data Unavailable
-            </h3>
-            <p className="text-gray-600">
-              We're unable to load your dashboard data at the moment. Please try
-              again later.
-            </p>
-          </div>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-          >
-            Retry
-          </button>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-6">
+        <Shield className="w-12 h-12 text-red-500 mb-4" />
+        <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+          Dashboard data unavailable
+        </h2>
+        <p className="text-gray-600 mb-4">
+          Please check your connection or try again later.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+        >
+          Retry
+        </button>
       </div>
     );
   }
 
   const welcomeName = currentUser
     ? `${currentUser.firstName} ${currentUser.lastName}`
-    : "Admin";
+    : "Administrator";
+
+  const chartData = [
+    { name: "Students", count: dashboardData.studentCount },
+    { name: "Teachers", count: dashboardData.teacherCount },
+    { name: "Staff", count: dashboardData.staffCount },
+    { name: "Departments", count: dashboardData.departmentCount },
+    { name: "Courses", count: dashboardData.courseCount },
+    { name: "Groups", count: dashboardData.groupCount },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Main Content */}
-      <div className="p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
-          {/* Enhanced Header */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500 rounded-lg">
-                  <BarChart3 className="w-6 h-6 text-white" />
+    <div className="min-h-screen bg-gray-100">
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {/* Header */}
+        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600">
+              Welcome back, <span className="font-medium">{welcomeName}</span>
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 bg-white border rounded-md px-4 py-2 shadow-sm">
+            <Activity className="w-5 h-5 text-green-500" />
+            <span className="text-sm text-gray-700">
+              All systems operational
+            </span>
+          </div>
+        </header>
+
+        {/* Cards Section */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <DashboardCard
+            title="Students"
+            value={dashboardData.studentCount}
+            icon={<Users className="w-6 h-6 text-blue-500" />}
+            description="Active enrolled students"
+          />
+          <DashboardCard
+            title="Teachers"
+            value={dashboardData.teacherCount}
+            icon={<UserCheck className="w-6 h-6 text-green-500" />}
+            description="Teaching staff"
+          />
+          <DashboardCard
+            title="Staff"
+            value={dashboardData.staffCount}
+            icon={<Briefcase className="w-6 h-6 text-purple-500" />}
+            description="Administrative staff"
+          />
+          <DashboardCard
+            title="Departments"
+            value={dashboardData.departmentCount}
+            icon={<Building2 className="w-6 h-6 text-orange-500" />}
+            description="Academic departments"
+          />
+          <DashboardCard
+            title="Courses"
+            value={dashboardData.courseCount}
+            icon={<Library className="w-6 h-6 text-indigo-500" />}
+            description="Available courses"
+          />
+          <DashboardCard
+            title="Groups"
+            value={dashboardData.groupCount}
+            icon={<Group className="w-6 h-6 text-pink-500" />}
+            description="Student groups"
+          />
+        </section>
+
+        {/* Quick Actions */}
+        <section className="bg-white rounded-lg border p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Quick Actions
+            </h3>
+            <TrendingUp className="w-5 h-5 text-gray-400" />
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              {
+                label: "Manage Users",
+                icon: Users,
+                href: "/admin/users",
+              },
+              {
+                label: "View Reports",
+                icon: BarChart3,
+                href: "/admin/reports",
+              },
+              {
+                label: "Settings",
+                icon: Shield,
+                href: "/admin/settings",
+              },
+              {
+                label: "Analytics",
+                icon: Activity,
+                href: "/admin/course-analytics",
+              },
+            ].map((action, i) => (
+              <Link
+                href={action.href}
+                key={i}
+                className="flex flex-col items-center gap-2 p-4 rounded-lg border hover:bg-gray-50 transition"
+              >
+                <div className="p-2 bg-gray-100 rounded-md">
+                  <action.icon className="w-5 h-5 text-gray-600" />
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-              </div>
-              <div className="space-y-2">
-                <h2 className="text-2xl font-semibold text-gray-800">
-                  Welcome back, {welcomeName}!
-                </h2>
-                <p className="text-gray-600 max-w-2xl">
-                  Here's an overview of your school's performance metrics and
-                  system status.
-                </p>
-              </div>
-            </div>
-
-            {/* Stats Overview */}
-            <div className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-green-500" />
-                <span className="text-sm font-medium text-gray-700">
-                  System Status
-                </span>
-              </div>
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-gray-600">
-                All Systems Operational
-              </span>
-            </div>
+                <span className="text-sm text-gray-700">{action.label}</span>
+              </Link>
+            ))}
           </div>
+        </section>
 
-          {/* Enhanced Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <DashboardCard
-              title="Total Students"
-              value={dashboardData.studentCount}
-              icon={<Users className="w-6 h-6" />}
-              trend="+12%"
-              description="Active enrolled students"
-              gradient="from-blue-500 to-blue-600"
-              delay="0"
-            />
-
-            <DashboardCard
-              title="Total Teachers"
-              value={dashboardData.teacherCount}
-              icon={<UserCheck className="w-6 h-6" />}
-              trend="+5%"
-              description="Teaching staff"
-              gradient="from-green-500 to-green-600"
-              delay="100"
-            />
-
-            <DashboardCard
-              title="Total Staff"
-              value={dashboardData.staffCount}
-              icon={<Briefcase className="w-6 h-6" />}
-              trend="+3%"
-              description="Administrative staff"
-              gradient="from-purple-500 to-purple-600"
-              delay="200"
-            />
-
-            <DashboardCard
-              title="Total Departments"
-              value={dashboardData.departmentCount}
-              icon={<Building2 className="w-6 h-6" />}
-              description="Academic departments"
-              gradient="from-orange-500 to-orange-600"
-              delay="300"
-            />
-
-            <DashboardCard
-              title="Total Courses"
-              value={dashboardData.courseCount}
-              icon={<Library className="w-6 h-6" />}
-              trend="+8%"
-              description="Available courses"
-              gradient="from-indigo-500 to-indigo-600"
-              delay="400"
-            />
-
-            <DashboardCard
-              title="Total Groups"
-              value={dashboardData.groupCount}
-              icon={<Group className="w-6 h-6" />}
-              description="Student groups"
-              gradient="from-pink-500 to-pink-600"
-              delay="500"
-            />
-          </div>
-
-          {/* Quick Actions Section */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Quick Actions
-              </h3>
-              <TrendingUp className="w-5 h-5 text-gray-400" />
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { label: "Manage Users", icon: Users, color: "blue" },
-                { label: "View Reports", icon: BarChart3, color: "green" },
-                { label: "Settings", icon: Shield, color: "purple" },
-                { label: "Analytics", icon: Activity, color: "orange" },
-              ].map((action, index) => (
-                <button
-                  key={index}
-                  className="flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group"
-                >
-                  <div
-                    className={`p-3 rounded-lg bg-${action.color}-100 group-hover:bg-${action.color}-200 transition-colors`}
-                  >
-                    <action.icon
-                      className={`w-6 h-6 text-${action.color}-600`}
-                    />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 text-center">
-                    {action.label}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* Analytics Chart */}
+        <section className="bg-white rounded-lg border p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            School Overview
+          </h3>
+          <AnalyticsChart data={chartData} />
+        </section>
       </div>
     </div>
   );

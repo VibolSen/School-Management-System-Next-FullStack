@@ -7,7 +7,7 @@ import AddStaffModal from "./AddStaffModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import Notification from "@/components/Notification";
 
-const ALL_ROLES = ["ADMIN", "HR", "FACULTY", "TEACHER", "STUDENT"];
+const ALL_ROLES = ["ADMIN", "HR", "FACULTY", "TEACHER"];
 
 export default function StaffManagementView() {
   const { user, loading: userLoading } = useUser();
@@ -47,18 +47,14 @@ export default function StaffManagementView() {
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       const allUsers = await res.json();
 
-      if (user?.role === "ADMIN") {
-        setStaffList(allUsers);
-      } else {
-        const staffOnly = allUsers.filter((user) => user.role !== "STUDENT");
-        setStaffList(staffOnly);
-      }
+      const staffOnly = allUsers.filter((user) => user.role !== "STUDENT");
+      setStaffList(staffOnly);
     } catch (err) {
       showMessage(`Failed to load staff data: ${err.message}`, "error");
     } finally {
       setIsLoading(false);
     }
-  }, [user?.role]);
+  }, []);
 
   useEffect(() => {
     fetchStaff();
