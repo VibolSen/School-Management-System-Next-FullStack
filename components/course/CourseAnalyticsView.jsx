@@ -12,8 +12,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import DashboardCard from "@/components/dashboard/DashboardCard";
-import UsersIcon from "@/components/icons/UsersIcon";
-import ChartBarIcon from "@/components/icons/ChartBarIcon";
+import { Users, BarChart3 } from "lucide-react";
 
 const CourseAnalyticsView = ({ loggedInUser }) => {
   const [selectedCourseId, setSelectedCourseId] = useState(null);
@@ -164,13 +163,13 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
             <DashboardCard
               title="Enrolled Students"
               value={courseData.enrolledStudents.length.toString()}
-              icon={<UsersIcon />}
+              icon={<Users className="w-6 h-6 text-blue-500" />}
               subtitle="Total students enrolled"
             />
             <DashboardCard
               title="Completion Rate"
               value={`${courseData.completionRate}%`}
-              icon={<ChartBarIcon />}
+              icon={<BarChart3 className="w-6 h-6 text-green-500" />}
               subtitle="Based on progress"
             />
           </div>

@@ -2,11 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import DashboardCard from "@/components/dashboard/DashboardCard";
-import { ClipboardList, FileText } from 'lucide-react';
-import UsersIcon from "@/components/icons/UsersIcon";
-import BookOpenIcon from "@/components/icons/BookOpenIcon";
-import ChartBarIcon from "@/components/icons/ChartBarIcon";
-
+import {
+  BookOpen,
+  ClipboardList,
+  FileText,
+  Users,
+  Calendar,
+  Library,
+  TrendingUp,
+  Shield,
+} from "lucide-react";
 import Link from "next/link";
 
 const StudentDashboard = ({ loggedInUser }) => {
@@ -36,88 +41,123 @@ const StudentDashboard = ({ loggedInUser }) => {
   }, [loggedInUser]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center space-y-3">
+          <div className="animate-spin w-10 h-10 border-4 border-gray-300 border-t-blue-500 rounded-full mx-auto" />
+          <p className="text-gray-600 font-medium">Loading dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
-  if (error) {
-    return <div>Error: {error}</div>;
+  if (error || !dashboardData) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-6">
+        <Shield className="w-12 h-12 text-red-500 mb-4" />
+        <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+          Dashboard data unavailable
+        </h2>
+        <p className="text-gray-600 mb-4">
+          Please check your connection or try again later.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
-  if (!dashboardData) {
-    return <div>No data available.</div>;
-  }
-
-  const { myProfile } = dashboardData;
-
-  console.log("myProfile:", myProfile);
+  const { myProfile, pendingAssignmentsCount, pendingExamsCount } =
+    dashboardData;
 
   const currentCourses = myProfile.enrollments.filter(
     (enrollment) => enrollment.progress < 100
   );
-  const pastCourses = myProfile.enrollments.filter(
-    (enrollment) => enrollment.progress === 100
-  );
 
-  console.log("currentCourses:", currentCourses);
+  const welcomeName = myProfile
+    ? `${myProfile.firstName} ${myProfile.lastName}`
+    : "Student";
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <h1 className="text-3xl font-bold text-slate-800">
-        Welcome back, {myProfile.firstName}!
-      </h1>
-      <p className="text-slate-500">
-        Here's your personal dashboard and academic summary.
-      </p>
+    <div className="min-h-screen bg-gray-100">
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        <header>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Welcome back, <span className="font-medium">{welcomeName}</span>!
+          </h1>
+          <p className="text-gray-600">
+            Here's your personal dashboard and academic summary.
+          </p>
+        </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <DashboardCard
-          title="Current Courses"
-          value={currentCourses.length.toString()}
-          icon={<BookOpenIcon />}
-        />
-        <DashboardCard
-          title="Past Courses"
-          value={pastCourses.length.toString()}
-          icon={<BookOpenIcon />}
-        />
-        <DashboardCard
-          title="My Groups"
-          value={myProfile.groups.length.toString()}
-          icon={<UsersIcon />}
-        />
-      </div>
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <DashboardCard
+            title="Current Courses"
+            value={currentCourses.length.toString()}
+            icon={<BookOpen className="w-6 h-6 text-blue-500" />}
+            description="Courses you are enrolled in"
+          />
+          <DashboardCard
+            title="Pending Assignments"
+            value={pendingAssignmentsCount.toString()}
+            icon={<ClipboardList className="w-6 h-6 text-orange-500" />}
+            description="Assignments that are due"
+          />
+          <DashboardCard
+            title="Upcoming Exams"
+            value={pendingExamsCount.toString()}
+            icon={<FileText className="w-6 h-6 text-purple-500" />}
+            description="Exams you need to take"
+          />
+          <DashboardCard
+            title="My Groups"
+            value={myProfile.groups.length.toString()}
+            icon={<Users className="w-6 h-6 text-green-500" />}
+            description="Groups you are a member of"
+          />
+        </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-slate-800">
-            My Groups
-          </h2>
-          <ul className="space-y-3">
-            {myProfile.groups.map((group) => (
-              <li
-                key={group.id}
-                className="p-3 bg-slate-50 rounded-lg"
-              >
-                <p className="font-semibold text-slate-800">{group.name}</p>
-                <ul className="space-y-1 mt-2">
-                  {group.students.map((student) => (
-                    <li key={student.id} className="text-sm text-slate-500">
-                      {student.firstName} {student.lastName}
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-slate-800">
-            My Courses
-          </h2>
-          <div>
-            <h3 className="text-lg font-semibold mb-2 text-slate-700">
-              Current Courses
+        <section className="bg-white rounded-lg border p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Quick Actions
             </h3>
+            <TrendingUp className="w-5 h-5 text-gray-400" />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[
+              {
+                label: "Assignments",
+                icon: ClipboardList,
+                href: "/student/assignments",
+              },
+              { label: "Exams", icon: FileText, href: "/student/exams" },
+              { label: "Schedule", icon: Calendar, href: "/student/schedule" },
+              { label: "e-Library", icon: Library, href: "/student/e-library" },
+            ].map((action, i) => (
+              <Link
+                href={action.href}
+                key={i}
+                className="flex flex-col items-center gap-2 p-4 rounded-lg border hover:bg-gray-50 transition"
+              >
+                <div className="p-2 bg-gray-100 rounded-md">
+                  <action.icon className="w-5 h-5 text-gray-600" />
+                </div>
+                <span className="text-sm text-gray-700">{action.label}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-xl shadow-md">
+            <h2 className="text-xl font-semibold mb-4 text-slate-800">
+              My Courses
+            </h2>
             <ul className="space-y-3">
               {currentCourses.map((enrollment) => {
                 const course = enrollment.course;
@@ -128,48 +168,44 @@ const StudentDashboard = ({ loggedInUser }) => {
                     className="p-3 bg-slate-50 rounded-lg flex justify-between items-center"
                   >
                     <div>
-                      <p className="font-semibold text-slate-800">{course.name}</p>
-                      <p className="text-sm text-slate-500">{course.courseDepartments[0]?.department?.name || 'N/A'}</p>
-                      <p className="text-sm text-slate-500">{course.leadBy?.firstName} {course.leadBy?.lastName}</p>
-                      <p className="text-sm text-slate-500">{course.groups.map(group => group.name).join(', ')}</p>
+                      <p className="font-semibold text-slate-800">
+                        {course.name}
+                      </p>
+                      <p className="text-sm text-slate-500">
+                        {course.courseDepartments[0]?.department?.name || "N/A"}
+                      </p>
                     </div>
-                    <Link href={`/student/courses/${course.id}`}>
-                      <a className="px-2 py-1 text-xs font-semibold text-sky-800 bg-sky-100 rounded-full">
-                        {course.id}
-                      </a>
+                    <Link
+                      href={`/student/courses/${course.id}`}
+                      className="px-3 py-1 text-sm font-semibold text-sky-800 bg-sky-100 rounded-full hover:bg-sky-200 transition"
+                    >
+                      View
                     </Link>
                   </li>
                 );
               })}
             </ul>
           </div>
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-2 text-slate-700">
-              Past Courses
-            </h3>
+          <div className="bg-white p-6 rounded-xl shadow-md">
+            <h2 className="text-xl font-semibold mb-4 text-slate-800">
+              My Groups
+            </h2>
             <ul className="space-y-3">
-              {pastCourses.map((enrollment) => {
-                const course = enrollment.course;
-                if (!course) return null;
-                return (
-                  <li
-                    key={course.id}
-                    className="p-3 bg-slate-50 rounded-lg flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="font-semibold text-slate-800">{course.name}</p>
-                      <p className="text-sm text-slate-500">{course.courseDepartments[0]?.department?.name || 'N/A'}</p>
-                      <p className="text-sm text-slate-500">{course.leadBy?.firstName} {course.leadBy?.lastName}</p>
-                      <p className="text-sm text-slate-500">{course.groups.map(group => group.name).join(', ')}</p>
-                    </div>
-                    <Link href={`/student/courses/${course.id}`}>
-                      <a className="px-2 py-1 text-xs font-semibold text-sky-800 bg-sky-100 rounded-full">
-                        {course.id}
-                      </a>
-                    </Link>
-                  </li>
-                );
-              })}
+              {myProfile.groups.map((group) => (
+                <li
+                  key={group.id}
+                  className="p-3 bg-slate-50 rounded-lg"
+                >
+                  <p className="font-semibold text-slate-800">{group.name}</p>
+                  <ul className="space-y-1 mt-2">
+                    {group.students.map((student) => (
+                      <li key={student.id} className="text-sm text-slate-500">
+                        {student.firstName} {student.lastName}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
