@@ -109,9 +109,26 @@ const TEACHER_NAV_ITEMS = [
   },
 ];
 
-export default function TeacherSidebar({ isOpen, setIsOpen }) {
+import { useState, useEffect } from "react";
+export default function TeacherSidebar({ initialOpen = true }) {
+  const [isOpen, setIsOpen] = useState(initialOpen);
   const isCollapsed = !isOpen;
   const pathname = usePathname();
+
+  useEffect(() => {
+    const savedState = localStorage.getItem("teacherSidebarState");
+    if (savedState !== null) {
+      setIsOpen(JSON.parse(savedState));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("teacherSidebarState", JSON.stringify(isOpen));
+  }, [isOpen]);
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
 
   return (
     <>
