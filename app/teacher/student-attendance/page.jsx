@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import StatusMessage from "@/components/StatusMessage";
+import { CircularProgress, Paper } from "@mui/material";
 
 const StudentAttendancePage = () => {
   const { user } = useUser();
@@ -12,6 +13,8 @@ const StudentAttendancePage = () => {
   const [attendance, setAttendance] = useState({});
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [status, setStatus] = useState(null);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [submitting, setSubmitting] = useState(false); // ✅ added missing state
 
   useEffect(() => {
     if (user?.id) {
@@ -30,34 +33,37 @@ const StudentAttendancePage = () => {
 
   useEffect(() => {
     if (selectedGroup && date) {
-      // Fetch students for the selected group
-      fetch(`/api/teacher/groups/${selectedGroup}/students`)
-        .then((res) => res.json())
-        .then(setStudents)
-        .catch((error) => {
-          console.error("Failed to fetch students:", error);
-          setStatus({
-            type: "error",
-            message: "Failed to fetch students for the selected group.",
-          });
-        });
-
-      // Fetch existing attendance for the selected group and date
-      fetch(`/api/teacher/groups/${selectedGroup}/attendance?date=${date}`)
-        .then((res) => res.json())
-        .then((data) => {
-          const newAttendance = {};
-          data.forEach((att) => {
-            newAttendance[att.studentId] = att.status;
-          });
-          setAttendance(newAttendance);
-        })
-        .catch((error) => {
-          console.error("Failed to fetch attendance:", error);
-          // It's okay if attendance doesn't exist yet, so no error message
-        });
+      setLoadingStudents(true);
+      Promise.all([
+        fetch(`/api/teacher/groups/${selectedGroup}/students`)
+          .then((res) => res.json())
+          .then(setStudents)
+          .catch((error) => {
+            console.error("Failed to fetch students:", error);
+            setStatus({
+              type: "error",
+              message: "Failed to fetch students for the selected group.",
+            });
+            return { students: [] };
+          }),
+        fetch(`/api/teacher/groups/${selectedGroup}/attendance?date=${date}`)
+          .then((res) => res.json())
+          .then((data) => {
+            const newAttendance = {};
+            data.forEach((att) => {
+              newAttendance[att.studentId] = att.status;
+            });
+            setAttendance(newAttendance);
+            return data;
+          })
+          .catch((error) => {
+            console.error("Failed to fetch attendance:", error);
+            return [];
+          }),
+      ]).finally(() => setLoadingStudents(false));
     } else {
       setStudents([]);
+      setAttendance({});
     }
   }, [selectedGroup, date]);
 
@@ -73,6 +79,8 @@ const StudentAttendancePage = () => {
       setStatus({ type: "error", message: "Please select a group and date." });
       return;
     }
+
+    setSubmitting(true);
 
     const attendances = Object.keys(attendance).map((studentId) => ({
       studentId,
@@ -108,6 +116,8 @@ const StudentAttendancePage = () => {
         type: "error",
         message: "An unexpected error occurred.",
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -117,12 +127,12 @@ const StudentAttendancePage = () => {
         Student Attendance
       </h1>
 
-      {status && (
-        <StatusMessage type={status.type} message={status.message} />
-      )}
+      {status && <StatusMessage type={status.type} message={status.message} />}
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <Paper elevation={3} sx={{ p: 4, mb: 4, borderRadius: 2 }}>
+        {/* ✅ ADDED FORM HERE */}
+        <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 items-end">
           <div>
             <label
               htmlFor="group-select"
@@ -134,7 +144,7 @@ const StudentAttendancePage = () => {
               id="group-select"
               value={selectedGroup}
               onChange={(e) => setSelectedGroup(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm"
               required
             >
               <option value="">-- Select a Group --</option>
@@ -157,28 +167,57 @@ const StudentAttendancePage = () => {
               id="date-picker"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm"
               required
             />
           </div>
+          <div className="flex justify-end md:justify-start">
+            <button
+              type="submit"
+              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!selectedGroup || students.length === 0 || submitting}
+            >
+              {submitting ? (
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : null}
+              {submitting ? 'Submitting...' : 'Submit Attendance'}
+            </button>
+          </div>
         </div>
 
-        {students.length > 0 && (
-          <div className="overflow-x-auto">
+        {loadingStudents ? (
+          <div className="flex justify-center items-center h-48">
+            <CircularProgress />
+            <p className="ml-4 text-gray-600">Loading students...</p>
+          </div>
+        ) : students.length > 0 ? (
+          <div className="overflow-x-auto shadow-md sm:rounded-lg mt-6">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Student Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Attendance Status
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {students.map((student) => (
-                  <tr key={student.id}>
+                {students.map((student, index) => (
+                  <tr
+                    key={student.id}
+                    className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {student.firstName} {student.lastName}
                     </td>
@@ -193,9 +232,9 @@ const StudentAttendancePage = () => {
                             onChange={() =>
                               handleAttendanceChange(student.id, "PRESENT")
                             }
-                            className="form-radio h-4 w-4 text-indigo-600"
+                            className="form-radio h-4 w-4 text-green-600"
                           />
-                          <span className="ml-2">Present</span>
+                          <span className="ml-2 text-green-700">Present</span>
                         </label>
                         <label className="flex items-center">
                           <input
@@ -208,7 +247,7 @@ const StudentAttendancePage = () => {
                             }
                             className="form-radio h-4 w-4 text-red-600"
                           />
-                          <span className="ml-2">Absent</span>
+                          <span className="ml-2 text-red-700">Absent</span>
                         </label>
                         <label className="flex items-center">
                           <input
@@ -221,7 +260,7 @@ const StudentAttendancePage = () => {
                             }
                             className="form-radio h-4 w-4 text-yellow-600"
                           />
-                          <span className="ml-2">Late</span>
+                          <span className="ml-2 text-yellow-700">Late</span>
                         </label>
                       </div>
                     </td>
@@ -230,18 +269,14 @@ const StudentAttendancePage = () => {
               </tbody>
             </table>
           </div>
+        ) : (
+          <div className="flex justify-center items-center h-48">
+            <p className="text-gray-600 text-lg">No students found for this group or date.</p>
+          </div>
         )}
-
-        <div className="mt-6 flex justify-end">
-          <button
-            type="submit"
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            disabled={!selectedGroup || students.length === 0}
-          >
-            Submit Attendance
-          </button>
-        </div>
-      </form>
+        </form>
+        {/* ✅ FORM CLOSES HERE */}
+      </Paper>
     </div>
   );
 };
