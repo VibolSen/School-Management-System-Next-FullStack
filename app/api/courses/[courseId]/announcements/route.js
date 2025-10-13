@@ -60,7 +60,6 @@ export async function POST(req, { params }) {
         { error: "Title and content are required" },
         { status: 400 }
       );
-    );
     }
 
     const newAnnouncement = await prisma.announcement.create({
