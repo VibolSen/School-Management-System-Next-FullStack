@@ -14,6 +14,7 @@ import {
   FiChevronRight,
   FiUsers,
   FiCode,
+  FiCreditCard,
 } from "react-icons/fi";
 
 const NavLink = ({
@@ -68,6 +69,11 @@ const HR_NAV_ITEMS = [
     label: "Manage Attendance",
     icon: <FiUsers className="w-5 h-5" />,
     href: "/hr/manage-attendance",
+  },
+  {
+    label: "Payroll",
+    icon: <FiCreditCard className="w-5 h-5" />,
+    href: "/hr/payroll",
   },
   {
     label: "Reports & Analytics",
