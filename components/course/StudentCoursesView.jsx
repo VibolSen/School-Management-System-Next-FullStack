@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import Link from "next/link";
 
 export default function StudentCoursesView({ loggedInUser }) {
   const [courses, setCourses] = useState([]);
@@ -83,7 +84,9 @@ export default function StudentCoursesView({ loggedInUser }) {
                 filteredCourses.map((course) => (
                   <tr key={course.id} className="hover:bg-slate-50">
                     <td className="px-6 py-4 font-medium text-slate-900">
-                      {course.name}
+                      <Link href={`/student/courses/${course.id}`} className="hover:underline">
+                        {course.name}
+                      </Link>
                     </td>
                     <td className="px-6 py-4">
                       {course.courseDepartments[0]?.department?.name || "N/A"}

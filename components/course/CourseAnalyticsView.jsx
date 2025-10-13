@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import { Users, BarChart3 } from "lucide-react";
+import AnnouncementsView from "@/components/announcements/AnnouncementsView";
 
 const CourseAnalyticsView = ({ loggedInUser }) => {
   const [selectedCourseId, setSelectedCourseId] = useState(null);
@@ -20,6 +21,7 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
   const [courseData, setCourseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState('analytics');
 
   // Fetch initial list of courses for the dropdown
   useEffect(() => {
@@ -77,8 +79,10 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
       }
     };
 
-    fetchAnalytics();
-  }, [selectedCourseId]);
+    if (activeTab === 'analytics') {
+        fetchAnalytics();
+    }
+  }, [selectedCourseId, activeTab]);
 
   const handleCourseChange = (e) => {
     setSelectedCourseId(e.target.value || null);
@@ -88,9 +92,9 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <h1 className="text-3xl font-bold text-slate-800">Course Analytics</h1>
+      <h1 className="text-3xl font-bold text-slate-800">Course Management</h1>
       <p className="text-slate-500">
-        Dive into the performance and engagement metrics for your courses.
+        Dive into the performance, engagement metrics and announcements for your courses.
       </p>
 
       <div className="bg-white p-4 rounded-xl shadow-md top-0 z-10">
@@ -121,9 +125,34 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
         </select>
       </div>
 
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`${
+              activeTab === 'analytics'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+          >
+            Analytics
+          </button>
+          <button
+            onClick={() => setActiveTab('announcements')}
+            className={`${
+              activeTab === 'announcements'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+          >
+            Announcements
+          </button>
+        </nav>
+      </div>
+
       {loading && (
         <div className="flex justify-center items-center h-64">
-          <div className="text-slate-600">Loading analytics data...</div>
+          <div className="text-slate-600">Loading...</div>
         </div>
       )}
 
@@ -145,7 +174,7 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
          </div>
       )}
 
-      {!loading && !error && selectedCourseId && !courseData && (
+      {!loading && !error && selectedCourseId && activeTab === 'analytics' && !courseData && (
         <div className="text-center py-20 bg-white rounded-xl shadow-md">
           <h3 className="mt-2 text-sm font-semibold text-slate-900">
             Select a course
@@ -157,7 +186,7 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
       )}
 
 
-      {!loading && !error && courseData && (
+      {activeTab === 'analytics' && !loading && !error && courseData && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <DashboardCard
@@ -227,6 +256,10 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
             </div>
           </div>
         </>
+      )}
+
+      {activeTab === 'announcements' && selectedCourseId && (
+        <AnnouncementsView courseId={selectedCourseId} loggedInUser={loggedInUser} />
       )}
     </div>
   );

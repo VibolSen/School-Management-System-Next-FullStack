@@ -1,6 +1,7 @@
 // app/api/groups/route.js
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { createNotification } from "@/lib/notification"; // New import
 
 const prisma = new PrismaClient();
 
@@ -76,20 +77,30 @@ export async function PUT(req) {
       );
     }
 
+    // Fetch current group data to find newly added students
+    const currentGroup = await prisma.group.findUnique({
+      where: { id },
+      select: { studentIds: true, name: true },
+    });
+
+    if (!currentGroup) {
+      return NextResponse.json({ error: "Group not found" }, { status: 404 });
+    }
+
+    const oldStudentIds = new Set(currentGroup.studentIds.map(String)); // Ensure string comparison
+    const newStudentIds = new Set(studentIds.map(String));
+
     const dataToUpdate = {};
 
     // Update basic details if provided
     if (name) dataToUpdate.name = name;
     if (Array.isArray(courseIds)) {
       dataToUpdate.courses = {
-        set: courseIds.map((courseId) => ({ id: courseId })),
+        set: courseIds.map((id) => ({ id })),
       };
     }
 
-    // ✅ THIS IS THE KEY LOGIC
     // If an array of studentIds is provided, update the relationship.
-    // The `set` command tells Prisma to make the members list EXACTLY match this array.
-    // It automatically handles adding new students and removing old ones.
     if (Array.isArray(studentIds)) {
       dataToUpdate.students = {
         set: studentIds.map((studentId) => ({ id: studentId })),
@@ -100,6 +111,21 @@ export async function PUT(req) {
       where: { id },
       data: dataToUpdate,
     });
+
+    // Identify newly added students and send notifications
+    const addedStudents = studentIds.filter(
+      (studentId) => !oldStudentIds.has(String(studentId))
+    );
+
+    for (const studentId of addedStudents) {
+      await createNotification(
+        studentId,
+        "GROUP_ADDED",
+        `You have been added to the group "${updatedGroup.name}".`,
+        `/student/groups` // Link to student's group page
+      );
+    }
+
     return NextResponse.json(updatedGroup);
   } catch (error) {
     if (error.code === "P2002") {

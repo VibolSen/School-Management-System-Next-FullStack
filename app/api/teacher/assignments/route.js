@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { createNotification } from "@/lib/notification";
 
 const prisma = new PrismaClient();
 
@@ -75,7 +76,7 @@ export async function POST(req) {
 
     const group = await prisma.group.findUnique({
       where: { id: groupId },
-      select: { studentIds: true },
+      select: { studentIds: true, name: true }, // Include group name for notification message
     });
     console.log("Found group:", group);
 
@@ -107,6 +108,16 @@ export async function POST(req) {
         data: submissionsData,
       });
       console.log(`Created ${submissionsData.length} pending submissions.`);
+
+      // Create notifications for each student in the group
+      for (const studentId of group.studentIds) {
+        await createNotification(
+          studentId,
+          "ASSIGNMENT_CREATED",
+          `New assignment "${newAssignment.title}" posted for your group "${group.name}".`,
+          `/student/assignments/${newAssignment.id}` // Link to assignment details page
+        );
+      }
     }
 
     return NextResponse.json(newAssignment, { status: 201 });

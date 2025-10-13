@@ -78,6 +78,8 @@ model User {
   schedulesAssignedToTeacher Schedule[] @relation("SchedulesAssignedToTeacher")
 
   profile   Profile?
+  createdAnnouncements Announcement[] @relation("AnnouncementsCreated")
+  notifications Notification[]
 }
 
 model StaffAttendance {
@@ -136,6 +138,21 @@ model Course {
   // ✅ Back relation for Enrollment
   enrollments Enrollment[]
   courseDepartments CourseDepartment[]
+  announcements Announcement[]
+}
+
+model Announcement {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course    Course   @relation(fields: [courseId], references: [id])
+  courseId  String   @db.ObjectId
+
+  author    User     @relation("AnnouncementsCreated", fields: [authorId], references: [id])
+  authorId  String   @db.ObjectId
 }
 
 model Group {
@@ -256,4 +273,15 @@ model CourseDepartment {
   department   Department @relation(fields: [departmentId], references: [id])
 
   @@unique([courseId, departmentId])
+}
+
+model Notification {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id])
+  type      String
+  message   String
+  link      String?
+  isRead    Boolean   @default(false)
+  createdAt DateTime  @default(now())
 }

@@ -13,6 +13,7 @@ import {
   Shield,
 } from "lucide-react";
 import Link from "next/link";
+import NotificationsView from "@/components/notifications/NotificationsView";
 
 const StudentDashboard = ({ loggedInUser }) => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -151,6 +152,14 @@ const StudentDashboard = ({ loggedInUser }) => {
               </Link>
             ))}
           </div>
+        </section>
+
+        {/* New Notifications Section */}
+        <section className="bg-white p-6 rounded-xl shadow-md">
+          <h2 className="text-xl font-semibold mb-4 text-slate-800">
+            Recent Notifications
+          </h2>
+          <NotificationsView loggedInUser={loggedInUser} />
         </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { createNotification } from "@/lib/notification"; // New import
 
 const prisma = new PrismaClient();
 
@@ -58,7 +59,21 @@ export async function PUT(req, { params }) {
         feedback,
         status: "GRADED",
       },
+      include: { // Include assignment and student to create notification
+        assignment: true,
+        student: true,
+      },
     });
+
+    // Create notification for the student
+    if (updatedSubmission.student && updatedSubmission.assignment) {
+      await createNotification(
+        updatedSubmission.student.id,
+        "SCORE_UPDATED",
+        `Your assignment "${updatedSubmission.assignment.title}" has been graded. Score: ${updatedSubmission.grade}/${updatedSubmission.assignment.points}.`,
+        `/student/assignments/${updatedSubmission.assignment.id}` // Link to assignment details page
+      );
+    }
 
     return NextResponse.json(updatedSubmission);
   } catch (error) {
