@@ -75,9 +75,7 @@ const StudentDashboard = ({ loggedInUser }) => {
   const { myProfile, pendingAssignmentsCount, pendingExamsCount } =
     dashboardData;
 
-  const currentCourses = myProfile.enrollments.filter(
-    (enrollment) => enrollment.progress < 100
-  );
+  const totalCourses = Array.from(new Set(myProfile.groups.flatMap(group => group.courses.map(course => course.id)))).length;
 
   const welcomeName = myProfile
     ? `${myProfile.firstName} ${myProfile.lastName}`
@@ -97,8 +95,8 @@ const StudentDashboard = ({ loggedInUser }) => {
 
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <DashboardCard
-            title="Current Courses"
-            value={currentCourses.length.toString()}
+            title="Total Courses"
+            value={totalCourses.toString()}
             icon={<BookOpen className="w-6 h-6 text-blue-500" />}
             description="Courses you are enrolled in"
           />
@@ -154,47 +152,7 @@ const StudentDashboard = ({ loggedInUser }) => {
           </div>
         </section>
 
-        {/* New Notifications Section */}
-        <section className="bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-slate-800">
-            Recent Notifications
-          </h2>
-          <NotificationsView loggedInUser={loggedInUser} />
-        </section>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <h2 className="text-xl font-semibold mb-4 text-slate-800">
-              My Courses
-            </h2>
-            <ul className="space-y-3">
-              {currentCourses.map((enrollment) => {
-                const course = enrollment.course;
-                if (!course) return null;
-                return (
-                  <li
-                    key={course.id}
-                    className="p-3 bg-slate-50 rounded-lg flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="font-semibold text-slate-800">
-                        {course.name}
-                      </p>
-                      <p className="text-sm text-slate-500">
-                        {course.courseDepartments[0]?.department?.name || "N/A"}
-                      </p>
-                    </div>
-                    <Link
-                      href={`/student/courses/${course.id}`}
-                      className="px-3 py-1 text-sm font-semibold text-sky-800 bg-sky-100 rounded-full hover:bg-sky-200 transition"
-                    >
-                      View
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
           <div className="bg-white p-6 rounded-xl shadow-md">
             <h2 className="text-xl font-semibold mb-4 text-slate-800">
               My Groups

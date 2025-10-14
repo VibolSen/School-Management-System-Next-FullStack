@@ -27,12 +27,12 @@ export async function GET(request) {
             } 
           } 
         }, 
-        groups: { 
-          include: { 
-            students: true 
-          } 
-        } 
-      },
+                groups: {
+                  include: {
+                    students: true,
+                    courses: true // Include courses here
+                  }
+                }      },
     });
 
     if (!studentProfile) {

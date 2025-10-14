@@ -42,9 +42,13 @@ export async function GET(req) {
       );
     }
 
-    const courses = user.groups.flatMap(group => group.courses).filter(Boolean);
+    const coursesWithGroupInfo = user.groups.flatMap(group => 
+      group.courses.map(course => ({ ...course, groupName: group.name }))
+    ).filter(Boolean);
 
-    return NextResponse.json(courses);
+    const uniqueCourses = Array.from(new Map(coursesWithGroupInfo.map(course => [course.id, course])).values());
+
+    return NextResponse.json(uniqueCourses);
   } catch (error) {
     console.error("GET My Courses (Student) Error:", error);
     return NextResponse.json(

@@ -62,34 +62,38 @@ export default function StudentCoursesView({ loggedInUser }) {
           <table className="w-full text-sm text-left text-slate-500">
             <thead className="text-xs text-slate-700 uppercase bg-slate-100">
               <tr>
-                <th className="px-6 py-3">Course Name</th>
                 <th className="px-6 py-3">Department</th>
+                <th className="px-6 py-3">Course Name</th>
+                <th className="px-6 py-3">Group</th>
                 <th className="px-6 py-3">Teacher</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
-                  <td colSpan={3} className="text-center py-8 text-slate-500">
+                  <td colSpan={4} className="text-center py-8 text-slate-500">
                     Loading courses...
                   </td>
                 </tr>
               ) : filteredCourses.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="text-center py-8 text-slate-500">
+                  <td colSpan={4} className="text-center py-8 text-slate-500">
                     You are not enrolled in any courses.
                   </td>
                 </tr>
               ) : (
                 filteredCourses.map((course) => (
                   <tr key={course.id} className="hover:bg-slate-50">
+                    <td className="px-6 py-4">
+                      {course.courseDepartments[0]?.department?.name || "N/A"}
+                    </td>
                     <td className="px-6 py-4 font-medium text-slate-900">
                       <Link href={`/student/courses/${course.id}`} className="hover:underline">
                         {course.name}
                       </Link>
                     </td>
                     <td className="px-6 py-4">
-                      {course.courseDepartments[0]?.department?.name || "N/A"}
+                      {course.groupName || "N/A"}
                     </td>
                     <td className="px-6 py-4">
                       {course.leadBy ? (
