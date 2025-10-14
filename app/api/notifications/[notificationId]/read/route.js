@@ -26,7 +26,7 @@ export async function PUT(req, { params }) {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
-  const { notificationId } = params;
+  const { notificationId } = await params;
 
   if (!notificationId) {
     return new NextResponse(JSON.stringify({ error: "Notification ID is required" }), { status: 400 });

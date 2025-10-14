@@ -121,7 +121,7 @@ export default function NotificationsDropdown() {
                         e.stopPropagation(); // Prevent the parent div's onClick from firing
                         handleMarkAsRead(notif.id);
                       }}
-                      className="ml-auto text-sm text-gray-800 hover:text-black"
+                      className="ml-auto text-xs text-blue-500 hover:text-blue-700 focus:outline-none focus:underline"
                     >
                       Mark as Read
                     </button>
