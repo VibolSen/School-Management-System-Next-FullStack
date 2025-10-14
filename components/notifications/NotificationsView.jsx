@@ -36,47 +36,60 @@ export default function NotificationsView({ loggedInUser }) {
     fetchNotifications();
   }, [fetchNotifications]);
 
-  const handleMarkAsRead = useCallback(async (notificationId) => {
-    try {
-      const res = await fetch(`/api/notifications/${notificationId}/read`, {
-        method: "PUT",
-      });
-      if (!res.ok) {
-        throw new Error("Failed to mark notification as read");
+  const handleMarkAsRead = useCallback(
+    async (notificationId) => {
+      try {
+        const res = await fetch(`/api/notifications/${notificationId}/read`, {
+          method: "PUT",
+        });
+        if (!res.ok) {
+          throw new Error("Failed to mark notification as read");
+        }
+        setNotifications((prev) =>
+          prev.map((notif) =>
+            notif.id === notificationId ? { ...notif, isRead: true } : notif
+          )
+        );
+        showMessage("Notification marked as read", "success");
+      } catch (err) {
+        showMessage(err.message, "error");
       }
-      setNotifications((prev) =>
-        prev.map((notif) =>
-          notif.id === notificationId ? { ...notif, isRead: true } : notif
-        )
-      );
-      showMessage("Notification marked as read", "success");
-    } catch (err) {
-      showMessage(err.message, "error");
-    }
-  }, [showMessage]);
+    },
+    [showMessage]
+  );
 
-  const handleMarkAllAsRead = useCallback(async () => {
-    try {
-      const unreadNotifications = notifications.filter(notif => !notif.isRead);
-      await Promise.all(unreadNotifications.map(notif =>
-        fetch(`/api/notifications/${notif.id}/read`, { method: "PUT" })
-      ));
-      setNotifications((prev) =>
-        prev.map((notif) => ({ ...notif, isRead: true }))
-      );
-      showMessage("All notifications marked as read", "success");
-    } catch (err) {
-      showMessage(err.message, "error");
-    }
-  }, [notifications, showMessage]);
+  const handleMarkAllAsRead = useCallback(
+    async () => {
+      try {
+        const unreadNotifications = notifications.filter(
+          (notif) => !notif.isRead
+        );
+        await Promise.all(
+          unreadNotifications.map((notif) =>
+            fetch(`/api/notifications/${notif.id}/read`, { method: "PUT" })
+          )
+        );
+        setNotifications((prev) =>
+          prev.map((notif) => ({ ...notif, isRead: true }))
+        );
+        showMessage("All notifications marked as read", "success");
+      } catch (err) {
+        showMessage(err.message, "error");
+      }
+    },
+    [notifications, showMessage]
+  );
 
   const unreadCount = notifications.filter((notif) => !notif.isRead).length;
 
   return (
-    <div className="p-6">
-      <Notification {...message} onClose={() => setMessage({ ...message, show: false })} />
+    <div className="p-6 bg-gray-200 min-h-screen"> {/* ✅ Background changed to gray */}
+      <Notification
+        {...message}
+        onClose={() => setMessage({ ...message, show: false })}
+      />
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Your Notifications</h1>
+        <h1 className="text-2xl font-bold text-black">Your Notifications</h1> {/* ✅ Text color black */}
         {notifications.length > 0 && (
           <button
             onClick={handleMarkAllAsRead}
@@ -89,38 +102,45 @@ export default function NotificationsView({ loggedInUser }) {
       </div>
 
       {isLoading ? (
-        <p>Loading notifications...</p>
+        <p className="text-black">Loading notifications...</p> 
       ) : error ? (
-        <p className="text-red-500">Error: {error}</p>
+        <p className="text-red-600">Error: {error}</p>
       ) : notifications.length === 0 ? (
-        <p>No notifications yet.</p>
+        <p className="text-black">No notifications yet.</p>
       ) : (
         <div className="space-y-4">
           {notifications.map((notif) => (
             <div
               key={notif.id}
-              className={`bg-white rounded-lg shadow-md p-4 flex items-center justify-between ${
+              className={`bg-gray-100 rounded-lg shadow-md p-4 flex items-center justify-between transition-colors duration-200 hover:bg-gray-300 ${
                 !notif.isRead ? "border-l-4 border-blue-500" : ""
-              }`}
+              }`} // ✅ Card background now gray
             >
               <div className="flex-1">
-                <p className={`font-semibold ${!notif.isRead ? "text-blue-700" : "text-gray-800"}`}>
+                <p
+                  className={`font-semibold ${
+                    !notif.isRead ? "text-blue-700" : "text-black"
+                  }`} // ✅ Default black text
+                >
                   {notif.message}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-700">
                   {new Date(notif.createdAt).toLocaleString()}
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 {notif.link && (
-                  <Link href={notif.link} className="text-blue-500 hover:underline">
+                  <Link
+                    href={notif.link}
+                    className="text-blue-600 hover:underline"
+                  >
                     View
                   </Link>
                 )}
                 {!notif.isRead && (
                   <button
                     onClick={() => handleMarkAsRead(notif.id)}
-                    className="text-sm text-gray-600 hover:text-gray-800"
+                    className="text-sm text-gray-800 hover:text-black"
                   >
                     Mark as Read
                   </button>
