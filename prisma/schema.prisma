@@ -194,7 +194,7 @@ model Submission {
 
   status SubmissionStatus @default(PENDING)
 
-  assignment   Assignment @relation(fields: [assignmentId], references: [id])
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
   assignmentId String     @db.ObjectId
   student      User       @relation("SubmissionsMade", fields: [studentId], references: [id])
   studentId    String     @db.ObjectId
@@ -270,7 +270,7 @@ model CourseDepartment {
   departmentId String   @db.ObjectId
 
   course       Course   @relation(fields: [courseId], references: [id])
-  department   Department @relation(fields: [departmentId], references: [id])
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
 
   @@unique([courseId, departmentId])
 }

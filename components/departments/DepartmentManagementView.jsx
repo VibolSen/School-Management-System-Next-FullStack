@@ -84,9 +84,15 @@ export default function DepartmentManagementView() {
         method: "DELETE",
       });
       // A successful DELETE often returns 204 No Content
-      if (!response.ok && response.status !== 204) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete the department.");
+      if (!response.ok) {
+        let errorMessage = "Failed to delete the department.";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (jsonError) {
+          // The response body is not JSON. Use the default error message.
+        }
+        throw new Error(errorMessage);
       }
       showMessage("Department deleted successfully!");
       setDepartments((prevDepts) =>
