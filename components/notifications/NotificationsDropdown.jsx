@@ -34,22 +34,21 @@ export default function NotificationsDropdown() {
     return () => clearInterval(interval);
   }, [isOpen]);
 
-  const handleNotificationClick = async (notificationId, link) => {
+  const handleMarkAsRead = async (notificationId) => {
     try {
       await fetch(`/api/notifications/${notificationId}/read`, {
         method: "PUT",
       });
-      // Optimistic update
-      setNotifications((prev) =>
-        prev.map((notif) =>
-          notif.id === notificationId ? { ...notif, isRead: true } : notif
-        )
-      );
-      if (link) {
-        window.location.href = link;
-      }
+      // After marking as read, refetch notifications to get the updated list (which will exclude the read one)
+      fetchNotifications();
     } catch (err) {
       console.error("Failed to mark notification as read", err);
+    }
+  };
+
+  const handleNotificationClick = (link) => {
+    if (link) {
+      window.location.href = link;
     }
   };
 
@@ -97,8 +96,7 @@ export default function NotificationsDropdown() {
               notifications.map((notif) => (
                 <div
                   key={notif.id}
-                  onClick={() => handleNotificationClick(notif.id, notif.link)}
-                  className={`flex items-center px-4 py-3 -mx-2 border-b border-gray-200 cursor-pointer hover:bg-gray-200 transition-colors ${
+                  className={`flex items-center px-4 py-3 -mx-2 border-b border-gray-200 transition-colors ${
                     !notif.isRead ? "bg-gray-50" : ""
                   }`}
                 >
@@ -117,6 +115,17 @@ export default function NotificationsDropdown() {
                       {new Date(notif.createdAt).toLocaleString()}
                     </p>
                   </div>
+                  {!notif.isRead && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent the parent div's onClick from firing
+                        handleMarkAsRead(notif.id);
+                      }}
+                      className="ml-auto text-sm text-gray-800 hover:text-black"
+                    >
+                      Mark as Read
+                    </button>
+                  )}
                 </div>
               ))}
           </div>

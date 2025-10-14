@@ -28,7 +28,7 @@ export async function GET(req) {
 
   try {
     const notifications = await prisma.notification.findMany({
-      where: { userId: user.id },
+      where: { userId: user.id, isRead: false }, // Only fetch unread notifications
       orderBy: { createdAt: "desc" },
     });
 
@@ -37,6 +37,39 @@ export async function GET(req) {
     console.error("GET Notifications Error:", error);
     return NextResponse.json(
       { error: "Failed to fetch notifications" },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT to mark a notification as read
+export async function PUT(req) {
+  const user = await getUser(req);
+  if (!user) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
+
+  const { notificationId } = await req.json();
+
+  if (!notificationId) {
+    return new NextResponse(JSON.stringify({ error: "Notification ID is required" }), { status: 400 });
+  }
+
+  try {
+    const updatedNotification = await prisma.notification.update({
+      where: { id: notificationId, userId: user.id },
+      data: { isRead: true },
+    });
+
+    if (!updatedNotification) {
+      return new NextResponse(JSON.stringify({ error: "Notification not found or not authorized" }), { status: 404 });
+    }
+
+    return NextResponse.json(updatedNotification);
+  } catch (error) {
+    console.error("PUT Mark Notification as Read Error:", error);
+    return NextResponse.json(
+      { error: "Failed to mark notification as read" },
       { status: 500 }
     );
   }

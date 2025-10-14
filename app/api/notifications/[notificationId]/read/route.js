@@ -19,7 +19,7 @@ async function getUser(req) {
   }
 }
 
-// PUT to mark a notification as read
+// PUT to mark a specific notification as read
 export async function PUT(req, { params }) {
   const user = await getUser(req);
   if (!user) {
@@ -28,28 +28,23 @@ export async function PUT(req, { params }) {
 
   const { notificationId } = params;
 
+  if (!notificationId) {
+    return new NextResponse(JSON.stringify({ error: "Notification ID is required" }), { status: 400 });
+  }
+
   try {
-    const notification = await prisma.notification.findUnique({
-      where: { id: notificationId },
-    });
-
-    if (!notification) {
-      return NextResponse.json({ error: "Notification not found" }, { status: 404 });
-    }
-
-    // Only the owner of the notification can mark it as read
-    if (notification.userId !== user.id) {
-      return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
-    }
-
     const updatedNotification = await prisma.notification.update({
-      where: { id: notificationId },
+      where: { id: notificationId, userId: user.id },
       data: { isRead: true },
     });
 
+    if (!updatedNotification) {
+      return new NextResponse(JSON.stringify({ error: "Notification not found or not authorized" }), { status: 404 });
+    }
+
     return NextResponse.json(updatedNotification);
   } catch (error) {
-    console.error("PUT Notification Read Error:", error);
+    console.error("PUT Mark Specific Notification as Read Error:", error);
     return NextResponse.json(
       { error: "Failed to mark notification as read" },
       { status: 500 }
