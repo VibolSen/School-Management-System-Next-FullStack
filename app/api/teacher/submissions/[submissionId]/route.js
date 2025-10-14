@@ -68,7 +68,7 @@ export async function PUT(req, { params }) {
     // Create notification for the student
     if (updatedSubmission.student && updatedSubmission.assignment) {
       await createNotification(
-        updatedSubmission.student.id,
+        ["STUDENT"], // Target only students
         "SCORE_UPDATED",
         `Your assignment "${updatedSubmission.assignment.title}" has been graded. Score: ${updatedSubmission.grade}/${updatedSubmission.assignment.points}.`,
         `/student/assignments/${updatedSubmission.assignment.id}` // Link to assignment details page

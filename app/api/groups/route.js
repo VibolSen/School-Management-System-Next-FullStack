@@ -117,9 +117,9 @@ export async function PUT(req) {
       (studentId) => !oldStudentIds.has(String(studentId))
     );
 
-    for (const studentId of addedStudents) {
+    if (addedStudents.length > 0) {
       await createNotification(
-        studentId,
+        ["STUDENT"], // Target only students
         "GROUP_ADDED",
         `You have been added to the group "${updatedGroup.name}".`,
         `/student/groups` // Link to student's group page

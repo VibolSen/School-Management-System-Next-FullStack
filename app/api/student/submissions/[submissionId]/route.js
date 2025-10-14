@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { createNotification } from "@/lib/notification"; // New import
 
 const prisma = new PrismaClient();
 
@@ -55,16 +56,25 @@ export async function PUT(req, { params }) {
         status: "SUBMITTED",
         submittedAt: new Date(),
       },
-      // ✅ FIX IS HERE: Include the exact same related data as the GET request.
-      // This ensures the API always returns a complete and consistent object.
       include: {
         assignment: {
           include: {
-            teacher: { select: { firstName: true, lastName: true } },
+            teacher: { select: { id: true, firstName: true, lastName: true } }, // Include teacher ID for notification
           },
         },
+        student: { select: { firstName: true, lastName: true } }, // Include student name for notification message
       },
     });
+
+    // Create notification for the teacher
+    if (updatedSubmission.assignment?.teacher && updatedSubmission.student) {
+      await createNotification(
+        ["TEACHER"], // Target only teachers
+        "ASSIGNMENT_SUBMITTED",
+        `Student ${updatedSubmission.student.firstName} ${updatedSubmission.student.lastName} has submitted assignment "${updatedSubmission.assignment.title}".`,
+        `/teacher/submissions/${updatedSubmission.id}` // Link to the submission details page for the teacher
+      );
+    }
 
     return NextResponse.json(updatedSubmission);
   } catch (error) {

@@ -283,5 +283,6 @@ model Notification {
   message   String
   link      String?
   isRead    Boolean   @default(false)
+  targetRoles Role[]    @default([STUDENT]) // New field for role-based targeting
   createdAt DateTime  @default(now())
 }

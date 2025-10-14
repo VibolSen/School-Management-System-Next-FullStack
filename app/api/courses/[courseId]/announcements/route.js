@@ -78,14 +78,12 @@ export async function POST(req, { params }) {
 
     // Create notifications for all students enrolled in the course
     if (newAnnouncement.course && newAnnouncement.course.enrollments.length > 0) {
-      for (const enrollment of newAnnouncement.course.enrollments) {
-        await createNotification(
-          enrollment.studentId,
-          "NEW_ANNOUNCEMENT",
-          `New announcement in "${newAnnouncement.course.name}": "${newAnnouncement.title}" `,
-          `/student/courses/${courseId}` // Link to course details page
-        );
-      }
+      await createNotification(
+        ["STUDENT"], // Target only students
+        "NEW_ANNOUNCEMENT",
+        `New announcement in "${newAnnouncement.course.name}": "${newAnnouncement.title}" `,
+        `/student/courses/${courseId}` // Link to course details page
+      );
     }
 
     return NextResponse.json(newAnnouncement, { status: 201 });

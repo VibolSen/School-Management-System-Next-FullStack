@@ -27,10 +27,16 @@ export async function GET(req) {
   }
 
   try {
-    const notifications = await prisma.notification.findMany({
-      where: { userId: user.id, isRead: false }, // Only fetch unread notifications
+    const allNotifications = await prisma.notification.findMany({
+      where: {
+        userId: user.id,
+        isRead: false,
+      },
       orderBy: { createdAt: "desc" },
     });
+
+    // Filter notifications in memory based on user's role
+    const notifications = allNotifications.filter(notif => Array.isArray(notif.targetRoles) && notif.targetRoles.includes(user.role));
 
     return NextResponse.json(notifications);
   } catch (error) {

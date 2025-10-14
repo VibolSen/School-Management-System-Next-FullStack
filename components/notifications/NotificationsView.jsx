@@ -106,7 +106,11 @@ export default function NotificationsView({ loggedInUser }) {
       ) : error ? (
         <p className="text-red-600">Error: {error}</p>
       ) : notifications.length === 0 ? (
-        <p className="text-black">No notifications yet.</p>
+        <p className="text-black">
+          {loggedInUser?.role === "TEACHER"
+            ? "No notifications to show." // Specific message for teachers
+            : "No notifications yet."}
+        </p>
       ) : (
         <div className="space-y-4">
           {notifications.map((notif) => (

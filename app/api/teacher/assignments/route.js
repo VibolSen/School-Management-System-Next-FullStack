@@ -110,9 +110,9 @@ export async function POST(req) {
       console.log(`Created ${submissionsData.length} pending submissions.`);
 
       // Create notifications for each student in the group
-      for (const studentId of group.studentIds) {
+      if (group.studentIds.length > 0) {
         await createNotification(
-          studentId,
+          ["STUDENT"], // Target only students
           "ASSIGNMENT_CREATED",
           `New assignment "${newAssignment.title}" posted for your group "${group.name}".`,
           `/student/assignments/${newAssignment.id}` // Link to assignment details page
