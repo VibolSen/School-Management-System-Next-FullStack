@@ -1,333 +1,216 @@
+// app/faculty/dashboard/FacultyDashboard.jsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import DashboardCard from "@/components/dashboard/DashboardCard";
-import {
-  Users,
-  Briefcase,
-  Building2,
-  Library,
-  Group,
-  UserCheck,
-  Calendar,
-  Bell,
-  BarChart3,
-} from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 import Link from "next/link";
+import {
+  Book,
+  Users,
+  ClipboardList,
+  BarChart2,
+  Calendar,
+  Settings,
+  User,
+  Activity,
+} from "lucide-react";
+import AnalyticsChart from "./AnalyticsChart";
+import { useUser } from "@/context/UserContext";
 
-export default function FacultyDashboard({ loggedInUser }) {
+export default function FacultyDashboard() {
+  const { user } = useUser();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [lastUpdated, setLastUpdated] = useState(null);
+
+  async function fetchDashboardData() {
+    try {
+      const res = await fetch("/api/dashboard"); // Adjust API endpoint if needed
+      if (!res.ok) throw new Error(`Dashboard API error: ${res.status}`);
+      const data = await res.json();
+      setDashboardData(data);
+    } catch (error) {
+      console.error("Failed to fetch dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    const fetchSystemWideDashboardData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch("/api/dashboard");
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || "Failed to fetch dashboard data");
-        }
-        const data = await res.json();
-        setDashboardData(data);
-        setLastUpdated(new Date());
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSystemWideDashboardData();
+    fetchDashboardData();
   }, []);
 
-  // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-lg font-semibold text-slate-600 animate-pulse">
-            Loading your dashboard...
-          </p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center space-y-3">
+          <div className="animate-spin w-10 h-10 border-4 border-gray-300 border-t-blue-500 rounded-full mx-auto" />
+          <p className="text-gray-600 font-medium">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
-  // Error state
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100">
-        <div className="text-center space-y-4 max-w-md">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
-            <span className="text-2xl">⚠️</span>
-          </div>
-          <h2 className="text-xl font-bold text-red-600">
-            Unable to Load Dashboard
-          </h2>
-          <p className="text-slate-600">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // No data
   if (!dashboardData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto">
-            <BarChart3 className="w-8 h-8 text-slate-400" />
-          </div>
-          <p className="text-lg font-semibold text-slate-500">
-            No dashboard data available
-          </p>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-6">
+        <Activity className="w-12 h-12 text-red-500 mb-4" />
+        <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+          Dashboard data unavailable
+        </h2>
+        <p className="text-gray-600 mb-4">
+          Please check your connection or try again later.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+        >
+          Retry
+        </button>
       </div>
     );
   }
 
-  const welcomeName = loggedInUser
-    ? `${loggedInUser.firstName} ${loggedInUser.lastName}`
+  const welcomeName = user
+    ? `${user.firstName} ${user.lastName}`
     : "Faculty Member";
 
+  const chartData = [
+    { name: "Courses", count: dashboardData.courseCount || 0 },
+    { name: "Students", count: dashboardData.studentCount || 0 },
+    { name: "Assignments", count: dashboardData.assignmentCount || 0 },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="relative z-10 p-6 md:p-8 space-y-8">
-        {/* Header Section */}
-        <div className="bg-white p-8 rounded-2xl shadow-lg text-gray-800">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-3">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-                Welcome back, {welcomeName}!
-              </h1>
-              <p className="text-gray-600 text-lg">
-                Here is a complete overview of the school system.
-              </p>
-              {lastUpdated && (
-                <p className="text-gray-500 text-sm">
-                  Last updated: {lastUpdated.toLocaleTimeString()}
-                </p>
-              )}
-            </div>
-
-            {/* Quick Actions */}
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/faculty/schedule"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-              >
-                <Calendar className="w-4 h-4" />
-                <span className="font-medium">Schedule</span>
-              </Link>
-              <Link
-                href="#"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-              >
-                <Bell className="w-4 h-4" />
-                <span className="font-medium">Alerts</span>
-              </Link>
-            </div>
+    <div className="min-h-screen ">
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {/* Header */}
+        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600">
+              Welcome back, <span className="font-medium">{welcomeName}</span>
+            </p>
           </div>
-        </div>
+          <div className="flex items-center gap-2 bg-white border rounded-md px-4 py-2 shadow-sm">
+            <Activity className="w-5 h-5 text-green-500" />
+            <span className="text-sm text-gray-700">
+              All systems operational
+            </span>
+          </div>
+        </header>
 
-        {/* Navigation Tabs */}
-        <div className="bg-white rounded-lg shadow-sm p-1">
-          <div className="flex space-x-1">
+        {/* Cards Section */}
+                <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <DashboardCard
+                    title="Total Course"
+                    value={dashboardData.courseCount || 0}
+                    icon={<Book className="w-6 h-6 text-blue-500" />}
+                    description="Courses you are teaching"
+                    href="/faculty/courses"
+                  />
+                  <DashboardCard
+                    title="Total Students"
+                    value={dashboardData.studentCount || 0}
+                    icon={<Users className="w-6 h-6 text-green-500" />}
+                    description="Students in your courses"
+                    href="/faculty/students"
+                  />
+                  <DashboardCard
+                    title="Total Teacher"
+                    value={dashboardData.teacherCount || 0}
+                    icon={<Users className="w-6 h-6 text-blue-500" />}
+                    description="Total teachers in the institution"
+                    href="/faculty/teacher"
+                  />
+                  <DashboardCard
+                    title="Department"
+                    value={dashboardData.departmentCount || 0}
+                    icon={<Book className="w-6 h-6 text-purple-500" />}
+                    description="Total departments"
+                    href="/faculty/departments"
+                  />
+                  <DashboardCard
+                    title="Group"
+                    value={dashboardData.groupCount || 0}
+                    icon={<Users className="w-6 h-6 text-green-500" />}
+                    description="Total groups"
+                    href="/faculty/groups"
+                  />
+                </section>
+
+        {/* Quick Actions */}
+        <section className="bg-white rounded-lg border p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Quick Actions
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { name: "overview", href: "#" },
-              { name: "analytics", href: "#" },
-              { name: "courses", href: "/faculty/courses" },
-              { name: "students", href: "/faculty/students" },
-            ].map((tab) => (
+              {
+                label: "My Profile",
+                icon: User,
+                href: "/faculty/profile",
+              },
+              {
+                label: "My Schedule",
+                icon: Calendar,
+                href: "/faculty/schedule",
+              },
+              {
+                label: "Gradebook",
+                icon: BarChart2,
+                href: "/faculty/gradebook",
+              },
+              {
+                label: "Settings",
+                icon: Settings,
+                href: "/faculty/settings",
+              },
+            ].map((action, i) => (
               <Link
-                key={tab.name}
-                href={tab.href}
-                onClick={() => setActiveTab(tab.name)}
-                className={`flex-1 md:flex-none px-4 py-2 rounded-md font-medium transition-all text-sm ${
-                  activeTab === tab.name
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
+                href={action.href}
+                key={i}
+                className="flex flex-col items-center gap-2 p-4 rounded-lg border hover:bg-gray-50 transition"
               >
-                {tab.name.charAt(0).toUpperCase() + tab.name.slice(1)}
+                <div className="p-2 bg-gray-100 rounded-md">
+                  <action.icon className="w-5 h-5 text-gray-600" />
+                </div>
+                <span className="text-sm text-gray-700">{action.label}</span>
               </Link>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* Main Dashboard Content */}
-        <div className="space-y-8">
-          {/* System Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Link href="/faculty/students">
-              <DashboardCard
-                title="Total Students"
-                value={dashboardData.studentCount}
-                icon={<Users className="w-6 h-6" />}
-                gradient="from-blue-500/20 to-blue-600/10"
-                description="Currently enrolled students"
-              />
-            </Link>
-            <Link href="/faculty/teacher">
-              <DashboardCard
-                title="Total Teachers"
-                value={dashboardData.teacherCount}
-                icon={<UserCheck className="w-6 h-6" />}
-                gradient="from-emerald-500/20 to-emerald-600/10"
-                description="Active teaching staff"
-              />
-            </Link>
-            <Link href="/faculty/staff">
-              <DashboardCard
-                title="Total Staff"
-                value={dashboardData.staffCount}
-                icon={<Briefcase className="w-6 h-6" />}
-                gradient="from-purple-500/20 to-purple-600/10"
-                description="Non-teaching staff members"
-              />
-            </Link>
-            <Link href="/faculty/departments">
-              <DashboardCard
-                title="Total Departments"
-                value={dashboardData.departmentCount}
-                icon={<Building2 className="w-6 h-6" />}
-                gradient="from-amber-500/20 to-amber-600/10"
-                description="Academic departments"
-              />
-            </Link>
-            <Link href="/faculty/courses">
-              <DashboardCard
-                title="Total Courses"
-                value={dashboardData.courseCount}
-                icon={<Library className="w-6 h-6" />}
-                gradient="from-sky-500/20 to-sky-600/10"
-                description="Available courses offered"
-              />
-            </Link>
-            <Link href="/faculty/groups">
-              <DashboardCard
-                title="Total Groups"
-                value={dashboardData.groupCount}
-                icon={<Group className="w-6 h-6" />}
-                gradient="from-rose-500/20 to-rose-600/10"
-                description="Student study groups"
-              />
-            </Link>
+        {/* My Schedule */}
+        <section className="bg-white rounded-lg border p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Today's Schedule
+          </h3>
+          <div className="space-y-4">
+            {dashboardData.schedule?.length > 0 ? (
+              dashboardData.schedule.map((item, i) => (
+                <div key={i} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
+                  <div className="font-semibold text-sm text-blue-600 bg-blue-100 px-3 py-1 rounded-md">
+                    {item.time}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-800">{item.course}</p>
+                    <p className="text-sm text-gray-500">{item.location}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 text-center py-4">No classes scheduled for today.</p>
+            )}
           </div>
+        </section>
 
-          {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Courses by Department */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  Courses by Department
-                </h2>
-                <BarChart3 className="w-5 h-5 text-gray-400" />
-              </div>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={dashboardData.coursesByDepartment}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis
-                    dataKey="name"
-                    angle={-45}
-                    textAnchor="end"
-                    height={60}
-                    fontSize={12}
-                    tick={{ fill: "#4b5563" }}
-                  />
-                  <YAxis allowDecimals={false} tick={{ fill: "#4b5563" }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "white",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "8px",
-                    }}
-                  />
-                  <Bar
-                    dataKey="count"
-                    fill="#3b82f6"
-                    name="Number of Courses"
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Students per Group */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  Students per Group
-                </h2>
-                <Users className="w-5 h-5 text-gray-400" />
-              </div>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={dashboardData.studentsPerGroup}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis
-                    dataKey="name"
-                    angle={-45}
-                    textAnchor="end"
-                    height={60}
-                    fontSize={12}
-                    tick={{ fill: "#4b5563" }}
-                  />
-                  <YAxis allowDecimals={false} tick={{ fill: "#4b5563" }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "white",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "8px",
-                    }}
-                  />
-                  <Bar
-                    dataKey="count"
-                    fill="#10b981"
-                    name="Number of Students"
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between pt-8 border-t border-gray-200">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-gray-600">System operational</span>
-          </div>
-          <div className="text-sm text-gray-500">Faculty Dashboard</div>
-        </div>
+        {/* Analytics Chart */}
+        <section className="bg-white rounded-lg border p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Overview
+          </h3>
+          <AnalyticsChart data={chartData} />
+        </section>
       </div>
     </div>
   );

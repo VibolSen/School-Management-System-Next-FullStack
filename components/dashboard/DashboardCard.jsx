@@ -1,9 +1,11 @@
 // components/dashboard/DashboardCard.jsx
-export default function DashboardCard({ title, value, icon, description }) {
+import Link from "next/link";
+
+export default function DashboardCard({ title, value, icon, description, href }) {
   const displayValue =
     typeof value === "number" ? value.toLocaleString() : value || "—";
 
-  return (
+  const cardContent = (
     <div
       className="
         bg-white
@@ -30,4 +32,10 @@ export default function DashboardCard({ title, value, icon, description }) {
       </div>
     </div>
   );
+
+  if (href) {
+    return <Link href={href}>{cardContent}</Link>;
+  }
+
+  return cardContent;
 }

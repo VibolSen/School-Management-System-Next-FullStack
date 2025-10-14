@@ -82,7 +82,7 @@ const TeacherDashboard = ({ loggedInUser }) => {
     : "Teacher";
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen ">
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* Header */}
         <header className="bg-white p-8 rounded-2xl shadow-lg text-gray-800">
