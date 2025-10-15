@@ -18,6 +18,7 @@ export default function Navbar() {
         const res = await fetch("/api/courses");
         if (!res.ok) throw new Error("Failed to fetch courses");
         const data = await res.json();
+        console.log('Fetched courses:', data);
         setCourses(data);
       } catch (err) {
         console.error(err);
@@ -30,7 +31,7 @@ export default function Navbar() {
     try {
       const res = await fetch("/api/logout", { method: "POST" });
       if (res.ok) {
-        router.push("/login");
+        window.location.href = "/";
       } else {
         console.error("Logout failed");
       }
@@ -77,15 +78,16 @@ export default function Navbar() {
             </button>
 
             {open && courses.length > 0 && (
-              <div className="absolute top-full left-0 mt-8 w-48 bg-white shadow-lg rounded-2xl py-2">
+              <div className="absolute top-full left-0 mt-8 min-w-48 max-w-md bg-gray-200 shadow-lg rounded-2xl py-2 animate-fade-in-scale">
                 {courses.map((course) => (
                   <Link
                     key={course.id}
-                    href={`/courses/${course.slug}`}
-                    className="block px-4 py-2 hover:bg-gray-100 text-black transition-colors"
+                    href={`/courses/${course.id}`}
+                    className="block px-4 py-2 hover:bg-gray-300 text-black transition-colors whitespace-nowrap overflow-hidden text-ellipsis"
                     onClick={() => setOpen(false)} // close dropdown after clicking
                   >
-                    {course.title}
+                    {/* The text in the dropdown is the name of the course. The length of the text is determined by the length of the course.name string. */}
+                    {course.name}
                   </Link>
                 ))}
               </div>

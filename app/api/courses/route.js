@@ -40,7 +40,6 @@ export async function GET(req) {
     }
 
     const courses = await prisma.course.findMany({
-      where: whereClause,
       orderBy: { name: "asc" },
       include: {
         courseDepartments: {

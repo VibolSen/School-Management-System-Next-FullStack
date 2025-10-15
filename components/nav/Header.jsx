@@ -29,7 +29,7 @@ export default function Header({ toggleSidebar }) {
 
   const handleLogout = () => {
     Cookies.remove("token");
-    router.push("/login");
+    window.location.href = "/";
   };
 
   const handleProfileClick = () => {
