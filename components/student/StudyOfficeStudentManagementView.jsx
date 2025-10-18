@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useCallback } from "react";
 import { PlusCircle, Edit, Trash2, X } from "lucide-react";
 import Notification from "@/components/Notification";
