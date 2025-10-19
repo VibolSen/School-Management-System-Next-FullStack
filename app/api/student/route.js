@@ -104,6 +104,10 @@ export async function PUT(request) {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
+    console.error("Error updating student:", error);
+    return new Response(JSON.stringify({ error: "Failed to update student" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
     });
   }
 }
