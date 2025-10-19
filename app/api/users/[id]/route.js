@@ -32,7 +32,8 @@ export async function GET(request, { params }) {
     if (
       loggedInUser.role === "ADMIN" ||
       (loggedInUser.role === "HR" && user.role !== "STUDENT") ||
-      (loggedInUser.role === "FACULTY" && user.role === "STUDENT")
+      (loggedInUser.role === "FACULTY" && user.role === "STUDENT") ||
+      (loggedInUser.role === "STUDY_OFFICE" && user.role === "STUDENT")
     ) {
       return NextResponse.json(user);
     }
@@ -40,7 +41,7 @@ export async function GET(request, { params }) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   } catch (error) {
     console.error('Error fetching user:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch user', details: error.message }, { status: 500 });
   }
 }
 
@@ -65,7 +66,8 @@ export async function PUT(request, { params }) {
     if (
       loggedInUser.role !== "ADMIN" &&
       !(loggedInUser.role === "HR" && userToUpdate.role !== "STUDENT") &&
-      !(loggedInUser.role === "FACULTY" && userToUpdate.role === "STUDENT")
+      !(loggedInUser.role === "FACULTY" && userToUpdate.role === "STUDENT") &&
+      !(loggedInUser.role === "STUDY_OFFICE" && userToUpdate.role === "STUDENT")
     ) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -74,7 +76,7 @@ export async function PUT(request, { params }) {
     const { firstName, lastName, email, password, role, departmentId } = body;
 
     // Prevent faculty from changing a user's role
-    if (loggedInUser.role === 'FACULTY' && role && role !== 'STUDENT') {
+    if ((loggedInUser.role === 'FACULTY' || loggedInUser.role === 'STUDY_OFFICE') && role && role !== 'STUDENT') {
         return NextResponse.json({ error: 'Faculty can only manage students' }, { status: 403 });
     }
 
@@ -106,7 +108,7 @@ export async function PUT(request, { params }) {
     return NextResponse.json(updatedUser);
   } catch (error) {
     console.error('Error updating user:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to update user', details: error.message }, { status: 500 });
   }
 }
 
@@ -131,7 +133,8 @@ export async function DELETE(request, { params }) {
     if (
       loggedInUser.role !== "ADMIN" &&
       !(loggedInUser.role === "HR" && userToDelete.role !== "STUDENT") &&
-      !(loggedInUser.role === "FACULTY" && userToDelete.role === "STUDENT")
+      !(loggedInUser.role === "FACULTY" && userToDelete.role === "STUDENT") &&
+      !(loggedInUser.role === "STUDY_OFFICE" && userToDelete.role === "STUDENT")
     ) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -143,6 +146,6 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error('Error deleting user:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to delete user', details: error.message }, { status: 500 });
   }
 }

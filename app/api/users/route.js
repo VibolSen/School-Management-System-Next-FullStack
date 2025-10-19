@@ -8,6 +8,7 @@ export async function GET(request) {
     const loggedInUser = await getLoggedInUser();
 
     if (!loggedInUser) {
+      console.log('Unauthorized: No logged in user.');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -23,10 +24,10 @@ export async function GET(request) {
       email: true,
       role: true,
       departmentId: true,
-      department: { select: { name: true } },
+      department: loggedInUser.departmentId ? { select: { name: true } } : false,
     };
 
-    if (loggedInUser.role === 'ADMIN' || loggedInUser.role === 'FACULTY' || loggedInUser.role === 'HR') {
+    if (loggedInUser.role === 'ADMIN' || loggedInUser.role === 'FACULTY' || loggedInUser.role === 'HR' || loggedInUser.role === 'STUDY_OFFICE') {
       if (roleFilter) {
         users = await prisma.user.findMany({
           where: { role: roleFilter },
@@ -67,6 +68,7 @@ export async function GET(request) {
         select: selectFields,
       })];
     } else {
+      console.log(`Forbidden: User with role ${loggedInUser.role} attempted to access user data.`);
       // Other roles might not be authorized to view users
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -74,7 +76,7 @@ export async function GET(request) {
     return NextResponse.json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch users', details: error.message }, { status: 500 });
   }
 }
 
@@ -82,14 +84,14 @@ export async function POST(request) {
   try {
     const loggedInUser = await getLoggedInUser();
 
-    if (!loggedInUser || (loggedInUser.role !== 'ADMIN' && loggedInUser.role !== 'FACULTY')) {
+    if (!loggedInUser || (loggedInUser.role !== 'ADMIN' && loggedInUser.role !== 'FACULTY' && loggedInUser.role !== 'STUDY_OFFICE')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
     const { firstName, lastName, email, password, role, departmentId } = body;
 
-    if (loggedInUser.role === 'FACULTY' && role !== 'STUDENT') {
+    if ((loggedInUser.role === 'FACULTY' || loggedInUser.role === 'STUDY_OFFICE') && role !== 'STUDENT') {
       return NextResponse.json({ error: 'Faculty can only create students' }, { status: 403 });
     }
 
@@ -129,7 +131,7 @@ export async function POST(request) {
     return NextResponse.json(newUser, { status: 201 });
   } catch (error) {
     console.error('Error creating user:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create user', details: error.message }, { status: 500 });
   }
 }
 
@@ -152,7 +154,7 @@ export async function PUT(request) {
     const { firstName, lastName, email, password, role, departmentId } = body;
 
     // Check permissions for updating other users
-    if (loggedInUser.id !== userId && loggedInUser.role !== 'ADMIN' && loggedInUser.role !== 'HR') {
+    if (loggedInUser.id !== userId && loggedInUser.role !== 'ADMIN' && loggedInUser.role !== 'HR' && loggedInUser.role !== 'STUDY_OFFICE') {
       return NextResponse.json({ error: 'Forbidden: You can only update your own profile or you do not have permission to update other users' }, { status: 403 });
     }
 
@@ -195,7 +197,7 @@ export async function PUT(request) {
     return NextResponse.json(updatedUser, { status: 200 });
   } catch (error) {
     console.error('Error updating user:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to update user', details: error.message }, { status: 500 });
   }
 }
 
@@ -203,7 +205,7 @@ export async function DELETE(request) {
   try {
     const loggedInUser = await getLoggedInUser();
 
-    if (!loggedInUser || (loggedInUser.role !== 'ADMIN' && loggedInUser.role !== 'HR')) {
+    if (!loggedInUser || (loggedInUser.role !== 'ADMIN' && loggedInUser.role !== 'HR' && loggedInUser.role !== 'STUDY_OFFICE')) {
       return NextResponse.json({ error: 'Unauthorized or Forbidden' }, { status: 403 });
     }
 
@@ -226,7 +228,7 @@ export async function DELETE(request) {
     return NextResponse.json({ message: 'User deleted successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error deleting user:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to delete user', details: error.message }, { status: 500 });
   }
 }
 

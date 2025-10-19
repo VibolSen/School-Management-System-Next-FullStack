@@ -47,12 +47,13 @@ export default function LoginPage() {
       const roleName = data?.user?.role?.toLowerCase() || "";
 
       // Route based on role name
-      if (roleName === "admin") window.location.href = "/admin/dashboard";
-      else if (roleName === "hr") window.location.href = "/hr/dashboard";
-      else if (roleName === "faculty") window.location.href = "/faculty/dashboard";
-      else if (roleName === "teacher") window.location.href = "/teacher/dashboard";
-      else if (roleName === "student") window.location.href = "/student/dashboard";
-      else window.location.href = "/"; // Fallback to a default page
+      if (roleName === "admin") router.push("/admin/dashboard");
+      else if (roleName === "hr") router.push("/hr/dashboard");
+      else if (roleName === "study-office") router.push("/study-office/dashboard");
+      else if (roleName === "faculty") router.push("/faculty/dashboard");
+      else if (roleName === "teacher") router.push("/teacher/dashboard");
+      else if (roleName === "student") router.push("/student/dashboard");
+      else router.push("/"); // Fallback to a default page
     } catch (err) {
       console.error("Login error:", err);
       setError("Login failed. Please try again.");

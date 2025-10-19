@@ -13,6 +13,7 @@ enum Role {
   FACULTY
   TEACHER
   STUDENT
+  STUDY_OFFICE
 }
 
 enum SubmissionStatus {

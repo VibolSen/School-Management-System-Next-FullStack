@@ -1,9 +1,6 @@
-import StudyOfficeStudentManagementView from "@/components/student/StudyOfficeStudentManagementView";
+import StudentManagementView from "@/components/students/StudentManagementView";
+import React from "react";
 
-const StudyOfficeStudentManagementPage = () => {
-  return (
-    <StudyOfficeStudentManagementView />
-  );
-};
-
-export default StudyOfficeStudentManagementPage;
+export default function StudyOfficeStudentsPage() {
+  return <StudentManagementView />;
+}

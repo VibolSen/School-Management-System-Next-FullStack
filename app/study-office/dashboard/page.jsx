@@ -1,11 +1,9 @@
+import StudyOfficeDashboard from "@/components/dashboard/StudyOfficeDashboard";
 
-const StudyOfficeDashboardPage = () => {
+export default function StudyOfficeDashboardPage() {
   return (
     <div>
-      <h1>Study Office Dashboard</h1>
-      <p>Welcome to the Study Office Dashboard!</p>
+      <StudyOfficeDashboard />
     </div>
   );
-};
-
-export default StudyOfficeDashboardPage;
+}
