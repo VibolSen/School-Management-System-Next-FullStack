@@ -2,21 +2,24 @@
 
 import React, { useState, useEffect } from 'react';
 
-const FacultyModal = ({ isOpen, onClose, onSave, facultyToEdit, isLoading }) => {
+const FacultyModal = ({ isOpen, onClose, onSave, facultyToEdit, isLoading, facultyUsers = [] }) => {
   const [name, setName] = useState('');
+  const [headId, setHeadId] = useState(''); // New state for headId
 
   useEffect(() => {
-    if (facultyToEdit) {
-      setName(facultyToEdit.name);
+    if (isOpen) {
+      setName(facultyToEdit?.name || '');
+      setHeadId(facultyToEdit?.headId || ''); // Initialize headId
     } else {
       setName('');
+      setHeadId('');
     }
   }, [facultyToEdit, isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onSave({ name });
+    onSave({ name, headId: headId || null }); // Pass headId
   };
 
   if (!isOpen) return null;
@@ -39,6 +42,25 @@ const FacultyModal = ({ isOpen, onClose, onSave, facultyToEdit, isLoading }) => 
               required
               disabled={isLoading}
             />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="director" className="block text-sm font-medium text-gray-700 mb-2">
+              Director (Faculty User)
+            </label>
+            <select
+              id="director"
+              className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md p-2"
+              value={headId}
+              onChange={(e) => setHeadId(e.target.value)}
+              disabled={isLoading}
+            >
+              <option value="">Select Director (Optional)</option>
+              {facultyUsers.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.firstName} {user.lastName}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="flex justify-end space-x-3">
             <button
