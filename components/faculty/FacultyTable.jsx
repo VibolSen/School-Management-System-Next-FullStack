@@ -35,10 +35,10 @@ const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAssi
                   {faculty.name}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {faculty.departments.length === 0
+                  {(faculty.departments || []).length === 0
                     ? 'None'
-                    : faculty.departments.length === 1
-                    ? faculty.departments[0].name
+                    : (faculty.departments || []).length === 1
+                    ? (faculty.departments || [])[0].name
                     : faculty.departments.length}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
