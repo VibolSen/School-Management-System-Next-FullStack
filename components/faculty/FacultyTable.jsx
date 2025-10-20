@@ -42,7 +42,7 @@ const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAssi
                     : faculty.departments.length}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {faculty.head ? `${faculty.head.firstName} ${faculty.head.lastName}` : 'N/A'}
+                  {faculty.head ? `${faculty.head.firstName || ''} ${faculty.head.lastName || ''}`.trim() : 'N/A'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <button

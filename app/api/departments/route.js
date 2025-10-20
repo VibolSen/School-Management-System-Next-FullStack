@@ -1,11 +1,22 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { getLoggedInUser } from "@/lib/auth"; // Import getLoggedInUser
 
 const prisma = new PrismaClient();
 
 export async function GET(req) {
   try {
+    const loggedInUser = await getLoggedInUser();
+    let whereClause = {};
+
+    // If the user is a FACULTY and heads at least one faculty, filter departments
+    if (loggedInUser && loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
+      const facultyIds = loggedInUser.headedFaculties.map(faculty => faculty.id);
+      whereClause = { facultyId: { in: facultyIds } };
+    }
+
     const departments = await prisma.department.findMany({
+      where: whereClause,
       include: {
         _count: {
           select: {

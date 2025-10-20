@@ -2,13 +2,44 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { createNotification } from "@/lib/notification"; // New import
+import { getLoggedInUser } from "@/lib/auth"; // Import getLoggedInUser
 
 const prisma = new PrismaClient();
 
 // GET all groups, including their parent course and a count of students
 export async function GET() {
   try {
+    const loggedInUser = await getLoggedInUser();
+    let whereClause = {};
+
+    // If the user is a FACULTY and heads at least one faculty, filter groups
+    if (loggedInUser && loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
+      const headedFacultyIds = loggedInUser.headedFaculties.map(faculty => faculty.id);
+
+      // Find all departments belonging to these headed faculties
+      const departmentsInHeadedFaculties = await prisma.department.findMany({
+        where: { facultyId: { in: headedFacultyIds } },
+        select: { id: true },
+      });
+      const departmentIds = departmentsInHeadedFaculties.map(dept => dept.id);
+
+      // Find all courses associated with these departments
+      const coursesInDepartments = await prisma.courseDepartment.findMany({
+        where: { departmentId: { in: departmentIds } },
+        select: { courseId: true },
+      });
+      const courseIds = coursesInDepartments.map(cd => cd.courseId);
+
+      // Filter groups that are associated with these courses
+      whereClause.courses = {
+        some: {
+          id: { in: courseIds },
+        },
+      };
+    }
+
     const groups = await prisma.group.findMany({
+      where: whereClause,
       orderBy: { name: "asc" },
       // ✅ MODIFIED: Include related course and a count of students
       include: {
@@ -30,6 +61,11 @@ export async function GET() {
 
 // CREATE a new group linked to a course
 export async function POST(req) {
+  const loggedInUser = await getLoggedInUser();
+  if (!loggedInUser || (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "FACULTY")) {
+    return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+  }
+
   try {
     // ✅ MODIFIED: Expect 'name' and 'courseIds'
     const { name, courseIds } = await req.json();
@@ -39,6 +75,28 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+
+    // Authorization for FACULTY directors (POST)
+    if (loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
+      const headedFacultyIds = loggedInUser.headedFaculties.map(faculty => faculty.id);
+      const departmentsInHeadedFaculties = await prisma.department.findMany({
+        where: { facultyId: { in: headedFacultyIds } },
+        select: { id: true },
+      });
+      const departmentIds = departmentsInHeadedFaculties.map(dept => dept.id);
+
+      const coursesInDepartments = await prisma.courseDepartment.findMany({
+        where: { departmentId: { in: departmentIds } },
+        select: { courseId: true },
+      });
+      const allowedCourseIds = coursesInDepartments.map(cd => cd.courseId);
+
+      const allCoursesAllowed = courseIds.every(courseId => allowedCourseIds.includes(courseId));
+      if (!allCoursesAllowed) {
+        return new NextResponse(JSON.stringify({ error: "Forbidden: Cannot create group with courses outside assigned faculty's departments" }), { status: 403 });
+      }
+    }
+
     const newGroup = await prisma.group.create({
       data: {
         name,
@@ -63,8 +121,12 @@ export async function POST(req) {
   }
 }
 
-// UPDATE an existing group
 export async function PUT(req) {
+  const loggedInUser = await getLoggedInUser();
+  if (!loggedInUser || (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "FACULTY")) {
+    return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+  }
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
@@ -75,6 +137,43 @@ export async function PUT(req) {
         { error: "Group ID is required" },
         { status: 400 }
       );
+    }
+
+    // Authorization for FACULTY directors (PUT)
+    if (loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
+      const headedFacultyIds = loggedInUser.headedFaculties.map(faculty => faculty.id);
+      const departmentsInHeadedFaculties = await prisma.department.findMany({
+        where: { facultyId: { in: headedFacultyIds } },
+        select: { id: true },
+      });
+      const departmentIds = departmentsInHeadedFaculties.map(dept => dept.id);
+
+      const coursesInDepartments = await prisma.courseDepartment.findMany({
+        where: { departmentId: { in: departmentIds } },
+        select: { courseId: true },
+      });
+      const allowedCourseIds = coursesInDepartments.map(cd => cd.courseId);
+
+      // Check if the group being updated belongs to an allowed course
+      const existingGroup = await prisma.group.findUnique({
+        where: { id },
+        include: { courses: { select: { id: true } } },
+      });
+      if (!existingGroup) {
+        return NextResponse.json({ error: "Group not found" }, { status: 404 });
+      }
+      const existingCourseIds = existingGroup.courses.map(course => course.id);
+
+      const allExistingCoursesAllowed = existingCourseIds.every(courseId => allowedCourseIds.includes(courseId));
+      if (!allExistingCoursesAllowed) {
+        return new NextResponse(JSON.stringify({ error: "Forbidden: Cannot update group not in assigned faculty's courses" }), { status: 403 });
+      }
+
+      // Check if new courseIds are all allowed
+      const allNewCoursesAllowed = courseIds.every(courseId => allowedCourseIds.includes(courseId));
+      if (!allNewCoursesAllowed) {
+        return new NextResponse(JSON.stringify({ error: "Forbidden: Cannot assign group to courses outside assigned faculty's departments" }), { status: 403 });
+      }
     }
 
     // Fetch current group data to find newly added students
@@ -144,6 +243,11 @@ export async function PUT(req) {
 
 // DELETE a group, with a safety check for students
 export async function DELETE(req) {
+  const loggedInUser = await getLoggedInUser();
+  if (!loggedInUser || (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "FACULTY")) {
+    return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+  }
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
@@ -152,6 +256,36 @@ export async function DELETE(req) {
         { error: "Group ID is required" },
         { status: 400 }
       );
+
+    // Authorization for FACULTY directors (DELETE)
+    if (loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
+      const headedFacultyIds = loggedInUser.headedFaculties.map(faculty => faculty.id);
+      const departmentsInHeadedFaculties = await prisma.department.findMany({
+        where: { facultyId: { in: headedFacultyIds } },
+        select: { id: true },
+      });
+      const departmentIds = departmentsInHeadedFaculties.map(dept => dept.id);
+
+      const coursesInDepartments = await prisma.courseDepartment.findMany({
+        where: { departmentId: { in: departmentIds } },
+        select: { courseId: true },
+      });
+      const allowedCourseIds = coursesInDepartments.map(cd => cd.courseId);
+
+      const groupCourses = await prisma.group.findUnique({
+        where: { id },
+        include: { courses: { select: { id: true } } },
+      });
+      if (!groupCourses) {
+        return NextResponse.json({ error: "Group not found" }, { status: 404 });
+      }
+      const existingCourseIds = groupCourses.courses.map(course => course.id);
+
+      const allExistingCoursesAllowed = existingCourseIds.every(courseId => allowedCourseIds.includes(courseId));
+      if (!allExistingCoursesAllowed) {
+        return new NextResponse(JSON.stringify({ error: "Forbidden: Cannot delete group not in assigned faculty's courses" }), { status: 403 });
+      }
+    }
 
     // ✅ ADDED: Safety check to prevent deleting a group that has students
     const studentCount = await prisma.user.count({

@@ -9,6 +9,7 @@ import Cookies from "js-cookie"; // You may need to install this: npm install js
 import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
+  const router = useRouter(); // Initialize useRouter
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
