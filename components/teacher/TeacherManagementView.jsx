@@ -6,9 +6,13 @@ import TeacherTable from "./TeacherTable";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import Notification from "@/components/Notification";
 
+import { useUser } from "@/context/UserContext";
+
 const TEACHER_ROLE = "TEACHER";
 
 export default function TeacherManagementView() {
+  const { user: currentUser } = useUser();
+  const canManageTeachers = currentUser?.role === "ADMIN" || currentUser?.role === "STUDY_OFFICE";
   const [teachers, setTeachers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState(null);
@@ -133,8 +137,10 @@ export default function TeacherManagementView() {
         onEditClick={handleEditClick}
         onDeleteClick={handleDeleteRequest}
         isLoading={isLoading}
+        canManageTeachers={canManageTeachers}
+        currentUserRole={currentUser?.role}
       />
-      {isModalOpen && (
+      {canManageTeachers && isModalOpen && (
         <AddTeacherModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
@@ -142,13 +148,15 @@ export default function TeacherManagementView() {
           teacherToEdit={editingTeacher}
         />
       )}
-      <ConfirmationDialog
-        isOpen={!!teacherToDelete}
-        onCancel={handleCancelDelete}
-        onConfirm={handleConfirmDelete}
-        title="Delete Teacher"
-        message={`Are you sure you want to delete ${teacherToDelete?.firstName} ${teacherToDelete?.lastName}?`}
-      />
+      {canManageTeachers && (
+        <ConfirmationDialog
+          isOpen={!!teacherToDelete}
+          onCancel={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title="Delete Teacher"
+          message={`Are you sure you want to delete ${teacherToDelete?.firstName} ${teacherToDelete?.lastName}?`}
+        />
+      )}
     </div>
   );
 }

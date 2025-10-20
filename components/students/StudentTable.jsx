@@ -10,6 +10,7 @@ export default function StudentTable({
   onDeleteClick,
   isLoading = false,
   currentUserRole,
+  canManageStudents,
 }) {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -36,12 +37,14 @@ export default function StudentTable({
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          <button
-            onClick={onAddStudentClick}
-            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
-          >
-            Add Student
-          </button>
+          {canManageStudents && (
+            <button
+              onClick={onAddStudentClick}
+              className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+            >
+              Add Student
+            </button>
+          )}
         </div>
       </div>
 
@@ -90,12 +93,14 @@ export default function StudentTable({
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium space-x-2 text-center">
-                    <button
-                      onClick={() => onEditClick(student)}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      Edit
-                    </button>
+                    {canManageStudents && (
+                      <button
+                        onClick={() => onEditClick(student)}
+                        className="text-indigo-600 hover:text-indigo-900"
+                      >
+                        Edit
+                      </button>
+                    )}
                     {currentUserRole && (
                       <Link href={`/${currentUserRole.toLowerCase()}/students/${student.id}`}>
                         <button
@@ -105,12 +110,14 @@ export default function StudentTable({
                         </button>
                       </Link>
                     )}
-                    <button
-                      onClick={() => onDeleteClick(student.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Delete
-                    </button>
+                    {canManageStudents && (
+                      <button
+                        onClick={() => onDeleteClick(student.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))

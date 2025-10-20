@@ -68,8 +68,16 @@ export async function middleware(request) {
 
     if (path.startsWith('/api/student')) {
       if (request.method === 'POST' || request.method === 'PUT' || request.method === 'DELETE') {
-        if (userRole !== 'admin' && userRole !== 'faculty' && userRole !== 'study_office') {
+        if (userRole !== 'admin' && userRole !== 'study_office') {
           return new NextResponse(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+        }
+      }
+    }
+
+    if (path.startsWith('/api/departments')) {
+      if (request.method === 'DELETE') {
+        if (userRole === 'faculty') {
+          return new NextResponse(JSON.stringify({ error: 'Forbidden: Faculty cannot delete departments' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
         }
       }
     }

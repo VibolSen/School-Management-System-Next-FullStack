@@ -54,11 +54,7 @@ const FACULTY_NAV_ITEMS = [
     icon: <FiHome className="w-5 h-5" />,
     href: "/faculty/dashboard",
   },
-  {
-    label: "Schedule Management",
-    icon: <FiCalendar className="w-5 h-5" />,
-    href: "/faculty/schedule",
-  },
+
   {
     label: "Departments",
     icon: <FiGrid className="w-5 h-5" />,

@@ -12,6 +12,7 @@ const STUDENT_ROLE = "STUDENT";
 
 export default function StudentManagementView() {
   const { user: currentUser } = useUser();
+  const canManageStudents = currentUser?.role === "ADMIN" || currentUser?.role === "STUDY_OFFICE";
   const [students, setStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
@@ -143,9 +144,10 @@ export default function StudentManagementView() {
         onDeleteClick={handleDeleteRequest}
         isLoading={isLoading}
         currentUserRole={currentUser?.role}
+        canManageStudents={canManageStudents}
       />
 
-      {isModalOpen && (
+      {canManageStudents && isModalOpen && (
         <AddStudentModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
@@ -154,14 +156,16 @@ export default function StudentManagementView() {
         />
       )}
 
-      <ConfirmationDialog
-        isOpen={!!itemToDelete}
-        onCancel={() => setItemToDelete(null)}
-        onConfirm={handleConfirmDelete}
-        title="Delete Student"
-        message={`Are you sure you want to delete student ${itemToDelete?.firstName} ${itemToDelete?.lastName}?`}
-        isLoading={isLoading}
-      />
+      {canManageStudents && (
+        <ConfirmationDialog
+          isOpen={!!itemToDelete}
+          onCancel={() => setItemToDelete(null)}
+          onConfirm={handleConfirmDelete}
+          title="Delete Student"
+          message={`Are you sure you want to delete student ${itemToDelete?.firstName} ${itemToDelete?.lastName}?`}
+          isLoading={isLoading}
+        />
+      )}
     </div>
   );
 }
