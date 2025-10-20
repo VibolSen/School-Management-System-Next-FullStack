@@ -9,7 +9,9 @@ export default function Navbar() {
   const { user, loading } = useUser();
   const router = useRouter();
   const [courses, setCourses] = useState([]);
+  const [faculties, setFaculties] = useState([]);
   const [open, setOpen] = useState(false);
+  const [facultiesOpen, setFacultiesOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -25,6 +27,18 @@ export default function Navbar() {
       }
     }
     fetchCourses();
+
+    async function fetchFaculties() {
+      try {
+        const res = await fetch("/api/faculties");
+        if (!res.ok) throw new Error("Failed to fetch faculties");
+        const data = await res.json();
+        setFaculties(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchFaculties();
   }, []);
 
   const handleLogout = async () => {
@@ -63,8 +77,38 @@ export default function Navbar() {
             Home
           </Link>
 
+          {/* Program Dropdown */}
+          <div className="relative" onMouseEnter={() => setFacultiesOpen(true)} onMouseLeave={() => setFacultiesOpen(false)} ref={dropdownRef}>
+            <button
+              onClick={() => setFacultiesOpen((prev) => !prev)}
+              className="hover:text-foreground transition-colors flex items-center gap-1"
+            >
+              Faculties
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-500 ${
+                  facultiesOpen ? "rotate-180" : "rotate-0"
+                }`}
+              />
+            </button>
+
+            {facultiesOpen && faculties.length > 0 && (
+              <div className="absolute top-full left-0 mt-8 min-w-48 max-w-md bg-gray-200 shadow-lg rounded-2xl py-2 animate-fade-in-scale">
+                {faculties.map((faculty) => (
+                  <Link
+                    key={faculty.id}
+                    href={`/faculties/${faculty.id}`}
+                    className="block px-4 py-2 hover:bg-gray-300 text-black transition-colors whitespace-nowrap overflow-hidden text-ellipsis"
+                    onClick={() => setFacultiesOpen(false)} // close dropdown after clicking
+                  >
+                    {faculty.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Courses Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} ref={dropdownRef}>
             <button
               onClick={() => setOpen((prev) => !prev)}
               className="hover:text-foreground transition-colors flex items-center gap-1"

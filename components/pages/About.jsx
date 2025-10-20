@@ -16,6 +16,7 @@ import {
   GraduationCap,
   BookOpen,
   Lightbulb,
+  Linkedin,
 } from "lucide-react";
 
 const AboutUs = () => {
@@ -59,6 +60,20 @@ const AboutUs = () => {
         facebook: "https://www.facebook.com/vibolsen02",
         telegram: "https://t.me/vibolsen",
         github: "https://github.com/VibolSen",
+        linkedin: "#",
+      },
+    },
+    {
+      name: "John Doe",
+      image: "/profile/john.jpg",
+      role: "Lead Frontend Developer",
+      description:
+        "Passionate about creating beautiful and intuitive user interfaces.",
+      social: {
+        facebook: "#",
+        telegram: "#",
+        github: "#",
+        linkedin: "#",
       },
     },
 
@@ -177,7 +192,7 @@ const AboutUs = () => {
         </motion.section>
 
       
-    {/* Team Section */}
+  {/* Team Section */}
 <motion.section className="py-20" variants={itemVariants}>
   <div className="text-center mb-16">
     <motion.div
@@ -198,79 +213,91 @@ const AboutUs = () => {
     </p>
   </div>
 
-  {/* Display a single, centered team member */}
-  <div className="flex justify-center">
-    <motion.div
-      className="group relative max-w-sm" // Added max-width to keep the card well-proportioned
-      variants={itemVariants}
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      whileHover={{ y: -10 }}
-    >
-      <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 relative overflow-hidden">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+  {/* Display all team members */}
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+    {teamMembers.map((member, index) => (
+      <motion.div
+        key={index}
+        className="group relative"
+        variants={itemVariants}
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: index * 0.2 }}
+        whileHover={{ y: -10 }}
+      >
+        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 relative overflow-hidden">
+          {/* Background Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-        <div className="relative z-10 text-center"> {/* Centered text for better appearance */}
-          <div className="relative mb-6">
-            <div className="w-32 h-32 mx-auto relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse"></div>
-              <Image
-                src={"/profile.jpg" || "/placeholder.svg"}
-                alt={"Mr. Sen Vibol"}
-                width={128}
-                height={128}
-                className="rounded-full w-full h-full object-cover border-4 border-white dark:border-gray-700 relative z-10"
-              />
-              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-full shadow-lg">
-                <GraduationCap className="w-4 h-4" />
+          <div className="relative z-10 text-center">
+            <div className="relative mb-6">
+              <div className="w-32 h-32 mx-auto relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse"></div>
+                <Image
+                  src={member.image || "/placeholder.svg"}
+                  alt={member.name}
+                  width={128}
+                  height={128}
+                  className="rounded-full w-full h-full object-cover border-4 border-white dark:border-gray-700 relative z-10"
+                />
+                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-full shadow-lg">
+                  <GraduationCap className="w-4 h-4" />
+                </div>
               </div>
             </div>
-          </div>
 
-          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
-            Mr. Sen Vibol
-          </h3>
-          <p className="text-blue-600 dark:text-blue-400 font-semibold mb-3">
-            Lead Backend Developer & System Architect
-          </p>
-          <p className="text-gray-600 dark:text-gray-400 text-sm mb-6 leading-relaxed">
-            Passionate about creating robust, scalable systems to streamline educational administration.
-          </p>
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
+              {member.name}
+            </h3>
+            <p className="text-blue-600 dark:text-blue-400 font-semibold mb-3">
+              {member.role}
+            </p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-6 leading-relaxed">
+              {member.description}
+            </p>
 
-          <div className="flex justify-center gap-4">
-            <motion.a
-              href="https://www.facebook.com/vibolsen02"
-              className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Facebook"
-            >
-              <Facebook className="w-5 h-5" />
-            </motion.a>
-            <motion.a
-              href="https://t.me/vibolsen"
-              className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Telegram"
-            >
-              <Send className="w-5 h-5" />
-            </motion.a>
-            <motion.a
-              href="https://github.com/VibolSen"
-              className="p-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="GitHub"
-            >
-              <Github className="w-5 h-5" />
-            </motion.a>
+            <div className="flex justify-center gap-4">
+              <motion.a
+                href={member.social.facebook}
+                className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Facebook"
+              >
+                <Facebook className="w-5 h-5" />
+              </motion.a>
+              <motion.a
+                href={member.social.telegram}
+                className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Telegram"
+              >
+                <Send className="w-5 h-5" />
+              </motion.a>
+              <motion.a
+                href={member.social.github}
+                className="p-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="GitHub"
+              >
+                <Github className="w-5 h-5" />
+              </motion.a>
+              <motion.a
+                href={member.social.linkedin}
+                className="p-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="LinkedIn"
+              >
+                <Linkedin className="w-5 h-5" />
+              </motion.a>
+            </div>
           </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    ))}
   </div>
 </motion.section>
 
@@ -393,6 +420,63 @@ const AboutUs = () => {
                   <Youtube className="w-6 h-6" />
                 </motion.a>
               </div>
+            </div>
+          </div>
+        </motion.section>
+
+        {/* Our Core Values Section */}
+        <motion.section className="py-20" variants={itemVariants}>
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full text-sm font-medium mb-4 shadow-lg"
+            >
+              <Sparkles className="w-4 h-4" />
+              Our Core Values
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4">
+              The Principles That Guide Us
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+              Our values are the foundation of our culture and the inspiration for our work.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <Heart className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-white text-center mb-4">
+                Integrity
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 text-center leading-relaxed">
+                We are committed to honesty, transparency, and accountability in everything we do.
+              </p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <Star className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-white text-center mb-4">
+                Excellence
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 text-center leading-relaxed">
+                We strive for the highest standards of quality and continuously seek to improve and innovate.
+              </p>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-white text-center mb-4">
+                Innovation
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 text-center leading-relaxed">
+                We embrace creativity and new ideas to develop cutting-edge solutions for education.
+              </p>
             </div>
           </div>
         </motion.section>
