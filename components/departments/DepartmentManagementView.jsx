@@ -8,6 +8,7 @@ import Notification from "@/components/Notification";
 
 export default function DepartmentManagementView() {
   const [departments, setDepartments] = useState([]);
+  const [faculties, setFaculties] = useState([]); // New state for faculties
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +20,7 @@ export default function DepartmentManagementView() {
   });
 
   const API_ENDPOINT = "/api/departments";
+  const FACULTY_API_ENDPOINT = "/api/faculty"; // New API endpoint for faculties
 
   const showMessage = (message, type = "success") => {
     setNotification({ show: true, message, type });
@@ -42,9 +44,21 @@ export default function DepartmentManagementView() {
     }
   }, []);
 
+  const fetchFaculties = useCallback(async () => {
+    try {
+      const response = await fetch(FACULTY_API_ENDPOINT);
+      if (!response.ok) throw new Error("Failed to fetch faculties.");
+      const data = await response.json();
+      setFaculties(data);
+    } catch (err) {
+      showMessage(err.message, "error");
+    }
+  }, []);
+
   useEffect(() => {
     fetchDepartments();
-  }, [fetchDepartments]);
+    fetchFaculties(); // Fetch faculties on mount
+  }, [fetchDepartments, fetchFaculties]);
 
   const handleSaveDepartment = async (formData) => {
     setIsLoading(true);
@@ -153,6 +167,7 @@ export default function DepartmentManagementView() {
           onSave={handleSaveDepartment}
           departmentToEdit={editingDepartment}
           isLoading={isLoading}
+          faculties={faculties} // Pass faculties here
         />
       )}
 

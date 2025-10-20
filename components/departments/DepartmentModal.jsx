@@ -7,8 +7,10 @@ export default function DepartmentModal({
   onSave,
   departmentToEdit,
   isLoading = false,
+  faculties = [], // New prop for faculties
 }) {
   const [name, setName] = useState("");
+  const [facultyId, setFacultyId] = useState(""); // New state for facultyId
   const [error, setError] = useState("");
   const [mounted, setMounted] = useState(false);
 
@@ -21,6 +23,7 @@ export default function DepartmentModal({
   useEffect(() => {
     if (isOpen) {
       setName(departmentToEdit?.name || "");
+      setFacultyId(departmentToEdit?.facultyId || ""); // Set facultyId if editing
       setError("");
     }
   }, [isOpen, departmentToEdit]);
@@ -31,7 +34,7 @@ export default function DepartmentModal({
       setError("Department name cannot be empty.");
       return;
     }
-    onSave({ name });
+    onSave({ name, facultyId: facultyId || null }); // Pass facultyId
   };
 
   if (!isOpen || !mounted) return null;
@@ -74,25 +77,46 @@ export default function DepartmentModal({
         {/* Modal Form */}
         <form onSubmit={handleSubmit}>
           <div className="p-6">
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Department Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                if (error) setError("");
-              }}
-              className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-                error
-                  ? "border-red-500 ring-1 ring-red-500"
-                  : "border-slate-300"
-              }`}
-              placeholder="e.g., Computer Science"
-              required
-            />
-            {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Department Name
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (error) setError("");
+                }}
+                className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                  error
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                }`}
+                placeholder="e.g., Computer Science"
+                required
+              />
+              {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Faculty
+              </label>
+              <select
+                value={facultyId}
+                onChange={(e) => setFacultyId(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 border-slate-300"
+                disabled={isLoading}
+              >
+                <option value="">Select Faculty (Optional)</option>
+                {faculties.map((faculty) => (
+                  <option key={faculty.id} value={faculty.id}>
+                    {faculty.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Modal Footer */}

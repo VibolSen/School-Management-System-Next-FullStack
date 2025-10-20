@@ -53,9 +53,9 @@ const STUDY_OFFICE_NAV_ITEMS = [
     href: "/study-office/dashboard",
   },
   {
-    label: "Schedule Management",
-    icon: <FiCalendar className="w-5 h-5" />,
-    href: "/study-office/schedule",
+    label: "Faculty",
+    icon: <FiBook className="w-5 h-5" />,
+    href: "/study-office/faculty",
   },
   {
     label: "Departments",
@@ -66,11 +66,6 @@ const STUDY_OFFICE_NAV_ITEMS = [
     label: "Courses",
     icon: <FiBook className="w-5 h-5" />,
     href: "/study-office/courses",
-  },
-  {
-    label: "Course Analytics",
-    icon: <FiBarChart2 className="w-5 h-5" />,
-    href: "/study-office/course-analytics",
   },
   {
     label: "Groups",
@@ -88,6 +83,11 @@ const STUDY_OFFICE_NAV_ITEMS = [
     href: "/study-office/students",
   },
   {
+    label: "Schedule Management",
+    icon: <FiCalendar className="w-5 h-5" />,
+    href: "/study-office/schedule",
+  },
+  {
     label: "Student Performance",
     icon: <FiTrendingUp className="w-5 h-5" />,
     href: "/study-office/student-performance",
@@ -96,6 +96,11 @@ const STUDY_OFFICE_NAV_ITEMS = [
     label: "Reports & Analytics",
     icon: <FiBarChart2 className="w-5 h-5" />,
     href: "/study-office/reports",
+  },
+  {
+    label: "Course Analytics",
+    icon: <FiBarChart2 className="w-5 h-5" />,
+    href: "/study-office/course-analytics",
   },
   {
     label: "E-Library",

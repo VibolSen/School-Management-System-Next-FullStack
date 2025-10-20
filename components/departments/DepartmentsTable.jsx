@@ -51,6 +51,9 @@ export default function DepartmentsTable({
               <th scope="col" className="px-6 py-3">
                 Name
               </th>
+              <th scope="col" className="px-6 py-3">
+                Faculty
+              </th>
               <th scope="col" className="px-6 py-3 text-center">
                 Courses
               </th>
@@ -77,6 +80,9 @@ export default function DepartmentsTable({
                 <tr key={dept.id} className="hover:bg-slate-50">
                   <td className="px-6 py-4 font-medium text-slate-900">
                     {dept.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                    {dept.faculty?.name || 'N/A'}
                   </td>
                   <td className="px-6 py-4 text-center">
                     <span className="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">

@@ -12,6 +12,7 @@ export async function GET(req) {
             departmentCourses: true,
           },
         },
+        faculty: true, // Include faculty information
       },
       orderBy: { name: "asc" },
     });
@@ -20,6 +21,60 @@ export async function GET(req) {
     console.error("GET Departments Error:", error);
     return NextResponse.json(
       { error: "Failed to fetch departments" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req) {
+  try {
+    const { name, facultyId } = await req.json();
+    if (!name) {
+      return NextResponse.json({ error: "Department name is required" }, { status: 400 });
+    }
+
+    const newDepartment = await prisma.department.create({
+      data: {
+        name,
+        faculty: facultyId ? { connect: { id: facultyId } } : undefined,
+      },
+    });
+    return NextResponse.json(newDepartment, { status: 201 });
+  } catch (error) {
+    console.error("POST Department Error:", error);
+    return NextResponse.json(
+      { error: "Failed to create department" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return NextResponse.json({ error: "Department ID is required" }, { status: 400 });
+  }
+
+  try {
+    const { name, facultyId } = await req.json();
+    if (!name) {
+      return NextResponse.json({ error: "Department name is required" }, { status: 400 });
+    }
+
+    const updatedDepartment = await prisma.department.update({
+      where: { id },
+      data: {
+        name,
+        faculty: facultyId ? { connect: { id: facultyId } } : { disconnect: true },
+      },
+    });
+    return NextResponse.json(updatedDepartment);
+  } catch (error) {
+    console.error("PUT Department Error:", error);
+    return NextResponse.json(
+      { error: "Failed to update department" },
       { status: 500 }
     );
   }
@@ -46,4 +101,3 @@ export async function DELETE(req) {
     );
   }
 }
-

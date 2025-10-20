@@ -126,6 +126,14 @@ model Department {
   users   User[]
   head    User?    @relation("DepartmentHead", fields: [headId], references: [id])
   headId  String?  @db.ObjectId
+  faculty   Faculty? @relation(fields: [facultyId], references: [id])
+  facultyId String?  @db.ObjectId
+}
+
+model Faculty {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  name         String       @unique
+  departments  Department[]
 }
 
 model Course {
