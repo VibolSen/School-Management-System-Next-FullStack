@@ -54,7 +54,7 @@ export default function TeacherTable({
               <th className="px-6 py-3">Name</th>
               <th className="px-6 py-3">Email</th>
               <th className="px-6 py-3 text-center">Assigned Courses</th>
-              <th className="px-6 py-3 text-center">Actions</th>
+              {canManageTeachers && <th className="px-6 py-3 text-center">Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -84,34 +84,22 @@ export default function TeacherTable({
                       {teacher._count?.ledCourses ?? 0}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium space-x-2 text-center">
-                    {canManageTeachers ? (
-                      <>
-                        <button
-                          onClick={() => onEditClick(teacher)}
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => onDeleteClick(teacher)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          Delete
-                        </button>
-                      </>
-                    ) : (
-                      currentUserRole && (
-                        <Link href={`/${currentUserRole.toLowerCase()}/teachers/${teacher.id}`}>
-                          <button
-                            className="text-blue-600 hover:text-blue-900"
-                          >
-                            View Profile
-                          </button>
-                        </Link>
-                      )
-                    )}
-                  </td>
+                  {canManageTeachers && (
+                    <td className="px-6 py-4 text-sm font-medium space-x-2 text-center">
+                      <button
+                        onClick={() => onEditClick(teacher)}
+                        className="text-indigo-600 hover:text-indigo-900"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => onDeleteClick(teacher)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))
             )}

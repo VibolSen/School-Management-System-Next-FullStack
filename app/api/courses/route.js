@@ -36,7 +36,7 @@ export async function GET(req) {
           departmentId: { in: departmentIds },
         },
       };
-    } else if (loggedInUser && loggedInUser.role !== "ADMIN" && loggedInUser.role !== "FACULTY") {
+    } else if (loggedInUser && loggedInUser.role !== "ADMIN" && loggedInUser.role !== "FACULTY" && loggedInUser.role !== "STUDY_OFFICE") {
       // If the user is not an admin or faculty, they can only see their own courses
       whereClause.leadById = loggedInUser.id;
     }
@@ -71,7 +71,7 @@ export async function GET(req) {
 // POST function (with authorization)
 export async function POST(req) {
   const loggedInUser = await getLoggedInUser(); // Use getLoggedInUser
-  if (!loggedInUser || (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "FACULTY")) {
+  if (!loggedInUser || (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE")) {
     return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
   }
 
@@ -85,20 +85,7 @@ export async function POST(req) {
       );
     }
 
-    // Authorization for FACULTY directors (POST)
-    if (loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
-      const headedFacultyIds = loggedInUser.headedFaculties.map(faculty => faculty.id);
-      const departmentsInHeadedFaculties = await prisma.department.findMany({
-        where: { facultyId: { in: headedFacultyIds } },
-        select: { id: true },
-      });
-      const allowedDepartmentIds = departmentsInHeadedFaculties.map(dept => dept.id);
 
-      const allDepartmentsAllowed = departmentIds.every(deptId => allowedDepartmentIds.includes(deptId));
-      if (!allDepartmentsAllowed) {
-        return new NextResponse(JSON.stringify({ error: "Forbidden: Cannot create course in unassigned faculty's department" }), { status: 403 });
-      }
-    }
 
     const dataToCreate = {
       name,
@@ -137,7 +124,7 @@ export async function POST(req) {
 // UPDATE function (with authorization)
 export async function PUT(req) {
   const loggedInUser = await getLoggedInUser(); // Use getLoggedInUser
-  if (!loggedInUser || (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "FACULTY")) {
+  if (!loggedInUser || (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE")) {
     return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
   }
 
@@ -153,33 +140,7 @@ export async function PUT(req) {
       );
     }
 
-    // Authorization for FACULTY directors (PUT)
-    if (loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
-      const headedFacultyIds = loggedInUser.headedFaculties.map(faculty => faculty.id);
-      const departmentsInHeadedFaculties = await prisma.department.findMany({
-        where: { facultyId: { in: headedFacultyIds } },
-        select: { id: true },
-      });
-      const allowedDepartmentIds = departmentsInHeadedFaculties.map(dept => dept.id);
 
-      // Check if the course being updated belongs to an allowed department
-      const existingCourseDepartments = await prisma.courseDepartment.findMany({
-        where: { courseId: id },
-        select: { departmentId: true },
-      });
-      const existingDepartmentIds = existingCourseDepartments.map(cd => cd.departmentId);
-
-      const allExistingDepartmentsAllowed = existingDepartmentIds.every(deptId => allowedDepartmentIds.includes(deptId));
-      if (!allExistingDepartmentsAllowed) {
-        return new NextResponse(JSON.stringify({ error: "Forbidden: Cannot update course not in assigned faculty's department" }), { status: 403 });
-      }
-
-      // Check if new departmentIds are all allowed
-      const allNewDepartmentsAllowed = departmentIds.every(deptId => allowedDepartmentIds.includes(deptId));
-      if (!allNewDepartmentsAllowed) {
-        return new NextResponse(JSON.stringify({ error: "Forbidden: Cannot assign course to unassigned faculty's department" }), { status: 403 });
-      }
-    }
 
     const dataToUpdate = {
       name,
@@ -230,7 +191,7 @@ export async function PUT(req) {
 // DELETE function (with authorization)
 export async function DELETE(req) {
   const loggedInUser = await getLoggedInUser(); // Use getLoggedInUser
-  if (!loggedInUser || (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "FACULTY")) {
+  if (!loggedInUser || (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE")) {
     return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
   }
 
@@ -243,26 +204,7 @@ export async function DELETE(req) {
         { status: 400 }
       );
 
-    // Authorization for FACULTY directors (DELETE)
-    if (loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
-      const headedFacultyIds = loggedInUser.headedFaculties.map(faculty => faculty.id);
-      const departmentsInHeadedFaculties = await prisma.department.findMany({
-        where: { facultyId: { in: headedFacultyIds } },
-        select: { id: true },
-      });
-      const allowedDepartmentIds = departmentsInHeadedFaculties.map(dept => dept.id);
 
-      const courseDepartments = await prisma.courseDepartment.findMany({
-        where: { courseId: id },
-        select: { departmentId: true },
-      });
-      const existingDepartmentIds = courseDepartments.map(cd => cd.departmentId);
-
-      const allExistingDepartmentsAllowed = existingDepartmentIds.every(deptId => allowedDepartmentIds.includes(deptId));
-      if (!allExistingDepartmentsAllowed) {
-        return new NextResponse(JSON.stringify({ error: "Forbidden: Cannot delete course not in assigned faculty's department" }), { status: 403 });
-      }
-    }
 
     await prisma.courseDepartment.deleteMany({ where: { courseId: id } });
 

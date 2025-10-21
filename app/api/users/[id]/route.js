@@ -32,8 +32,9 @@ export async function GET(request, { params }) {
     if (
       loggedInUser.role === "ADMIN" ||
       (loggedInUser.role === "HR" && user.role !== "STUDENT") ||
-      (loggedInUser.role === "FACULTY" && user.role === "STUDENT") ||
-      (loggedInUser.role === "STUDY_OFFICE" && user.role === "STUDENT")
+      (loggedInUser.role === "FACULTY" && user.role !== "STUDENT") ||
+      (loggedInUser.role === "STUDY_OFFICE") ||
+      (loggedInUser.id === id)
     ) {
       return NextResponse.json(user);
     }
@@ -62,11 +63,10 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Authorization: ADMIN can update any user, HR can update any non-student, FACULTY can update STUDENTs
+    // Authorization: ADMIN can update any user, HR can update any non-student
     if (
       loggedInUser.role !== "ADMIN" &&
       !(loggedInUser.role === "HR" && userToUpdate.role !== "STUDENT") &&
-      !(loggedInUser.role === "FACULTY" && userToUpdate.role === "STUDENT") &&
       !(loggedInUser.role === "STUDY_OFFICE" && userToUpdate.role === "STUDENT")
     ) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -75,10 +75,7 @@ export async function PUT(request, { params }) {
     const body = await request.json();
     const { firstName, lastName, email, password, role, departmentId } = body;
 
-    // Prevent faculty from changing a user's role
-    if ((loggedInUser.role === 'FACULTY' || loggedInUser.role === 'STUDY_OFFICE') && role && role !== 'STUDENT') {
-        return NextResponse.json({ error: 'Faculty can only manage students' }, { status: 403 });
-    }
+
 
     const data = {
       firstName,
@@ -129,11 +126,10 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Authorization: ADMIN can delete any user, HR can delete any non-student, FACULTY can delete STUDENTs
+    // Authorization: ADMIN can delete any user, HR can delete any non-student
     if (
       loggedInUser.role !== "ADMIN" &&
       !(loggedInUser.role === "HR" && userToDelete.role !== "STUDENT") &&
-      !(loggedInUser.role === "FACULTY" && userToDelete.role === "STUDENT") &&
       !(loggedInUser.role === "STUDY_OFFICE" && userToDelete.role === "STUDENT")
     ) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

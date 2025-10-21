@@ -84,16 +84,12 @@ export async function POST(request) {
   try {
     const loggedInUser = await getLoggedInUser();
 
-    if (!loggedInUser || (loggedInUser.role !== 'ADMIN' && loggedInUser.role !== 'FACULTY' && loggedInUser.role !== 'STUDY_OFFICE')) {
+    if (!loggedInUser || (loggedInUser.role !== 'ADMIN' && loggedInUser.role !== 'HR')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
     const { firstName, lastName, email, password, role, departmentId } = body;
-
-    if ((loggedInUser.role === 'FACULTY' || loggedInUser.role === 'STUDY_OFFICE') && role !== 'STUDENT') {
-      return NextResponse.json({ error: 'Faculty can only create students' }, { status: 403 });
-    }
 
     if (!firstName || !lastName || !email || !password || !role) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });

@@ -12,7 +12,7 @@ const TEACHER_ROLE = "TEACHER";
 
 export default function TeacherManagementView() {
   const { user: currentUser } = useUser();
-  const canManageTeachers = currentUser?.role === "ADMIN" || currentUser?.role === "STUDY_OFFICE";
+  const canManageTeachers = currentUser?.role === "ADMIN" || currentUser?.role === "HR";
   const [teachers, setTeachers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState(null);

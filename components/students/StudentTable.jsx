@@ -56,7 +56,7 @@ export default function StudentTable({
               <th className="px-6 py-3">Name</th>
               <th className="px-6 py-3">Email</th>
               <th className="px-6 py-3">Role</th>
-              <th className="px-6 py-3 text-center">Actions</th>
+              {canManageStudents && <th className="px-6 py-3 text-center">Actions</th>}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -92,33 +92,22 @@ export default function StudentTable({
                       {student.role}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium space-x-2 text-center">
-                    {canManageStudents && (
+                  {canManageStudents && (
+                    <td className="px-6 py-4 text-sm font-medium space-x-2 text-center">
                       <button
                         onClick={() => onEditClick(student)}
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         Edit
                       </button>
-                    )}
-                    {currentUserRole && (
-                      <Link href={`/${currentUserRole.toLowerCase()}/students/${student.id}`}>
-                        <button
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          View Profile
-                        </button>
-                      </Link>
-                    )}
-                    {canManageStudents && (
                       <button
                         onClick={() => onDeleteClick(student.id)}
                         className="text-red-600 hover:text-red-900"
                       >
                         Delete
                       </button>
-                    )}
-                  </td>
+                    </td>
+                  )}
                 </tr>
               ))
             )}

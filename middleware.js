@@ -12,7 +12,7 @@ const roleProtectedPaths = {
   faculty: ["/faculty", "/faculty/dashboard"],
   teacher: ["/teacher", "/teacher/dashboard"],
   student: ["/student", "/student/dashboard"],
-  study_office: ["/study-office", "/study-office/dashboard", "/study-office/students"],
+  study_office: ["/study-office", "/study-office/dashboard", "/study-office/students", "/study-office/courses", "/study-office/courses/[id]"],
 };
 
 export async function middleware(request) {

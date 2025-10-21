@@ -117,6 +117,11 @@ const ADMIN_NAV_ITEMS = [
     href: "/admin/staff",
   },
   {
+    label: "Teachers",
+    icon: <FiUsers className="w-5 h-5" />, // Using FiUsers for teachers
+    href: "/admin/teachers",
+  },
+  {
     label: "Students",
     icon: <FiUser className="w-5 h-5" />, // Singular user icon for students
     href: "/admin/students",
