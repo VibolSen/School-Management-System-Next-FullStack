@@ -55,6 +55,7 @@ export default function LoginPage() {
       else if (roleName === "teacher") router.push("/teacher/dashboard");
       else if (roleName === "student") router.push("/student/dashboard");
       else router.push("/"); // Fallback to a default page
+      router.refresh(); // Force a refresh to re-evaluate server-side data and middleware
     } catch (err) {
       console.error("Login error:", err);
       setError("Login failed. Please try again.");
