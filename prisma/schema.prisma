@@ -321,4 +321,16 @@ model JobPosting {
   status      JobPostingStatus @default(OPEN)
   hiringManagerId String? @db.ObjectId
   hiringManager User? @relation("JobPostingHiringManager", fields: [hiringManagerId], references: [id])
+  applications JobApplication[]
+}
+
+model JobApplication {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  applicantName   String
+  applicantEmail  String
+  resume          String // URL to the uploaded resume
+  coverLetter     String? // URL to the uploaded cover letter
+  appliedAt       DateTime     @default(now())
+  jobPosting      JobPosting   @relation(fields: [jobPostingId], references: [id])
+  jobPostingId    String       @db.ObjectId
 }

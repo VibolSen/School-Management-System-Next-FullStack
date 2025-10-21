@@ -5,12 +5,14 @@ import { useParams } from "next/navigation";
 import { Briefcase, MapPin, DollarSign, Clock, Calendar, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
+import JobApplicationModal from "@/components/careers/JobApplicationModal"; // Import the modal
 
 export default function JobDetailPage() {
   const { id } = useParams();
   const [jobPosting, setJobPosting] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
 
   useEffect(() => {
     if (!id) return;
@@ -104,14 +106,22 @@ export default function JobDetailPage() {
         </div>
 
         <div className="text-center">
-          <a
-            href="#"
+          <button
+            onClick={() => setIsModalOpen(true)} // Open modal on click
             className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Apply Now
-          </a>
+          </button>
         </div>
       </div>
+
+      {/* Job Application Modal */}
+      <JobApplicationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        jobPostingId={jobPosting.id}
+        jobTitle={jobPosting.title}
+      />
     </div>
   );
 }

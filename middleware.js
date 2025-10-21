@@ -23,7 +23,7 @@ export async function middleware(request) {
   }
   // Decode URI components to handle encoded characters
   path = decodeURIComponent(path);
-  const isAuthPath = path === "/" || path === "/login" || path === "/register" || path === "/about" || path === "/contact" || path === "/careers";
+  const isAuthPath = path === "/" || path === "/login" || path === "/register" || path === "/about" || path === "/contact" || path === "/careers" || path.startsWith("/careers/");
   const token = request.cookies.get("token")?.value;
 
   // 1. If no token and trying to access a protected route, redirect to login
