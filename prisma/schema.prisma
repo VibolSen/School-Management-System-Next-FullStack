@@ -82,6 +82,7 @@ model User {
   profile   Profile?
   createdAnnouncements Announcement[] @relation("AnnouncementsCreated")
   notifications Notification[]
+  jobPostings JobPosting[] @relation("JobPostingHiringManager")
 }
 
 model StaffAttendance {
@@ -297,4 +298,27 @@ model Notification {
   isRead    Boolean   @default(false)
   targetRoles Role[]    @default([STUDENT]) // New field for role-based targeting
   createdAt DateTime  @default(now())
+}
+
+enum JobPostingStatus {
+  OPEN
+  CLOSED
+  FILLED
+}
+
+model JobPosting {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  requirements String[]
+  responsibilities String[]
+  location    String
+  department  String?
+  salaryRange String?
+  employmentType String
+  applicationDeadline DateTime
+  postedDate  DateTime  @default(now())
+  status      JobPostingStatus @default(OPEN)
+  hiringManagerId String? @db.ObjectId
+  hiringManager User? @relation("JobPostingHiringManager", fields: [hiringManagerId], references: [id])
 }

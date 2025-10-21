@@ -15,6 +15,7 @@ import {
   FiUsers,
   FiCode,
   FiCreditCard,
+  FiClipboard,
 } from "react-icons/fi";
 
 const NavLink = ({
@@ -58,6 +59,11 @@ const HR_NAV_ITEMS = [
     label: "Staff",
     icon: <FiBriefcase className="w-5 h-5" />,
     href: "/hr/staff",
+  },
+  {
+    label: "Job Postings",
+    icon: <FiClipboard className="w-5 h-5" />,
+    href: "/hr/job-postings",
   },
   { label: "Leave", icon: <FiSend className="w-5 h-5" />, href: "/hr/leave" },
   {
