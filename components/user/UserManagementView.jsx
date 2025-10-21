@@ -9,7 +9,7 @@ import Notification from "@/components/Notification";
 // ✅ MODIFIED: Roles are now a static list based on your Prisma Enum
 import { useUser } from "@/context/UserContext";
 
-const ROLES = ["ADMIN", "HR", "FACULTY", "TEACHER", "STUDENT"];
+const ROLES = ["ADMIN", "HR", "FACULTY", "TEACHER", "STUDENT", "STUDY_OFFICE"];
 
 export default function UserManagementView() {
   const { user: currentUser } = useUser();
@@ -139,7 +139,7 @@ export default function UserManagementView() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeIn">
       <Notification
         show={notification.show}
         message={notification.message}

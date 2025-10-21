@@ -217,41 +217,43 @@ export default function UserModal({
             </div>
 
             {/* Password */}
-            <div className="md:col-span-2 relative">
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Password {isEditMode ? "(Optional)" : ""}
-              </label>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder={
-                  isEditMode
-                    ? "Leave blank to keep current password"
-                    : "Minimum 6 characters"
-                }
-                value={formData.password}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md text-sm ${
-                  errors.password
-                    ? "border-red-500 ring-1 ring-red-500"
-                    : "border-slate-300"
-                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 px-3 flex items-center text-sm leading-5"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <Eye className="h-5 w-5 text-gray-400" />
+            {!isEditMode && (
+              <div className="md:col-span-2 relative">
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Password
+                </label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder={
+                    isEditMode
+                      ? "Leave blank to keep current password"
+                      : "Minimum 6 characters"
+                  }
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 border rounded-md text-sm ${
+                    errors.password
+                      ? "border-red-500 ring-1 ring-red-500"
+                      : "border-slate-300"
+                  } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 px-3 flex items-center text-sm leading-5"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
+                </button>
+                {errors.password && (
+                  <p className="text-xs text-red-500 mt-1">{errors.password}</p>
                 )}
-              </button>
-              {errors.password && (
-                <p className="text-xs text-red-500 mt-1">{errors.password}</p>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Actions */}

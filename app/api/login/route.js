@@ -1,11 +1,11 @@
 // /api/login/route.js
 import { PrismaClient } from "@prisma/client";
-import { SignJWT } from "jose";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
-const JWT_SECRET_STRING =
+const JWT_SECRET =
   process.env.JWT_SECRET || "your-super-secret-key-that-is-long";
-const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_STRING);
 
 export async function POST(req) {
   try {
@@ -25,12 +25,13 @@ export async function POST(req) {
       });
     }
 
-    const token = await new SignJWT({ userId: user.id, role: user.role.name })
-      .setProtectedHeader({ alg: "HS256" })
-      .setIssuedAt()
-      .setExpirationTime("1d")
-      .sign(JWT_SECRET);
+    // ✅ MODIFIED: Include user's ID and ROLE in the JWT token payload
+    const tokenPayload = {
+      userId: user.id,
+      role: user.role, // Add the role here
+    };
 
+    const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: "1d" });
     const { password: _, ...userWithoutPassword } = user;
 
     return new Response(JSON.stringify({ user: userWithoutPassword, token }), {

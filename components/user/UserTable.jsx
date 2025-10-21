@@ -124,13 +124,15 @@ export default function UserTable({
                 </option>
               ))}
           </select>
-          <button
-            onClick={onAddUserClick}
-            disabled={isLoading}
-            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
-          >
-            Add User
-          </button>
+          {currentUserRole === "ADMIN" && (
+            <button
+              onClick={onAddUserClick}
+              disabled={isLoading}
+              className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+            >
+              Add User
+            </button>
+          )}
         </div>
       </div>
 
@@ -186,7 +188,7 @@ export default function UserTable({
               </tr>
             ) : (
               sortedUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-slate-50">
+                <tr key={user.id} className="hover:bg-slate-50 transition-all duration-200">
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <div className="w-9 h-9 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-600 text-xs mr-3">
@@ -209,13 +211,15 @@ export default function UserTable({
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium space-x-2 text-center">
-                    <button
-                      onClick={() => onEditClick(user)}
-                      className="text-indigo-600 hover:text-indigo-900"
-                      disabled={isLoading}
-                    >
-                      Edit
-                    </button>
+                    {currentUserRole === "ADMIN" && (
+                      <button
+                        onClick={() => onEditClick(user)}
+                        className="text-indigo-600 hover:text-indigo-900"
+                        disabled={isLoading}
+                      >
+                        Edit
+                      </button>
+                    )}
                     {currentUserRole && (
                       <Link href={`/${currentUserRole.toLowerCase()}/users/${user.id}`}>
                         <button
@@ -226,13 +230,15 @@ export default function UserTable({
                         </button>
                       </Link>
                     )}
-                    <button
-                      onClick={() => onDeleteClick(user.id)}
-                      className="text-red-600 hover:text-red-900"
-                      disabled={isLoading}
-                    >
-                      Delete
-                    </button>
+                    {currentUserRole === "ADMIN" && (
+                      <button
+                        onClick={() => onDeleteClick(user.id)}
+                        className="text-red-600 hover:text-red-900"
+                        disabled={isLoading}
+                      >
+                        Delete
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))
