@@ -49,6 +49,42 @@ const NavLink = ({ icon, label, href, isCollapsed, isActive }) => (
 );
 
 // ✅ 2. Updated the nav items with more descriptive icons
+const AnnouncementIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+    <path fillRule="evenodd" d="M18 3a1 1 0 00-1.447-.894L10 6.364 3.447 2.106A1 1 0 002 3v14a1 1 0 001.447.894L10 13.636l6.553 4.258A1 1 0 0018 17V3z" clipRule="evenodd" />
+  </svg>
+);
+
+const AssignmentIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0113 3.414L16.586 7A2 2 0 0118 8.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm0 4a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z" clipRule="evenodd" />
+  </svg>
+);
+
+const ExamIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+    <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z" clipRule="evenodd" />
+  </svg>
+);
+
+const HrPayrollIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+    <path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h2v12zm0 0V4h4v3a1 1 0 001 1h3v7a3 3 0 01-3 3H8z" />
+  </svg>
+);
+
+const RolesPermissionsIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+  </svg>
+);
+
+const ScheduleIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+    <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+  </svg>
+);
+
 const ADMIN_NAV_ITEMS = [
   {
     label: "Dashboard",
@@ -59,6 +95,21 @@ const ADMIN_NAV_ITEMS = [
     label: "Users",
     icon: <FiUsers className="w-5 h-5" />,
     href: "/admin/users",
+  },
+  {
+    label: "Announcements",
+    icon: <AnnouncementIcon />,
+    href: "/admin/announcements",
+  },
+  {
+    label: "Assignments",
+    icon: <AssignmentIcon />,
+    href: "/admin/assignments",
+  },
+  {
+    label: "Exams",
+    icon: <ExamIcon />,
+    href: "/admin/exam",
   },
   {
     label: "Staff",
@@ -105,13 +156,26 @@ const ADMIN_NAV_ITEMS = [
     icon: <FiTrendingUp className="w-5 h-5" />,
     href: "/admin/student-performance",
   },
-
+  {
+    label: "HR & Payroll",
+    icon: <HrPayrollIcon />,
+    href: "/admin/hr",
+  },
+  {
+    label: "Roles & Permissions",
+    icon: <RolesPermissionsIcon />,
+    href: "/admin/roles",
+  },
+  {
+    label: "Schedule",
+    icon: <ScheduleIcon />,
+    href: "/admin/schedule",
+  },
   {
     label: "My Attendance",
     icon: <FiCalendar className="w-5 h-5" />,
     href: "/admin/my-attendance",
   },
-
   {
     label: "Settings",
     icon: <FiSettings className="w-5 h-5" />,
@@ -205,4 +269,5 @@ export default function AdminSidebar({ initialOpen = true }) {
       </aside>
     </>
   );
-}
+};
+
