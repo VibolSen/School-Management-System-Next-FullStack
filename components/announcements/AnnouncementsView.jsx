@@ -6,6 +6,8 @@ import AnnouncementCard from "./AnnouncementCard";
 import Notification from "@/components/Notification";
 
 export default function AnnouncementsView({ courseId, loggedInUser }) {
+  console.log("AnnouncementsView - loggedInUser:", loggedInUser);
+  console.log("AnnouncementsView - loggedInUser.role:", loggedInUser?.role);
   const [announcements, setAnnouncements] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,7 +24,7 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/courses/${courseId}/announcements`);
+      const res = await fetch(courseId ? `/api/courses/${courseId}/announcements` : `/api/announcements`);
       if (!res.ok) throw new Error("Failed to fetch announcements");
       setAnnouncements(await res.json());
     } catch (err) {
@@ -37,9 +39,12 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
   }, [fetchData]);
 
   const handleSave = async (formData) => {
-    const url = announcementToEdit
-      ? `/api/announcements/${announcementToEdit.id}`
-      : `/api/courses/${courseId}/announcements`;
+    let url;
+    if (announcementToEdit) {
+      url = `/api/announcements?id=${announcementToEdit.id}`;
+    } else {
+      url = courseId ? `/api/courses/${courseId}/announcements` : `/api/announcements`;
+    }
     const method = announcementToEdit ? "PUT" : "POST";
 
     setIsLoading(true);
@@ -78,7 +83,12 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
     if (!announcementToDelete) return;
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/announcements/${announcementToDelete}`, { method: "DELETE" });
+      const res = await fetch(
+        courseId
+          ? `/api/courses/${courseId}/announcements/${announcementToDelete}`
+          : `/api/announcements?id=${announcementToDelete}`,
+        { method: "DELETE" }
+      );
       if (!res.ok) {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to delete announcement");
@@ -94,13 +104,13 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
     }
   };
   
-  const canCreate = loggedInUser?.role === 'ADMIN' || loggedInUser?.role === 'FACULTY';
+  const canCreate = loggedInUser?.role === 'ADMIN';
 
   return (
     <div className="p-6">
       <Notification {...notification} onClose={() => setNotification({ ...notification, show: false })} />
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Course Announcements</h1>
+        <h1 className="text-2xl font-bold">{courseId ? "Course Announcements" : "Announcements Management"}</h1>
         {canCreate && (
           <button onClick={() => setIsModalOpen(true)} className="bg-blue-600 text-white px-4 py-2 rounded-md">
             New Announcement

@@ -72,18 +72,21 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { firstName, lastName, email, password, role, departmentId } = body;
+    const formData = await request.formData();
+    const firstName = formData.get("firstName");
+    const lastName = formData.get("lastName");
 
+    const data = {};
+    if (firstName) data.firstName = firstName;
+    if (lastName) data.lastName = lastName;
 
-
-    const data = {
-      firstName,
-      lastName,
-      email,
-      role,
-      departmentId,
-    };
+    // Handle image file separately
+    const imageFile = formData.get("image");
+    if (imageFile && imageFile.size > 0) {
+      // This part needs to be implemented for image upload.
+      // For now, we'll just log it and skip actual upload.
+      console.log("Image file received for upload:", imageFile.name);
+    }
 
     if (password) {
       data.password = await bcrypt.hash(password, 10);

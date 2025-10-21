@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function AnnouncementCard({ announcement, onEdit, onDelete, currentUser }) {
-  const canModify = currentUser?.role === 'ADMIN' || currentUser?.id === announcement.author.id;
+  const canModify = currentUser?.role === 'ADMIN';
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">

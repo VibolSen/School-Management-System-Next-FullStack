@@ -7,11 +7,23 @@ export default function ProfilePage() {
   const { user, loading } = useUser();
 
   const handleUpdateProfile = async (formData) => {
-    // Implement your update logic here
-    // For example, make a PUT request to your API
-    console.log("Updating profile with:", formData);
-    // Return the updated user data
-    return user;
+    try {
+      const res = await fetch(`/api/users?id=${user.id}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to update profile");
+      }
+
+      const updatedUser = await res.json();
+      return updatedUser;
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      throw error;
+    }
   };
 
   if (loading) {

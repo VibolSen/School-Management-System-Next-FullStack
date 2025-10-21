@@ -10,7 +10,8 @@ export default function Navbar() {
   const router = useRouter();
   const [courses, setCourses] = useState([]);
   const [faculties, setFaculties] = useState([]);
-  const [open, setOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef(null);
   const [facultiesOpen, setFacultiesOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -151,9 +152,9 @@ export default function Navbar() {
           {!loading &&
             (user ? (
               <>
-                <div className="relative" ref={dropdownRef}>
+                <div className="relative" ref={profileDropdownRef} onMouseEnter={() => setProfileDropdownOpen(true)} onMouseLeave={() => setProfileDropdownOpen(false)}>
                   <button
-                    onClick={() => setOpen((prev) => !prev)}
+                    onClick={() => setProfileDropdownOpen((prev) => !prev)}
                     className="flex items-center gap-2 hover:text-foreground transition-colors"
                   >
                     <span>
@@ -161,17 +162,17 @@ export default function Navbar() {
                     </span>
                     <ChevronDown
                       className={`w-4 h-4 transition-transform duration-500 ${
-                        open ? "rotate-180" : "rotate-0"
+                        profileDropdownOpen ? "rotate-180" : "rotate-0"
                       }`}
                     />
                   </button>
 
-                  {open && (
+                  {profileDropdownOpen && (
                     <div className="absolute top-full right-0 mt-8 w-48 bg-white shadow-lg rounded-2xl py-2">
                       <Link
                         href={`/${user.role.name.toLowerCase()}/profile`}
                         className="block px-4 py-2 hover:bg-gray-100 text-black transition-colors"
-                        onClick={() => setOpen(false)}
+                        onClick={() => setProfileDropdownOpen(false)}
                       >
                         Profile
                       </Link>
@@ -185,22 +186,14 @@ export default function Navbar() {
                   )}
                 </div>
               </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/register"
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-                >
-                  Register
-                </Link>
-              </>
-            ))}
+                        ) : (
+              <Link
+                href="https://t.me/vibolsen"
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+              >
+                Ask Me
+              </Link>
+            ))} 
         </div>
       </div>
     </header>

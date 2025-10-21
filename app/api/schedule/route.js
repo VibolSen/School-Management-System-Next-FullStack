@@ -29,7 +29,7 @@ export async function POST(request) {
   try {
     const session = await getLoggedInUser();
 
-    if (!session) {
+    if (!session || session.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -51,6 +51,40 @@ export async function POST(request) {
     return NextResponse.json(schedule, { status: 201 });
   } catch (error) {
     console.error('Error creating schedule:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function PUT(request) {
+  try {
+    const session = await getLoggedInUser();
+
+    if (!session || session.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const data = await request.json();
+    const { id, title, startTime, endTime, date, assignedToTeacherId, assignedToGroupId } = data;
+
+    if (!id) {
+      return NextResponse.json({ error: 'Schedule ID is required for PUT request' }, { status: 400 });
+    }
+
+    const updatedSchedule = await prisma.schedule.update({
+      where: { id },
+      data: {
+        title,
+        startTime,
+        endTime,
+        date,
+        assignedToTeacherId,
+        assignedToGroupId,
+      },
+    });
+
+    return NextResponse.json(updatedSchedule);
+  } catch (error) {
+    console.error('Error updating schedule:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

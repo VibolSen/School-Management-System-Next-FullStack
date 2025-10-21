@@ -96,21 +96,9 @@ const ADMIN_NAV_ITEMS = [
     icon: <FiUsers className="w-5 h-5" />,
     href: "/admin/users",
   },
-  {
-    label: "Announcements",
-    icon: <AnnouncementIcon />,
-    href: "/admin/announcements",
-  },
-  {
-    label: "Assignments",
-    icon: <AssignmentIcon />,
-    href: "/admin/assignments",
-  },
-  {
-    label: "Exams",
-    icon: <ExamIcon />,
-    href: "/admin/exam",
-  },
+
+
+
   {
     label: "Staff",
     icon: <FiBriefcase className="w-5 h-5" />, // Icon for professional staff
@@ -160,16 +148,6 @@ const ADMIN_NAV_ITEMS = [
     label: "Student Performance",
     icon: <FiTrendingUp className="w-5 h-5" />,
     href: "/admin/student-performance",
-  },
-  {
-    label: "HR & Payroll",
-    icon: <HrPayrollIcon />,
-    href: "/admin/hr",
-  },
-  {
-    label: "Roles & Permissions",
-    icon: <RolesPermissionsIcon />,
-    href: "/admin/roles",
   },
   {
     label: "Schedule",

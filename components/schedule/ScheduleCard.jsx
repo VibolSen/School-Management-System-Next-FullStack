@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function ScheduleCard({ schedule, onEdit, onDelete, onSelect, isSelected, canSelect }) {
+export default function ScheduleCard({ schedule, onEdit, onDelete, onSelect, isSelected, canSelect, currentUser }) {
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -67,20 +67,22 @@ export default function ScheduleCard({ schedule, onEdit, onDelete, onSelect, isS
           </div>
         </dl>
       </div>
-      <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-        <button
-          onClick={() => onEdit(schedule)}
-          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2"
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => onDelete(schedule.id)}
-          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-        >
-          Delete
-        </button>
-      </div>
+      {currentUser?.role === 'ADMIN' && (
+        <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
+          <button
+            onClick={() => onEdit(schedule)}
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-2"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => onDelete(schedule.id)}
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+          >
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   );
 }
