@@ -13,6 +13,7 @@ export default function Navbar() {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef(null);
   const [facultiesOpen, setFacultiesOpen] = useState(false);
+  const [open, setOpen] = useState(false); // Added for Courses dropdown
   const dropdownRef = useRef(null);
 
   useEffect(() => {

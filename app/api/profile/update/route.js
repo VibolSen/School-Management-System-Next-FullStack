@@ -12,12 +12,13 @@ export const runtime = "nodejs";
 
 export async function PUT(req) {
   try {
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader)
+    const cookieStore = req.cookies;
+    const tokenCookie = cookieStore.get("token");
+
+    if (!tokenCookie)
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
 
-    const token = authHeader.replace("Bearer ", "");
-    const { payload: decoded } = await jwtVerify(token, JWT_SECRET);
+    const { payload: decoded } = await jwtVerify(tokenCookie.value, JWT_SECRET);
 
     // Parse multipart form data
     const formData = await req.formData();
