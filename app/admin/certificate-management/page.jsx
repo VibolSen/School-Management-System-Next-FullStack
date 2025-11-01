@@ -152,9 +152,7 @@ const CertificateManagementPage = () => {
                 <tr>
                   <th className="py-3 px-4 text-left">Recipient</th>
                   <th className="py-3 px-4 text-left">Course</th>
-                  <th className="py-3 px-4 text-left">Issue Date</th>
-                  <th className="py-3 px-4 text-left">Expiry Date</th>
-                  <th className="py-3 px-4 text-left">Unique ID</th>
+
                   <th className="py-3 px-4 text-left">Actions</th>
                 </tr>
               </thead>
@@ -167,9 +165,7 @@ const CertificateManagementPage = () => {
                       </Link>
                     </td>
                     <td className="py-3 px-4">{getCourseName(certificate.course.id)}</td>
-                    <td className="py-3 px-4">{certificate.issueDate}</td>
-                    <td className="py-3 px-4">{certificate.expiryDate}</td>
-                    <td className="py-3 px-4">{certificate.uniqueId}</td>
+
                     <td className="py-3 px-4">
                       <button
                         onClick={() => handleEditCertificate(certificate)}
