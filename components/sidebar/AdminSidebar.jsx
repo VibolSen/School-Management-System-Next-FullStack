@@ -129,6 +129,11 @@ const ADMIN_NAV_ITEMS = [
     href: "/admin/schedule",
   },
   {
+    label: "Certificate Management",
+    icon: <FiBookOpen className="w-5 h-5" />,
+    href: "/admin/certificate-management",
+  },
+  {
     label: "Settings",
     icon: <FiSettings className="w-5 h-5" />,
     href: "/admin/settings",

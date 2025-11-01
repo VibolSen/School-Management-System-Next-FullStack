@@ -152,6 +152,31 @@ model Course {
   enrollments Enrollment[]
   courseDepartments CourseDepartment[]
   announcements Announcement[]
+  certificates Certificate[] // New: Relation to Certificate model
+}
+
+model Certificate {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  recipient   String
+  course      Course    @relation(fields: [courseId], references: [id])
+  courseId    String    @db.ObjectId
+  issueDate   DateTime
+  expiryDate  DateTime?
+  uniqueId    String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  template    Template? @relation(fields: [templateId], references: [id])
+  templateId  String?   @db.ObjectId
+}
+
+model Template {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  content   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  certificates Certificate[]
 }
 
 model Announcement {

@@ -1,0 +1,7 @@
+{
+  "name": "Generic Web Certificate",
+  "description": "A basic web-friendly certificate template.",
+  "layout": "<div style=\"font-family: Arial, sans-serif; text-align: center; border: 2px solid #000; padding: 20px;"><h1 style=\"color: #0056b3;\">Certificate of Achievement</h1><p>This certifies that</p><h2 style=\"color: #000;\">{{recipientName}}</h2><p>has successfully completed the course</p><h3 style=\"color: #0056b3;\">{{courseName}}</h3><p>on</p><p>{{issueDate}}</p><p>Unique ID: {{uniqueId}}</p></div>",
+  "placeholders": ["recipientName", "courseName", "issueDate", "uniqueId"],
+  "styles": "{ \"backgroundColor\": \"#ffffff\", \"fontSize\": \"16px\" }"
+}
