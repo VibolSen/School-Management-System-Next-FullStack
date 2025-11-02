@@ -17,6 +17,7 @@ import {
   FiHash,
   FiTrendingUp,
   FiCalendar,
+  FiAward,
 } from "react-icons/fi";
 
 // -------------------------
@@ -122,6 +123,11 @@ const ADMIN_NAV_ITEMS = [
     label: "Student Performance",
     icon: <FiTrendingUp className="w-5 h-5" />,
     href: "/admin/student-performance",
+  },
+  {
+    label: "Points Management",
+    icon: <FiAward className="w-5 h-5" />,
+    href: "/admin/points-management",
   },
   {
     label: "Schedule",

@@ -59,8 +59,16 @@ export async function PUT(req, { params }) {
         feedback,
         status: "GRADED",
       },
-      include: { // Include assignment and student to create notification
-        assignment: true,
+      include: { 
+        assignment: {
+          include: {
+            group: {
+              include: {
+                courses: true,
+              },
+            },
+          },
+        },
         student: true,
       },
     });
@@ -73,6 +81,20 @@ export async function PUT(req, { params }) {
         `Your assignment "${updatedSubmission.assignment.title}" has been graded. Score: ${updatedSubmission.grade}/${updatedSubmission.assignment.points}.`,
         `/student/assignments/${updatedSubmission.assignment.id}` // Link to assignment details page
       );
+    }
+
+    // Trigger progress update
+    if (updatedSubmission.student && updatedSubmission.assignment.group.courses.length > 0) {
+      const studentId = updatedSubmission.student.id;
+      const courseId = updatedSubmission.assignment.group.courses[0].id; // Assuming one course per group for now
+
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/enrollments/progress`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ studentId, courseId }),
+      });
     }
 
     return NextResponse.json(updatedSubmission);

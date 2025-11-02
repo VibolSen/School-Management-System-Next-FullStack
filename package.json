@@ -33,6 +33,7 @@
     "formidable": "^3.5.4",
     "framer-motion": "^12.23.12",
     "glob": "^11.0.3",
+    "html-pdf": "^3.0.1",
     "jose": "^6.1.0",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",

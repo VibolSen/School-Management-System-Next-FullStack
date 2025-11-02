@@ -3,11 +3,24 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const userId = searchParams.get('userId');
+
   try {
-    const certificates = await prisma.certificate.findMany({
-      include: { course: true, template: true },
-    });
+    let certificates;
+    if (userId) {
+      certificates = await prisma.certificate.findMany({
+        where: {
+          recipient: userId,
+        },
+        include: { course: true, template: true },
+      });
+    } else {
+      certificates = await prisma.certificate.findMany({
+        include: { course: true, template: true },
+      });
+    }
 
     const sanitizedCertificates = certificates.map(certificate => ({
       ...certificate,
