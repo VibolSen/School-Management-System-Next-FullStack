@@ -105,6 +105,16 @@ const ADMIN_NAV_ITEMS = [
     href: "/admin/courses",
   },
   {
+    label: "Assignment Management",
+    icon: <FiBookOpen className="w-5 h-5" />,
+    href: "/admin/assignment-management",
+  },
+  {
+    label: "Exam Management",
+    icon: <FiBook className="w-5 h-5" />,
+    href: "/admin/exam-management",
+  },
+  {
     label: "Course Analytics",
     icon: <FiBarChart2 className="w-5 h-5" />,
     href: "/admin/course-analytics",

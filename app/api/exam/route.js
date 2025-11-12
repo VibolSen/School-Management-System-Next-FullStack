@@ -1,19 +1,30 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/authOptions";
 
 const prisma = new PrismaClient();
 
 // GET all exams or a single exam by id
 export async function GET(req) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
+    const userRole = session.user.role;
+    const userId = session.user.id;
 
     if (id) {
+      // Fetch a single exam
       const exam = await prisma.exam.findUnique({
         where: { id },
         include: {
-          group: { select: { name: true } },
+          group: { select: { name: true, studentIds: true } },
           teacher: { select: { firstName: true, lastName: true } },
         },
       });
@@ -22,20 +33,46 @@ export async function GET(req) {
         return NextResponse.json({ error: "Exam not found" }, { status: 404 });
       }
 
-      return NextResponse.json(exam);
+      // Authorization for single exam
+      if (userRole === "admin") {
+        return NextResponse.json(exam);
+      } else if (userRole === "teacher" && exam.teacherId === userId) {
+        return NextResponse.json(exam);
+      } else if (userRole === "student" && exam.group.studentIds.includes(userId)) {
+        return NextResponse.json(exam);
+      } else {
+        return new NextResponse("Forbidden", { status: 403 });
+      }
+    } else {
+      // Fetch multiple exams
+      if (userRole === "admin") {
+        const exams = await prisma.exam.findMany({
+          include: {
+            group: { select: { name: true } },
+            teacher: { select: { firstName: true, lastName: true } },
+          },
+          orderBy: {
+            examDate: "desc",
+          },
+        });
+        return NextResponse.json(exams);
+      } else if (userRole === "teacher") {
+        const exams = await prisma.exam.findMany({
+          where: { teacherId: userId },
+          include: {
+            group: { select: { name: true } },
+            teacher: { select: { firstName: true, lastName: true } },
+          },
+          orderBy: {
+            examDate: "desc",
+          },
+        });
+        return NextResponse.json(exams);
+      } else {
+        // Students should not be able to fetch all exams
+        return new NextResponse("Forbidden", { status: 403 });
+      }
     }
-
-    const exams = await prisma.exam.findMany({
-      include: {
-        group: { select: { name: true } },
-        teacher: { select: { firstName: true, lastName: true } },
-      },
-      orderBy: {
-        examDate: "desc",
-      },
-    });
-
-    return NextResponse.json(exams);
   } catch (error) {
     console.error("GET Exams Error:", error);
     return NextResponse.json(
@@ -47,14 +84,42 @@ export async function GET(req) {
 
 // CREATE a new exam and generate pending submissions for all students in the group
 export async function POST(req) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  const userRole = session.user.role;
+  const userId = session.user.id;
+
+  if (userRole !== "admin" && userRole !== "teacher") {
+    return new NextResponse("Forbidden", { status: 403 });
+  }
+
   try {
-    const { title, description, examDate, groupId, teacherId } =
-      await req.json();
-    if (!title || !groupId || !teacherId) {
+    const { title, description, examDate, groupId, teacherId: requestTeacherId } = await req.json();
+
+    if (!title || !groupId) {
       return NextResponse.json(
-        { error: "Title, Group ID, and Teacher ID are required" },
+        { error: "Title and Group ID are required" },
         { status: 400 }
       );
+    }
+
+    let finalTeacherId = requestTeacherId;
+
+    // If a teacher is creating, assign themselves as the teacher
+    if (userRole === "teacher") {
+      finalTeacherId = userId;
+    } else if (userRole === "admin") {
+      // If an admin is creating, teacherId must be provided in the body
+      if (!requestTeacherId) {
+        return NextResponse.json(
+          { error: "Teacher ID is required for admin to create an exam" },
+          { status: 400 }
+        );
+      }
     }
 
     const group = await prisma.group.findUnique({
@@ -71,7 +136,7 @@ export async function POST(req) {
         title,
         description,
         examDate: examDate ? new Date(examDate) : null,
-        teacher: { connect: { id: teacherId } },
+        teacher: { connect: { id: finalTeacherId } },
         group: { connect: { id: groupId } },
       },
     });
@@ -105,17 +170,37 @@ export async function POST(req) {
  * WARNING: This is INSECURE. It does not check who is making the update request.
  */
 export async function PUT(req) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  const userRole = session.user.role;
+  const userId = session.user.id;
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
-    if (!id)
-      return new Response(
-        JSON.stringify({ error: "Exam ID is required for updating." }),
-        { status: 400 }
-      );
+    if (!id) {
+      return new NextResponse("Exam ID is required for updating.", { status: 400 });
+    }
 
-    // REMOVED: All security checks. Anyone who knows an exam ID can update it.
+    const existingExam = await prisma.exam.findUnique({
+      where: { id },
+      select: { teacherId: true },
+    });
+
+    if (!existingExam) {
+      return new NextResponse("Exam not found.", { status: 404 });
+    }
+
+    // Authorization
+    if (userRole !== "admin" && !(userRole === "teacher" && existingExam.teacherId === userId)) {
+      return new NextResponse("Forbidden", { status: 403 });
+    }
+
     const data = await req.json();
 
     const updatedExam = await prisma.exam.update({
@@ -127,17 +212,13 @@ export async function PUT(req) {
       },
     });
 
-    return new Response(JSON.stringify(updatedExam), { status: 200 });
+    return NextResponse.json(updatedExam, { status: 200 });
   } catch (error) {
     console.error("PUT /api/exam Error:", error);
-    if (error.code === "P2025")
-      return new Response(JSON.stringify({ error: "Exam not found." }), {
-        status: 404,
-      });
-    return new Response(
-      JSON.stringify({ error: "An internal server error occurred." }),
-      { status: 500 }
-    );
+    if (error.code === "P2025") {
+      return new NextResponse("Exam not found.", { status: 404 });
+    }
+    return new NextResponse("An internal server error occurred.", { status: 500 });
   }
 }
 
@@ -149,39 +230,52 @@ export async function PUT(req) {
  * WARNING: This is INSECURE. It does not check who is making the delete request.
  */
 export async function DELETE(req) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  const userRole = session.user.role;
+  const userId = session.user.id;
+
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
-    if (!id)
-      return new Response(
-        JSON.stringify({ error: "Exam ID is required for deletion." }),
-        { status: 400 }
-      );
+    if (!id) {
+      return new NextResponse("Exam ID is required for deletion.", { status: 400 });
+    }
+
+    const existingExam = await prisma.exam.findUnique({
+      where: { id },
+      select: { teacherId: true },
+    });
+
+    if (!existingExam) {
+      return new NextResponse("Exam not found.", { status: 404 });
+    }
+
+    // Authorization
+    if (userRole !== "admin" && !(userRole === "teacher" && existingExam.teacherId === userId)) {
+      return new NextResponse("Forbidden", { status: 403 });
+    }
 
     // Before deleting the exam, delete all related exam submissions
     await prisma.examSubmission.deleteMany({
       where: { examId: id },
     });
 
-    // REMOVED: All security checks. Anyone who knows an exam ID can delete it.
     await prisma.exam.delete({
       where: { id },
     });
 
-    return new Response(
-      JSON.stringify({ message: "Exam deleted successfully." }),
-      { status: 200 }
-    );
+    return new NextResponse("Exam deleted successfully.", { status: 200 });
   } catch (error) {
     console.error("DELETE /api/exam Error:", error);
-    if (error.code === "P2025")
-      return new Response(JSON.stringify({ error: "Exam not found." }), {
-        status: 404,
-      });
-    return new Response(
-      JSON.stringify({ error: "An internal server error occurred." }),
-      { status: 500 }
-    );
+    if (error.code === "P2025") {
+      return new NextResponse("Exam not found.", { status: 404 });
+    }
+    return new NextResponse("An internal server error occurred.", { status: 500 });
   }
 }

@@ -1,41 +1,54 @@
 // app/api/groups/route.js
-import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { createNotification } from "@/lib/notification"; // New import
-import { getLoggedInUser } from "@/lib/auth"; // Import getLoggedInUser
-
-const prisma = new PrismaClient();
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/authOptions";
+import { createNotification } from "@/lib/notification";
+import { getLoggedInUser } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
 // GET all groups, including their parent course and a count of students
 export async function GET() {
   try {
-    const loggedInUser = await getLoggedInUser();
-    let whereClause = {};
+    const session = await getServerSession(authOptions);
 
-    // If the user is a FACULTY and heads at least one faculty, filter groups
-    if (loggedInUser && loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
+    if (!session) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+    const userRole = session.user.role;
+    const userId = session.user.id;
+    console.log("Groups API - User Role:", userRole, "User ID:", userId);
+
+    let whereClause = {};
+    const loggedInUser = await getLoggedInUser(); // Define loggedInUser here
+
+    // If the user is an ADMIN, fetch all groups without filtering
+    if (session.user.role === "admin") {
+      // No additional filtering needed for admin
+    } else if (session.user.role === "teacher") {
+      whereClause.id = { in: loggedInUser.groupIds };
+    } else if (loggedInUser && loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
       const headedFacultyIds = loggedInUser.headedFaculties.map(faculty => faculty.id);
 
-      // Find all departments belonging to these headed faculties
       const departmentsInHeadedFaculties = await prisma.department.findMany({
         where: { facultyId: { in: headedFacultyIds } },
         select: { id: true },
       });
       const departmentIds = departmentsInHeadedFaculties.map(dept => dept.id);
 
-      // Find all courses associated with these departments
       const coursesInDepartments = await prisma.courseDepartment.findMany({
         where: { departmentId: { in: departmentIds } },
         select: { courseId: true },
       });
       const courseIds = coursesInDepartments.map(cd => cd.courseId);
 
-      // Filter groups that are associated with these courses
       whereClause.courses = {
         some: {
           id: { in: courseIds },
         },
       };
+    } else {
+      // If not admin or faculty with headed faculties, return forbidden or empty array
+      return new NextResponse("Forbidden", { status: 403 });
     }
 
     const groups = await prisma.group.findMany({
