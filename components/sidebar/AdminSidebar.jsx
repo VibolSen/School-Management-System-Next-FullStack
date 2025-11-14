@@ -18,6 +18,7 @@ import {
   FiTrendingUp,
   FiCalendar,
   FiAward,
+  FiCreditCard,
 } from "react-icons/fi";
 
 // -------------------------
@@ -80,6 +81,11 @@ const ADMIN_NAV_ITEMS = [
     href: "/admin/staff",
   },
   {
+    label: "Job Postings",
+    icon: <FiBriefcase className="w-5 h-5" />,
+    href: "/admin/job-postings",
+  },
+  {
     label: "Teachers",
     icon: <FiUsers className="w-5 h-5" />,
     href: "/admin/teachers",
@@ -138,6 +144,16 @@ const ADMIN_NAV_ITEMS = [
     label: "Points Management",
     icon: <FiAward className="w-5 h-5" />,
     href: "/admin/points-management",
+  },
+  {
+    label: "Attendance",
+    icon: <FiCalendar className="w-5 h-5" />,
+    href: "/admin/attendance",
+  },
+  {
+    label: "Payroll",
+    icon: <FiCreditCard className="w-5 h-5" />,
+    href: "/admin/payroll",
   },
   {
     label: "Schedule",

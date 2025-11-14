@@ -57,7 +57,7 @@ export default function TeacherManagementView() {
   const handleSaveTeacher = async (teacherData) => {
     setIsLoading(true);
     const isEditing = !!editingTeacher;
-    const url = isEditing ? `/api/users?id=${editingTeacher.id}` : "/api/users";
+    const url = isEditing ? `/api/users/teachers/${editingTeacher.id}` : "/api/users/teachers";
     const method = isEditing ? "PUT" : "POST";
 
     // Ensure the 'TEACHER' role is always set
@@ -88,7 +88,7 @@ export default function TeacherManagementView() {
     if (!teacherToDelete) return;
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/users?id=${teacherToDelete.id}`, {
+      const res = await fetch(`/api/users/teachers/${teacherToDelete.id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete teacher");

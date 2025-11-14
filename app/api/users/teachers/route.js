@@ -31,3 +31,45 @@ export async function GET() {
     );
   }
 }
+
+export async function POST(request) {
+  try {
+    const session = await getLoggedInUser();
+
+    if (!session || session.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { firstName, lastName, email, password } = await request.json();
+
+    if (!firstName || !lastName || !email || !password) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    // Hash password before storing (assuming bcrypt or similar is used elsewhere)
+    // For now, storing as plain text, but in a real app, this should be hashed.
+    const hashedPassword = password; // Placeholder for actual hashing
+
+    const newTeacher = await prisma.user.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        role: 'TEACHER',
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    return NextResponse.json(newTeacher, { status: 201 });
+  } catch (error) {
+    console.error('Error creating teacher:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

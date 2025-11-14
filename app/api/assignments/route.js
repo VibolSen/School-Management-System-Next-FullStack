@@ -25,8 +25,6 @@ export async function GET(request) {
         },
       });
       console.log("Admin fetched assignments count:", assignments.length);
-    }
-      console.log("Admin fetched assignments count:", assignments.length);
     } else if (userRole === "teacher") {
       assignments = await prisma.assignment.findMany({
         where: {
