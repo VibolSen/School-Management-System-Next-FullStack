@@ -14,53 +14,53 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setIsLoading(true);
 
-    try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (!res.ok) {
-        setError(data.error || "Invalid credentials");
-        return;
-      }
-
-      // Set the token in a cookie for the middleware to use
-      if (data.token) {
-        Cookies.set("token", data.token, {
-          expires: 1,
-          secure: true,
-          sameSite: "strict",
-        });
-      }
-
-      // ✅ CORRECT: Get role from user data and redirect
-      const roleName = data?.user?.role?.toLowerCase() || "";
-
-      // Route based on role name
-      if (roleName === "admin") window.location.href = "/admin/dashboard";
-      else if (roleName === "hr") window.location.href = "/hr/dashboard";
-      else if (roleName === "study-office")
-        window.location.href = "/study-office/dashboard";
-      else if (roleName === "faculty") window.location.href = "/faculty/dashboard";
-      else if (roleName === "teacher") window.location.href = "/teacher/dashboard";
-      else if (roleName === "student") window.location.href = "/student/dashboard";
-      else window.location.href = "/"; // Fallback to a default page
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("Login failed. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (!res.ok) {
+      setError(data.error || "Invalid credentials");
+      return;
     }
-  };
+
+    if (data.token) {
+      Cookies.set("token", data.token, {
+        expires: 1,
+        secure: true,
+        sameSite: "strict",
+      });
+    }
+
+    const roleName = data?.user?.role?.toLowerCase() || "";
+
+    if (roleName === "admin") window.location.href = "/admin/dashboard";
+    else if (roleName === "hr") window.location.href = "/hr/dashboard";
+    else if (roleName === "study-office" || roleName === "study_office")
+      window.location.href = "/study-office/dashboard";
+    else if (roleName === "faculty")
+      window.location.href = "/faculty/dashboard";
+    else if (roleName === "teacher")
+      window.location.href = "/teacher/dashboard";
+    else if (roleName === "student")
+      window.location.href = "/student/dashboard";
+    else window.location.href = "/";
+  } catch (err) {
+    console.error("Login error:", err);
+    setError("Login failed. Please try again.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
