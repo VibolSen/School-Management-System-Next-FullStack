@@ -1,20 +1,25 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
-const CertificateForm = ({ initialData = {}, onSubmit, onCancel }) => {
+const CertificateForm = ({
+  initialData = {},
+  onSubmit,
+  onCancel,
+  isLoading = false,
+}) => {
   const [formData, setFormData] = useState({
-    recipient: initialData.recipient || '',
-    course: initialData.course || '',
-    issueDate: initialData.issueDate || '',
-    expiryDate: initialData.expiryDate || '',
-    uniqueId: initialData.uniqueId || '',
+    recipient: "",
+    course: "",
+    issueDate: "",
+    expiryDate: "",
   });
+  const [errors, setErrors] = useState({});
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch('/api/courses');
+        const response = await fetch("/api/courses");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -28,42 +33,74 @@ const CertificateForm = ({ initialData = {}, onSubmit, onCancel }) => {
     fetchCourses();
   }, []);
 
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        recipient: initialData.recipient || "",
+        course: initialData.course || "",
+        issueDate: initialData.issueDate || "",
+        expiryDate: initialData.expiryDate || "",
+      });
+    }
+  }, [initialData]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.recipient.trim())
+      newErrors.recipient = "Recipient is required";
+    if (!formData.course) newErrors.course = "Course is required";
+    if (!formData.issueDate) newErrors.issueDate = "Issue date is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (validateForm()) {
+      onSubmit(formData);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-white shadow-md rounded-lg">
-      <div>
-        <label htmlFor="recipient" className="block text-sm font-medium text-gray-700">Recipient</label>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-4 items-center gap-4">
+        <label htmlFor="recipient" className="text-right text-sm font-medium">
+          Recipient
+        </label>
         <input
-          type="text"
-          name="recipient"
           id="recipient"
+          name="recipient"
           value={formData.recipient}
           onChange={handleChange}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          required
+          className="col-span-3 px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
+        {errors.recipient && (
+          <p className="col-span-4 text-xs text-red-500 text-right">
+            {errors.recipient}
+          </p>
+        )}
       </div>
-      <div>
-        <label htmlFor="course" className="block text-sm font-medium text-gray-700">Course</label>
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <label htmlFor="course" className="text-right text-sm font-medium">
+          Course
+        </label>
         <select
-          name="course"
           id="course"
+          name="course"
           value={formData.course}
           onChange={handleChange}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          required
+          className="col-span-3 px-3 py-2 border rounded-md text-sm bg-white border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           <option value="">Select a course</option>
           {courses.map((course) => (
@@ -72,55 +109,63 @@ const CertificateForm = ({ initialData = {}, onSubmit, onCancel }) => {
             </option>
           ))}
         </select>
+        {errors.course && (
+          <p className="col-span-4 text-xs text-red-500 text-right">
+            {errors.course}
+          </p>
+        )}
       </div>
-      <div>
-        <label htmlFor="issueDate" className="block text-sm font-medium text-gray-700">Issue Date</label>
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <label htmlFor="issueDate" className="text-right text-sm font-medium">
+          Issue Date
+        </label>
         <input
           type="date"
-          name="issueDate"
           id="issueDate"
+          name="issueDate"
           value={formData.issueDate}
           onChange={handleChange}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          required
+          className="col-span-3 px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
+        {errors.issueDate && (
+          <p className="col-span-4 text-xs text-red-500 text-right">
+            {errors.issueDate}
+          </p>
+        )}
       </div>
-      <div>
-        <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700">Expiry Date</label>
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <label htmlFor="expiryDate" className="text-right text-sm font-medium">
+          Expiry Date
+        </label>
         <input
           type="date"
-          name="expiryDate"
           id="expiryDate"
+          name="expiryDate"
           value={formData.expiryDate}
           onChange={handleChange}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+          className="col-span-3 px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
 
-      <div>
-        <label htmlFor="uniqueId" className="block text-sm font-medium text-gray-700">Unique ID</label>
-        <input
-          type="text"
-          name="uniqueId"
-          id="uniqueId"
-          value={formData.uniqueId}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-        />
-      </div>
-      <div className="flex justify-end space-x-2">
+
+
+      <div className="flex justify-end space-x-2 pt-4">
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+          disabled={isLoading}
+          className="px-4 py-2 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
         >
           Cancel
         </button>
         <button
           type="submit"
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+          disabled={isLoading}
+          className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          Save Certificate
+          {isLoading ? "Saving..." : "Save Certificate"}
         </button>
       </div>
     </form>

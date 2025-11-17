@@ -142,7 +142,6 @@ const CertificateManagementPage = () => {
             courseId: formData.course, // Map 'course' from form to 'courseId' for API
             issueDate: formData.issueDate,
             expiryDate: formData.expiryDate,
-            uniqueId: formData.uniqueId,
           };
     
           if (editingCertificate) {

@@ -39,7 +39,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const { recipient, courseId, issueDate, expiryDate, templateId, uniqueId } = await request.json();
+    const { recipient, courseId, issueDate, expiryDate, templateId } = await request.json();
     const newCertificate = await prisma.certificate.create({
       data: {
         recipient,
@@ -47,7 +47,6 @@ export async function POST(request) {
         issueDate: new Date(issueDate),
         expiryDate: expiryDate ? new Date(expiryDate) : null,
         templateId,
-        uniqueId,
       },
     });
     return NextResponse.json(newCertificate, { status: 201 });
@@ -59,7 +58,7 @@ export async function POST(request) {
 
 export async function PUT(request) {
   try {
-    const { id, recipient, courseId, issueDate, expiryDate, templateId, uniqueId } = await request.json();
+    const { id, recipient, courseId, issueDate, expiryDate, templateId } = await request.json();
     const updatedCertificate = await prisma.certificate.update({
       where: { id },
       data: {
@@ -68,25 +67,11 @@ export async function PUT(request) {
         issueDate: new Date(issueDate),
         expiryDate: expiryDate ? new Date(expiryDate) : null,
         templateId,
-        uniqueId,
       },
     });
     return NextResponse.json(updatedCertificate);
   } catch (error) {
     console.error("Error updating certificate:", error);
     return NextResponse.json({ message: "Failed to update certificate" }, { status: 500 });
-  }
-}
-
-export async function DELETE(request) {
-  try {
-    const { id } = await request.json();
-    await prisma.certificate.delete({
-      where: { id },
-    });
-    return NextResponse.json({ message: 'Certificate deleted' });
-  } catch (error) {
-    console.error("Error deleting certificate:", error);
-    return NextResponse.json({ message: "Failed to delete certificate" }, { status: 500 });
   }
 }
