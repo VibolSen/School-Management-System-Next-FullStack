@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ScheduleModal from './ScheduleModal';
-import ScheduleCard from './ScheduleCard';
 import ScheduleCalendarView from './ScheduleCalendarView';
 import { useUser } from '@/context/UserContext';
 import Notification from '@/components/Notification';
@@ -12,7 +11,7 @@ export default function ScheduleView() {
   const [schedules, setSchedules] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentSchedule, setCurrentSchedule] = useState(null);
-  const [view, setView] = useState('card'); // 'card' or 'calendar'
+  const [view, setView] = useState('calendar'); // 'card' or 'calendar'
   const [selectedSchedules, setSelectedSchedules] = useState([]);
   const [notification, setNotification] = useState({
     show: false,
@@ -153,38 +152,15 @@ export default function ScheduleView() {
         )}
         <div>
           <button
-            onClick={() => setView('card')}
-            className={`py-2 px-4 rounded-l-md text-sm font-medium ${view === 'card' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'}`}
-          >
-            Card View
-          </button>
-          <button
             onClick={() => setView('calendar')}
-            className={`py-2 px-4 rounded-r-md text-sm font-medium ${view === 'calendar' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'}`}
+            className={`py-2 px-4 rounded-md text-sm font-medium ${view === 'calendar' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'}`}
           >
             Calendar View
           </button>
         </div>
       </div>
 
-      {view === 'card' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {schedules.map((schedule) => (
-            <ScheduleCard
-              key={schedule.id}
-              schedule={schedule}
-              onEdit={handleEditClick}
-              onDelete={handleDeleteSchedule}
-              onSelect={handleSelectSchedule}
-              isSelected={selectedSchedules.includes(schedule.id)}
-              canSelect={user?.role === 'ADMIN'}
-              currentUser={user}
-            />
-          ))}
-        </div>
-      ) : (
-        <ScheduleCalendarView schedules={schedules} onSelectEvent={handleSelectEvent} />
-      )}
+      <ScheduleCalendarView schedules={schedules} onSelectEvent={handleSelectEvent} />
 
       <ScheduleModal
         isOpen={isModalOpen}

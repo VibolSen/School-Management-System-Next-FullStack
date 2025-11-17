@@ -12,6 +12,8 @@ export default function ConfirmationDialog({
   onCancel,
   isLoading = false,
   type = "danger", // 'danger', 'warning', or 'success'
+  confirmText, // New prop for custom confirm button text
+  cancelText = "Cancel", // New prop for custom cancel button text
 }) {
   const [isClient, setIsClient] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -115,38 +117,36 @@ export default function ConfirmationDialog({
 
         {/* Action buttons */}
         <div className="bg-slate-50/70 px-6 py-4 flex justify-center space-x-3 rounded-b-2xl border-t border-slate-200/50">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-all duration-200 hover:shadow-sm disabled:opacity-50 shadow-sm"
-            disabled={isLoading}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            className={`px-5 py-2.5 ${currentConfig.confirmButton} border border-transparent rounded-xl text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 flex items-center justify-center shadow-md hover:shadow-lg relative overflow-hidden group`}
-            disabled={isLoading}
-          >
-            {/* Shine effect on hover */}
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
-
-            {/* Loading spinner or text */}
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                {type === "danger" && "Delete"}
-                {type === "warning" && "Continue"}
-                {type === "success" && "Confirm"}
-              </>
-            )}
-          </button>
-        </div>
+                      <button
+                      type="button"
+                      onClick={onCancel}
+                      className="px-5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-all duration-200 hover:shadow-sm disabled:opacity-50 shadow-sm"
+                      disabled={isLoading}
+                    >
+                      {cancelText}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onConfirm}
+                      className={`px-5 py-2.5 ${currentConfig.confirmButton} border border-transparent rounded-xl text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 flex items-center justify-center shadow-md hover:shadow-lg relative overflow-hidden group`}
+                      disabled={isLoading}
+                    >
+                      {/* Shine effect on hover */}
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+          
+                      {/* Loading spinner or text */}
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        confirmText ||
+                        (type === "danger" && "Delete") ||
+                        (type === "warning" && "Continue") ||
+                        (type === "success" && "Confirm")
+                      )}
+                    </button>        </div>
       </div>
     </div>
   );

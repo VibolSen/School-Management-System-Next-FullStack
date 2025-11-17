@@ -1,10 +1,20 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { getLoggedInUser } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
 export async function GET(req) {
   try {
+    const loggedInUser = await getLoggedInUser();
+    if (!loggedInUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (loggedInUser.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const faculties = await prisma.faculty.findMany({
       orderBy: { name: "asc" },
       include: {
@@ -33,6 +43,15 @@ export async function GET(req) {
 
 export async function PUT(req) {
   try {
+    const loggedInUser = await getLoggedInUser();
+    if (!loggedInUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (loggedInUser.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const id = req.nextUrl.searchParams.get('id');
     const { headId } = await req.json();
 
@@ -54,6 +73,44 @@ export async function PUT(req) {
     console.error("PUT Faculty Error:", error);
     return NextResponse.json(
       { error: "Failed to update faculty" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req) {
+  try {
+    const loggedInUser = await getLoggedInUser();
+    if (!loggedInUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (loggedInUser.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { name, description, headId } = await req.json();
+
+    if (!name) {
+      return NextResponse.json({ error: "Faculty name is required" }, { status: 400 });
+    }
+    if (!headId) {
+      return NextResponse.json({ error: "Faculty head is required" }, { status: 400 });
+    }
+
+    const newFaculty = await prisma.faculty.create({
+      data: {
+        name,
+        description,
+        headId,
+      },
+    });
+
+    return NextResponse.json(newFaculty, { status: 201 });
+  } catch (error) {
+    console.error("POST Faculty Error:", error);
+    return NextResponse.json(
+      { error: "Failed to create faculty" },
       { status: 500 }
     );
   }

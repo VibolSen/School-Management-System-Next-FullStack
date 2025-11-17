@@ -1,16 +1,15 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
+import { getLoggedInUser } from "@/lib/auth"; // Use custom JWT authentication
 
 export async function GET(request, { params }) {
-  const session = await getServerSession(authOptions);
+  const loggedInUser = await getLoggedInUser();
 
-  if (!session) {
+  if (!loggedInUser) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  if (session.user.role !== "admin") {
+  if (loggedInUser.role !== "ADMIN") {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
@@ -37,13 +36,13 @@ export async function GET(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
-  const session = await getServerSession(authOptions);
+  const loggedInUser = await getLoggedInUser();
 
-  if (!session) {
+  if (!loggedInUser) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  if (session.user.role !== "admin") {
+  if (loggedInUser.role !== "ADMIN") {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
@@ -74,13 +73,13 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
-  const session = await getServerSession(authOptions);
+  const loggedInUser = await getLoggedInUser();
 
-  if (!session) {
+  if (!loggedInUser) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  if (session.user.role !== "admin") {
+  if (loggedInUser.role !== "ADMIN") {
     return new NextResponse("Forbidden", { status: 403 });
   }
 

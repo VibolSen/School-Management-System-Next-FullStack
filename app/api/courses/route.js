@@ -146,11 +146,7 @@ export async function PUT(req) {
       name,
     };
 
-    // Delete existing CourseDepartment entries for this course
-    await prisma.courseDepartment.deleteMany({
-      where: { courseId: id },
-    });
-
+    // Handle teacherId update
     if (teacherId) {
       dataToUpdate.leadBy = { connect: { id: teacherId } };
     } else {
@@ -160,15 +156,37 @@ export async function PUT(req) {
     const updatedCourse = await prisma.course.update({
       where: { id },
       data: dataToUpdate,
+      include: {
+        courseDepartments: true, // Include existing departments to compare
+      },
     });
 
-    // Create new CourseDepartment entries
-    if (departmentIds && departmentIds.length > 0) {
+    // Update CourseDepartment entries efficiently
+    const existingDepartmentIds = updatedCourse.courseDepartments.map(
+      (cd) => cd.departmentId
+    );
+    const departmentsToConnect = departmentIds.filter(
+      (deptId) => !existingDepartmentIds.includes(deptId)
+    );
+    const departmentsToDisconnect = existingDepartmentIds.filter(
+      (deptId) => !departmentIds.includes(deptId)
+    );
+
+    if (departmentsToConnect.length > 0) {
       await prisma.courseDepartment.createMany({
-        data: departmentIds.map((deptId) => ({
+        data: departmentsToConnect.map((deptId) => ({
           courseId: updatedCourse.id,
           departmentId: deptId,
         })),
+      });
+    }
+
+    if (departmentsToDisconnect.length > 0) {
+      await prisma.courseDepartment.deleteMany({
+        where: {
+          courseId: updatedCourse.id,
+          departmentId: { in: departmentsToDisconnect },
+        },
       });
     }
 

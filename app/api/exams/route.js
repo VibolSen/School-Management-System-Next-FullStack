@@ -1,32 +1,31 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
+import { getLoggedInUser } from "@/lib/auth"; // Use custom JWT authentication
 
 export async function GET(request) {
-  const session = await getServerSession(authOptions);
+  const loggedInUser = await getLoggedInUser();
 
-  if (!session) {
+  if (!loggedInUser) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const userRole = session.user.role;
-  const userId = session.user.id;
+  const userRole = loggedInUser.role;
+  const userId = loggedInUser.id;
 
   try {
     let exams;
-    if (userRole === "admin") {
+    if (userRole === "ADMIN") {
       exams = await prisma.exam.findMany({
         include: {
           group: { select: { id: true, name: true } },
           teacher: { select: { id: true, firstName: true, lastName: true } },
         },
       });
-    } else if (userRole === "teacher") {
+    } else if (userRole === "TEACHER") {
       exams = await prisma.exam.findMany({
         where: {
           teacherId: userId,
-          groupId: { in: session.user.groupIds },
+          groupId: { in: loggedInUser.groupIds }, // Assuming groupIds is available on loggedInUser
         },
         include: {
           group: { select: { id: true, name: true } },
@@ -45,16 +44,16 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const session = await getServerSession(authOptions);
+  const loggedInUser = await getLoggedInUser();
 
-  if (!session) {
+  if (!loggedInUser) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const userRole = session.user.role;
-  const userId = session.user.id;
+  const userRole = loggedInUser.role;
+  const userId = loggedInUser.id;
 
-  if (userRole !== "admin" && userRole !== "teacher") {
+  if (userRole !== "ADMIN" && userRole !== "TEACHER") {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
@@ -69,12 +68,12 @@ export async function POST(request) {
     let finalTeacherId = requestTeacherId;
 
     // If a teacher is creating, assign themselves as the teacher and validate group
-    if (userRole === "teacher") {
-      if (!session.user.groupIds.includes(groupId)) {
+    if (userRole === "TEACHER") {
+      if (!loggedInUser.groupIds.includes(groupId)) { // Assuming groupIds is available on loggedInUser
         return new NextResponse("Forbidden: Teacher can only assign exams to their assigned groups.", { status: 403 });
       }
       finalTeacherId = userId;
-    } else if (userRole === "admin") {
+    } else if (userRole === "ADMIN") {
       // If an admin is creating, teacherId must be provided in the body
       if (!requestTeacherId) {
         return new NextResponse("Teacher ID is required for admin to create an exam", { status: 400 });

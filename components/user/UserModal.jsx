@@ -1,9 +1,17 @@
-// UserModal.jsx
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
 import { Eye, EyeOff } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"; // Import dialog components
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 export default function UserModal({
   isOpen,
@@ -21,14 +29,9 @@ export default function UserModal({
     role: "",
   });
   const [errors, setErrors] = useState({});
-  const [mounted, setMounted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const isEditMode = !!userToEdit;
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -85,120 +88,82 @@ export default function UserModal({
     }
   };
 
-  if (!isOpen || !mounted) return null;
+  if (!isOpen) return null;
 
-  const modalContent = (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-full overflow-y-auto animate-fade-in-scale">
-        <div className="p-6 border-b">
-          <div className="flex justify-between items-center">
-            <h2
-              id="add-user-modal-title"
-              className="text-xl font-bold text-slate-800"
-            >
-              {isEditMode ? "Edit User Details" : "Add New User"}
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-slate-500 hover:text-slate-800"
-              aria-label="Close modal"
-              disabled={isLoading}
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>{isEditMode ? "Edit User" : "Add New User"}</DialogTitle>
+        </DialogHeader>
         <form onSubmit={handleSubmit} noValidate>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* First Name */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="firstName" className="text-right">
                 First Name
-              </label>
-              <input
-                type="text"
+              </Label>
+              <Input
+                id="firstName"
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md text-sm ${
-                  errors.firstName
-                    ? "border-red-500 ring-1 ring-red-500"
-                    : "border-slate-300"
-                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                className="col-span-3 px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               {errors.firstName && (
-                <p className="text-xs text-red-500 mt-1">{errors.firstName}</p>
+                <p className="col-span-4 text-xs text-red-500 text-right">
+                  {errors.firstName}
+                </p>
               )}
             </div>
-
-            {/* Last Name */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="lastName" className="text-right">
                 Last Name
-              </label>
-              <input
-                type="text"
+              </Label>
+              <Input
+                id="lastName"
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md text-sm ${
-                  errors.lastName
-                    ? "border-red-500 ring-1 ring-red-500"
-                    : "border-slate-300"
-                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                className="col-span-3 px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               {errors.lastName && (
-                <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>
+                <p className="col-span-4 text-xs text-red-500 text-right">
+                  {errors.lastName}
+                </p>
               )}
             </div>
-
-            {/* Email */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Email Address
-              </label>
-              <input
-                type="email"
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="email" className="text-right">
+                Email
+              </Label>
+              <Input
+                id="email"
                 name="email"
+                type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md text-sm ${
-                  errors.email
-                    ? "border-red-500 ring-1 ring-red-500"
-                    : "border-slate-300"
-                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                className={`col-span-3 px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                  errors.email ? "border-red-500" : ""
+                }`}
               />
               {errors.email && (
-                <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+                <p className="col-span-4 text-xs text-red-500 text-right">
+                  {errors.email}
+                </p>
               )}
             </div>
-
-            {/* Role */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="role" className="text-right">
                 Role
-              </label>
+              </Label>
               <select
+                id="role"
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md text-sm bg-white ${
-                  errors.role
-                    ? "border-red-500 ring-1 ring-red-500"
-                    : "border-slate-300"
-                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                className={`col-span-3 px-3 py-2 border rounded-md text-sm bg-white border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                  errors.role ? "border-red-500" : ""
+                }`}
               >
                 <option value="" disabled>
                   Select Role
@@ -212,76 +177,60 @@ export default function UserModal({
                   ))}
               </select>
               {errors.role && (
-                <p className="text-xs text-red-500 mt-1">{errors.role}</p>
+                <p className="col-span-4 text-xs text-red-500 text-right">
+                  {errors.role}
+                </p>
               )}
             </div>
-
-            {/* Password */}
             {!isEditMode && (
-              <div className="md:col-span-2 relative">
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+              <div className="grid grid-cols-4 items-center gap-4 relative">
+                <Label htmlFor="password" className="text-right">
                   Password
-                </label>
-                <input
-                  type={showPassword ? "text" : "password"}
+                </Label>
+                <Input
+                  id="password"
                   name="password"
-                  placeholder={
-                    isEditMode
-                      ? "Leave blank to keep current password"
-                      : "Minimum 6 characters"
-                  }
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Minimum 6 characters"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full px-3 py-2 border rounded-md text-sm ${
-                    errors.password
-                      ? "border-red-500 ring-1 ring-red-500"
-                      : "border-slate-300"
-                  } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                  className={`col-span-3 px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                    errors.password ? "border-red-500" : ""
+                  }`}
                 />
                 <button
                   type="button"
+                  className="absolute right-0 top-0 h-full px-3 py-2 text-gray-400 hover:text-gray-600"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 px-3 flex items-center text-sm leading-5"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
+                    <EyeOff className="h-4 w-4" />
                   ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
+                    <Eye className="h-4 w-4" />
                   )}
                 </button>
                 {errors.password && (
-                  <p className="text-xs text-red-500 mt-1">{errors.password}</p>
+                  <p className="col-span-4 text-xs text-red-500 text-right">
+                    {errors.password}
+                  </p>
                 )}
               </div>
             )}
           </div>
-
-          {/* Actions */}
-          <div className="p-6 bg-slate-50 border-t rounded-b-xl flex justify-end items-center gap-4">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isLoading}
-              className="px-4 py-2 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
-            >
+          <DialogFooter>
+            <Button variant="outline" onClick={onClose} disabled={isLoading}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
+            </Button>
+            <Button type="submit" disabled={isLoading}>
               {isLoading
                 ? "Saving..."
                 : isEditMode
                 ? "Save Changes"
                 : "Save User"}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
-
-  return createPortal(modalContent, document.body);
 }

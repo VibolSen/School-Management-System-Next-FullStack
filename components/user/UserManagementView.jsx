@@ -24,19 +24,25 @@ export default function UserManagementView() {
   });
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
   };
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/users");
+      const response = await fetch("/api/users", { cache: "no-store" });
       if (!response.ok) throw new Error("Failed to fetch users.");
       const data = await response.json();
       setUsers(data);
@@ -91,7 +97,8 @@ export default function UserManagementView() {
         );
       }
 
-      showMessage(`User ${isEditing ? "updated" : "created"} successfully!`);
+      setSuccessMessage(`User ${isEditing ? "updated" : "created"} successfully!`);
+      setIsSuccessModalOpen(true);
       await fetchUsers();
       handleCloseModal();
     } catch (err) {
@@ -138,14 +145,19 @@ export default function UserManagementView() {
     setUserToDelete(null);
   };
 
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn">
-      <Notification
-        show={notification.show}
-        message={notification.message}
-        type={notification.type}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
+
       <h1 className="text-3xl font-bold text-slate-800">User Management</h1>
       <UserTable
         users={users}
@@ -174,6 +186,26 @@ export default function UserManagementView() {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         isLoading={isLoading}
+      />
+      <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="success"
+      />
+      <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="danger"
       />
     </div>
   );

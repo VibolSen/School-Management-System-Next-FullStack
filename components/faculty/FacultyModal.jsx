@@ -19,7 +19,7 @@ const FacultyModal = ({ isOpen, onClose, onSave, facultyToEdit, isLoading, facul
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onSave({ name, headId: headId || null }); // Pass headId
+    onSave({ name, headId }); // Pass headId directly
   };
 
   if (!isOpen) return null;
@@ -53,8 +53,9 @@ const FacultyModal = ({ isOpen, onClose, onSave, facultyToEdit, isLoading, facul
               value={headId}
               onChange={(e) => setHeadId(e.target.value)}
               disabled={isLoading}
+              required={!facultyToEdit} // Make required only when adding a new faculty
             >
-              <option value="">Select Director (Optional)</option>
+              <option value="">Select Director</option>
               {facultyUsers.map((user) => (
                 <option key={user.id} value={user.id}>
                   {user.firstName} {user.lastName}

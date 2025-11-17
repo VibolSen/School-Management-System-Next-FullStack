@@ -1,35 +1,34 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
+import { getLoggedInUser } from "@/lib/auth"; // Use custom JWT authentication
 
 export async function GET(request) {
-  const session = await getServerSession(authOptions);
+  const loggedInUser = await getLoggedInUser();
 
-  if (!session) {
+  if (!loggedInUser) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const userRole = session.user.role;
-  const userId = session.user.id;
+  const userRole = loggedInUser.role;
+  const userId = loggedInUser.id;
   console.log("Assignments API - User Role:", userRole, "User ID:", userId);
 
   try {
     let assignments;
-    if (userRole === "admin") {
-      console.log("Admin role detected. Attempting to fetch all assignments.");
+    if (userRole === "ADMIN") {
+      console.log("ADMIN role detected. Attempting to fetch all assignments.");
       assignments = await prisma.assignment.findMany({
         include: {
           group: { select: { id: true, name: true } },
           teacher: { select: { id: true, firstName: true, lastName: true } },
         },
       });
-      console.log("Admin fetched assignments count:", assignments.length);
-    } else if (userRole === "teacher") {
+      console.log("ADMIN fetched assignments count:", assignments.length);
+    } else if (userRole === "TEACHER") {
       assignments = await prisma.assignment.findMany({
         where: {
           teacherId: userId,
-          groupId: { in: session.user.groupIds },
+          groupId: { in: loggedInUser.groupIds }, // Assuming groupIds is available on loggedInUser
         },
         include: {
           group: { select: { id: true, name: true } },
@@ -48,16 +47,16 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  const session = await getServerSession(authOptions);
+  const loggedInUser = await getLoggedInUser();
 
-  if (!session) {
+  if (!loggedInUser) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const userRole = session.user.role;
-  const userId = session.user.id;
+  const userRole = loggedInUser.role;
+  const userId = loggedInUser.id;
 
-  if (userRole !== "admin" && userRole !== "teacher") {
+  if (userRole !== "ADMIN" && userRole !== "TEACHER") {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
@@ -71,12 +70,12 @@ export async function POST(request) {
 
     let finalTeacherId = requestTeacherId;
 
-    if (userRole === "teacher") {
-      if (!session.user.groupIds.includes(groupId)) {
+    if (userRole === "TEACHER") {
+      if (!loggedInUser.groupIds.includes(groupId)) { // Assuming groupIds is available on loggedInUser
         return new NextResponse("Forbidden: Teacher can only assign to their assigned groups.", { status: 403 });
       }
       finalTeacherId = userId;
-    } else if (userRole === "admin") {
+    } else if (userRole === "ADMIN") {
       if (!requestTeacherId) {
         return new NextResponse("Teacher ID is required for admin to create an assignment", { status: 400 });
       }

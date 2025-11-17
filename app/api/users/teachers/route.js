@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { getLoggedInUser } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
