@@ -82,6 +82,15 @@ export async function middleware(request) {
       }
     }
 
+    // Protect API routes for certificates
+    if (path.startsWith('/api/certificates')) {
+      if (request.method === 'POST' || request.method === 'PUT' || request.method === 'DELETE') {
+        if (userRole !== 'admin') {
+          return new NextResponse(JSON.stringify({ error: 'Forbidden: Only administrators can manage certificates' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+        }
+      }
+    }
+
     // ✅ IMPROVED LOGIC: Check if the user is in an area they are allowed to be in
     const allowedPaths = roleProtectedPaths[userRole];
     const isAccessingAllowedPath =
