@@ -1,23 +1,29 @@
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function GET(request, { params }) {
+export async function DELETE(request, props) {
   try {
-    const { id } = await params;
-    const certificate = await prisma.certificate.findUnique({
-      where: { id },
-      include: { course: true, template: true },
+    const { id } = props.params;
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Certificate ID is required" },
+        { status: 400 }
+      );
+    }
+
+    await prisma.certificate.delete({
+      where: { id: id.toString() },
     });
 
-    if (certificate) {
-      return NextResponse.json(certificate);
-    } else {
-      return NextResponse.json({ message: 'Certificate not found' }, { status: 404 });
-    }
+    return NextResponse.json({ message: "Certificate deleted successfully" });
   } catch (error) {
-    console.error("Error fetching certificate:", error);
-    return NextResponse.json({ message: "Failed to fetch certificate" }, { status: 500 });
+    console.error("Error deleting certificate:", error);
+    return NextResponse.json(
+      { message: "Failed to delete certificate", error: error.message },
+      { status: 500 }
+    );
   }
 }
