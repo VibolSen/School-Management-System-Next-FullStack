@@ -39,7 +39,7 @@ export async function GET(req) {
     const processedCourses = coursesLedByTeacher.map((course) => {
       const groupCount = course.groups.length;
       const studentCount = course.groups.reduce(
-        (sum, group) => sum + group._count.students,
+        (sum, group) => sum + group._count.students.students,
         0
       );
 
