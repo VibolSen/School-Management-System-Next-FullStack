@@ -11,6 +11,7 @@ export async function GET(req) {
     const teacherId = searchParams.get("teacherId");
 
     if (!teacherId) {
+      console.error("GET My Courses (Faculty) Error: Teacher ID is missing.");
       return NextResponse.json(
         { error: "Teacher ID is required" },
         { status: 400 }
@@ -54,7 +55,7 @@ export async function GET(req) {
 
     return NextResponse.json(processedCourses);
   } catch (error) {
-    console.error("GET My Courses (Faculty) Error:", error);
+    console.error("GET My Courses (Faculty) Error:", error, "Teacher ID:", teacherId);
     return NextResponse.json(
       { error: "Failed to fetch courses" },
       { status: 500 }
