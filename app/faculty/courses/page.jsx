@@ -1,5 +1,8 @@
-import CourseManagementView from "@/components/course/CourseManagementView";
+import FacultyCoursesView from "@/components/course/FacultyCoursesView";
 
-export default function CoursesPage() {
-  return <CourseManagementView />;
+export default function CoursesPage({ searchParams }) {
+  const loggedInUser = {
+    id: searchParams.teacherId,
+  };
+  return <FacultyCoursesView loggedInUser={loggedInUser} />;
 }
