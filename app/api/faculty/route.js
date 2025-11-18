@@ -11,7 +11,7 @@ export async function GET(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (loggedInUser.role !== "ADMIN") {
+    if (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE" && loggedInUser.role !== "FACULTY") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -48,7 +48,7 @@ export async function PUT(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (loggedInUser.role !== "ADMIN") {
+    if (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -85,7 +85,7 @@ export async function POST(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (loggedInUser.role !== "ADMIN") {
+    if (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -111,6 +111,41 @@ export async function POST(req) {
     console.error("POST Faculty Error:", error);
     return NextResponse.json(
       { error: "Failed to create faculty" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req) {
+  try {
+    const loggedInUser = await getLoggedInUser();
+    if (!loggedInUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const id = req.nextUrl.searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: "Faculty ID is required" }, { status: 400 });
+    }
+
+    const deletedFaculty = await prisma.faculty.delete({
+      where: { id: id },
+    });
+
+    if (!deletedFaculty) {
+      return NextResponse.json({ error: "Faculty not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Faculty deleted successfully" });
+  } catch (error) {
+    console.error("DELETE Faculty Error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete faculty" },
       { status: 500 }
     );
   }

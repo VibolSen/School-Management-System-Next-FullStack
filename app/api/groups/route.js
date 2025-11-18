@@ -18,7 +18,7 @@ export async function GET() {
     let whereClause = {};
 
     // If the user is an ADMIN, fetch all groups without filtering
-    if (userRole === "ADMIN") {
+    if (userRole === "ADMIN" || userRole === "STUDY_OFFICE") {
       // No additional filtering needed for admin
     } else if (userRole === "TEACHER") {
       whereClause.id = { in: loggedInUser.groupIds };
@@ -63,6 +63,124 @@ export async function GET() {
     console.error("GET Groups Error:", error);
     return NextResponse.json(
       { error: "Failed to fetch groups" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req) {
+  try {
+    const loggedInUser = await getLoggedInUser();
+    if (!loggedInUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { name, courseIds } = await req.json();
+
+    if (!name) {
+      return NextResponse.json({ error: "Group name is required" }, { status: 400 });
+    }
+    if (!courseIds || courseIds.length === 0) {
+      return NextResponse.json({ error: "At least one course is required" }, { status: 400 });
+    }
+
+    const newGroup = await prisma.group.create({
+      data: {
+        name,
+        courses: {
+          connect: courseIds.map((id) => ({ id })),
+        },
+      },
+    });
+
+    return NextResponse.json(newGroup, { status: 201 });
+  } catch (error) {
+    console.error("POST Group Error:", error);
+    return NextResponse.json(
+      { error: "Failed to create group" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req) {
+  try {
+    const loggedInUser = await getLoggedInUser();
+    if (!loggedInUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const id = req.nextUrl.searchParams.get('id');
+    const { name, courseIds } = await req.json();
+
+    if (!id) {
+      return NextResponse.json({ error: "Group ID is required" }, { status: 400 });
+    }
+    if (!name) {
+      return NextResponse.json({ error: "Group name is required" }, { status: 400 });
+    }
+    if (!courseIds || courseIds.length === 0) {
+      return NextResponse.json({ error: "At least one course is required" }, { status: 400 });
+    }
+
+    const updatedGroup = await prisma.group.update({
+      where: { id: id },
+      data: {
+        name,
+        courses: {
+          set: courseIds.map((id) => ({ id })),
+        },
+      },
+    });
+
+    if (!updatedGroup) {
+      return NextResponse.json({ error: "Group not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(updatedGroup);
+  } catch (error) {
+    console.error("PUT Group Error:", error);
+    return NextResponse.json(
+      { error: "Failed to update group" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req) {
+  try {
+    const loggedInUser = await getLoggedInUser();
+    if (!loggedInUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const id = req.nextUrl.searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: "Group ID is required" }, { status: 400 });
+    }
+
+    await prisma.group.delete({
+      where: { id: id },
+    });
+
+    return NextResponse.json({ message: "Group deleted successfully" });
+  } catch (error) {
+    console.error("DELETE Group Error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete group" },
       { status: 500 }
     );
   }
