@@ -70,14 +70,17 @@ export async function GET(req) {
 
 // POST function (with authorization)
 export async function POST(req) {
-  const loggedInUser = await getLoggedInUser(); // Use getLoggedInUser
-  if (!loggedInUser || (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE")) {
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+  const loggedInUser = await getLoggedInUser();
+  if (!loggedInUser) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
+  const { role, id: loggedInUserId } = loggedInUser;
+
   try {
-      const { name, departmentIds, teacherId } = await req.json();
-    console.log("--- Creating Course ---", { name, departmentIds, teacherId });
+    const { name, departmentIds, teacherId: requestedTeacherId } = await req.json();
+    console.log("--- Creating Course ---", { name, departmentIds, requestedTeacherId });
+
     if (!name || !departmentIds || departmentIds.length === 0) {
       return NextResponse.json(
         { error: "Course name and department ID are required" },
@@ -85,14 +88,25 @@ export async function POST(req) {
       );
     }
 
+    let finalTeacherId = requestedTeacherId;
 
+    // Authorization logic for POST
+    if (role === "FACULTY") {
+      // Faculty can only create courses where they are the lead teacher
+      if (requestedTeacherId && requestedTeacherId !== loggedInUserId) {
+        return new NextResponse(JSON.stringify({ error: "Faculty can only create courses they lead." }), { status: 403 });
+      }
+      finalTeacherId = loggedInUserId; // Ensure faculty is assigned as lead
+    } else if (role !== "ADMIN" && role !== "STUDY_OFFICE") {
+      // Only ADMIN, STUDY_OFFICE, or FACULTY (for themselves) can create courses
+      return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+    }
 
     const dataToCreate = {
       name,
-
     };
-    if (teacherId) {
-      dataToCreate.leadBy = { connect: { id: teacherId } };
+    if (finalTeacherId) {
+      dataToCreate.leadBy = { connect: { id: finalTeacherId } };
     }
     const newCourse = await prisma.course.create({ data: dataToCreate });
 
@@ -123,15 +137,17 @@ export async function POST(req) {
 
 // UPDATE function (with authorization)
 export async function PUT(req) {
-  const loggedInUser = await getLoggedInUser(); // Use getLoggedInUser
-  if (!loggedInUser || (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE")) {
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+  const loggedInUser = await getLoggedInUser();
+  if (!loggedInUser) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
+
+  const { role, id: loggedInUserId } = loggedInUser;
 
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    const { name, departmentIds, teacherId } = await req.json();
+    const { name, departmentIds, teacherId: requestedTeacherId } = await req.json();
 
     if (!id || !name || !departmentIds) {
       return NextResponse.json(
@@ -140,18 +156,41 @@ export async function PUT(req) {
       );
     }
 
+    const existingCourse = await prisma.course.findUnique({
+      where: { id },
+      select: { leadById: true },
+    });
 
+    if (!existingCourse) {
+      return NextResponse.json({ error: "Course not found" }, { status: 404 });
+    }
+
+    // Authorization logic for PUT
+    if (role === "FACULTY") {
+      // Faculty can only update courses they lead
+      if (existingCourse.leadById !== loggedInUserId) {
+        return new NextResponse(JSON.stringify({ error: "Faculty can only update courses they lead." }), { status: 403 });
+      }
+      // Faculty cannot change the lead teacher
+      if (requestedTeacherId && requestedTeacherId !== loggedInUserId) {
+        return new NextResponse(JSON.stringify({ error: "Faculty cannot change the lead teacher of a course." }), { status: 403 });
+      }
+    } else if (role !== "ADMIN" && role !== "STUDY_OFFICE") {
+      // Only ADMIN, STUDY_OFFICE, or FACULTY (for courses they lead) can update courses
+      return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+    }
 
     const dataToUpdate = {
       name,
     };
 
-    // Handle teacherId update
-    if (teacherId) {
-      dataToUpdate.leadBy = { connect: { id: teacherId } };
-    } else {
+    // Handle teacherId update (only if not faculty or if faculty is updating to themselves)
+    if (requestedTeacherId && (role !== "FACULTY" || requestedTeacherId === loggedInUserId)) {
+      dataToUpdate.leadBy = { connect: { id: requestedTeacherId } };
+    } else if (requestedTeacherId === null && role !== "FACULTY") { // Allow admin/study_office to disconnect
       dataToUpdate.leadBy = { disconnect: true };
     }
+
 
     const updatedCourse = await prisma.course.update({
       where: { id },
@@ -208,24 +247,44 @@ export async function PUT(req) {
 
 // DELETE function (with authorization)
 export async function DELETE(req) {
-  const loggedInUser = await getLoggedInUser(); // Use getLoggedInUser
-  if (!loggedInUser || (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE")) {
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+  const loggedInUser = await getLoggedInUser();
+  if (!loggedInUser) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
+
+  const { role, id: loggedInUserId } = loggedInUser;
 
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    if (!id)
+    if (!id) {
       return NextResponse.json(
         { error: "Course ID is required" },
         { status: 400 }
       );
+    }
 
+    const existingCourse = await prisma.course.findUnique({
+      where: { id },
+      select: { leadById: true },
+    });
 
+    if (!existingCourse) {
+      return NextResponse.json({ error: "Course not found" }, { status: 404 });
+    }
+
+    // Authorization logic for DELETE
+    if (role === "FACULTY") {
+      // Faculty can only delete courses they lead
+      if (existingCourse.leadById !== loggedInUserId) {
+        return new NextResponse(JSON.stringify({ error: "Faculty can only delete courses they lead." }), { status: 403 });
+      }
+    } else if (role !== "ADMIN" && role !== "STUDY_OFFICE") {
+      // Only ADMIN, STUDY_OFFICE, or FACULTY (for courses they lead) can delete courses
+      return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
+    }
 
     await prisma.courseDepartment.deleteMany({ where: { courseId: id } });
-
     await prisma.course.delete({ where: { id } });
     return new NextResponse(null, { status: 204 });
   } catch (error) {
