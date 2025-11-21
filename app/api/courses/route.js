@@ -19,25 +19,8 @@ export async function GET(req) {
       whereClause.leadById = teacherId; // Changed from teacherId to leadById
     }
 
-    // If the user is a FACULTY and heads at least one faculty, filter courses
-    if (loggedInUser && loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
-      const headedFacultyIds = loggedInUser.headedFaculties.map(faculty => faculty.id);
-
-      // Find all departments belonging to these headed faculties
-      const departmentsInHeadedFaculties = await prisma.department.findMany({
-        where: { facultyId: { in: headedFacultyIds } },
-        select: { id: true },
-      });
-      const departmentIds = departmentsInHeadedFaculties.map(dept => dept.id);
-
-      // Filter courses that are associated with these departments
-      whereClause.courseDepartments = {
-        some: {
-          departmentId: { in: departmentIds },
-        },
-      };
-    } else if (loggedInUser && loggedInUser.role !== "ADMIN" && loggedInUser.role !== "FACULTY" && loggedInUser.role !== "STUDY_OFFICE") {
-      // If the user is not an admin or faculty, they can only see their own courses
+    if (loggedInUser && loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE" && loggedInUser.role !== "FACULTY") {
+      // If the user is not an admin, study office, or faculty, they can only see their own courses
       whereClause.leadById = loggedInUser.id;
     }
 
@@ -91,14 +74,8 @@ export async function POST(req) {
     let finalTeacherId = requestedTeacherId;
 
     // Authorization logic for POST
-    if (role === "FACULTY") {
-      // Faculty can only create courses where they are the lead teacher
-      if (requestedTeacherId && requestedTeacherId !== loggedInUserId) {
-        return new NextResponse(JSON.stringify({ error: "Faculty can only create courses they lead." }), { status: 403 });
-      }
-      finalTeacherId = loggedInUserId; // Ensure faculty is assigned as lead
-    } else if (role !== "ADMIN" && role !== "STUDY_OFFICE") {
-      // Only ADMIN, STUDY_OFFICE, or FACULTY (for themselves) can create courses
+    if (role !== "ADMIN" && role !== "STUDY_OFFICE" && role !== "FACULTY") {
+      // Only ADMIN, STUDY_OFFICE or FACULTY can create courses
       return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
     }
 
@@ -166,17 +143,8 @@ export async function PUT(req) {
     }
 
     // Authorization logic for PUT
-    if (role === "FACULTY") {
-      // Faculty can only update courses they lead
-      if (existingCourse.leadById !== loggedInUserId) {
-        return new NextResponse(JSON.stringify({ error: "Faculty can only update courses they lead." }), { status: 403 });
-      }
-      // Faculty cannot change the lead teacher
-      if (requestedTeacherId && requestedTeacherId !== loggedInUserId) {
-        return new NextResponse(JSON.stringify({ error: "Faculty cannot change the lead teacher of a course." }), { status: 403 });
-      }
-    } else if (role !== "ADMIN" && role !== "STUDY_OFFICE") {
-      // Only ADMIN, STUDY_OFFICE, or FACULTY (for courses they lead) can update courses
+    if (role !== "ADMIN" && role !== "STUDY_OFFICE" && role !== "FACULTY") {
+      // Only ADMIN, STUDY_OFFICE or FACULTY can update courses
       return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
     }
 
@@ -274,13 +242,8 @@ export async function DELETE(req) {
     }
 
     // Authorization logic for DELETE
-    if (role === "FACULTY") {
-      // Faculty can only delete courses they lead
-      if (existingCourse.leadById !== loggedInUserId) {
-        return new NextResponse(JSON.stringify({ error: "Faculty can only delete courses they lead." }), { status: 403 });
-      }
-    } else if (role !== "ADMIN" && role !== "STUDY_OFFICE") {
-      // Only ADMIN, STUDY_OFFICE, or FACULTY (for courses they lead) can delete courses
+    if (role !== "ADMIN" && role !== "STUDY_OFFICE" && role !== "FACULTY") {
+      // Only ADMIN, STUDY_OFFICE or FACULTY can delete courses
       return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
     }
 

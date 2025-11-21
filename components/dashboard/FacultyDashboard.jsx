@@ -101,13 +101,7 @@ export default function FacultyDashboard() {
 
         {/* Cards Section */}
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  <DashboardCard
-                    title="Total Course"
-                    value={dashboardData.courseCount || 0}
-                    icon={<Book className="w-6 h-6 text-blue-500" />}
-                    description="Courses you are teaching"
-                    href="/faculty/courses"
-                  />
+
                   <DashboardCard
                     title="Total Students"
                     value={dashboardData.studentCount || 0}

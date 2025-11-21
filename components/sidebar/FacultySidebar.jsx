@@ -54,22 +54,18 @@ const FACULTY_NAV_ITEMS = [
     icon: <FiHome className="w-5 h-5" />,
     href: "/faculty/dashboard",
   },
+  {
+    label: "Course Management",
+    icon: <FiBook className="w-5 h-5" />,
+    href: "/faculty/courses",
+  },
 
   {
     label: "Departments",
     icon: <FiGrid className="w-5 h-5" />,
     href: "/faculty/departments",
   },
-  {
-    label: "Courses",
-    icon: <FiBook className="w-5 h-5" />,
-    href: "/faculty/courses",
-  },
-  {
-    label: "Course Analytics",
-    icon: <FiBarChart2 className="w-5 h-5" />,
-    href: "/faculty/course-analytics",
-  },
+
   {
     label: "Groups",
     icon: <FiHash className="w-5 h-5" />,
