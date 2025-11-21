@@ -13,6 +13,9 @@ import {
   Settings,
   User,
   Activity,
+  Building2,
+  BookOpen,
+  TrendingUp,
 } from "lucide-react";
 import AnalyticsChart from "./AnalyticsChart";
 import { useUser } from "@/context/UserContext";
@@ -103,31 +106,31 @@ export default function FacultyDashboard() {
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
                   <DashboardCard
-                    title="Total Students"
+                    title="My Students"
                     value={dashboardData.studentCount || 0}
                     icon={<Users className="w-6 h-6 text-green-500" />}
                     description="Students in your courses"
                     href="/faculty/students"
                   />
                   <DashboardCard
-                    title="Total Teacher"
-                    value={dashboardData.teacherCount || 0}
-                    icon={<Users className="w-6 h-6 text-blue-500" />}
-                    description="Total teachers in the institution"
-                    href="/faculty/teacher"
+                    title="My Courses"
+                    value={dashboardData.courseCount || 0}
+                    icon={<Book className="w-6 h-6 text-blue-500" />}
+                    description="Courses you are teaching"
+                    href="/faculty/courses"
                   />
                   <DashboardCard
-                    title="Department"
+                    title="My Departments"
                     value={dashboardData.departmentCount || 0}
-                    icon={<Book className="w-6 h-6 text-purple-500" />}
-                    description="Total departments"
+                    icon={<Building2 className="w-6 h-6 text-purple-500" />}
+                    description="Departments you are associated with"
                     href="/faculty/departments"
                   />
                   <DashboardCard
-                    title="Group"
+                    title="My Groups"
                     value={dashboardData.groupCount || 0}
                     icon={<Users className="w-6 h-6 text-green-500" />}
-                    description="Total groups"
+                    description="Groups you manage"
                     href="/faculty/groups"
                   />
                 </section>
@@ -137,7 +140,7 @@ export default function FacultyDashboard() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Quick Actions
           </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
             {[
               {
                 label: "My Profile",
@@ -158,6 +161,26 @@ export default function FacultyDashboard() {
                 label: "Settings",
                 icon: Settings,
                 href: "/faculty/settings",
+              },
+              {
+                label: "Course Management",
+                icon: Book,
+                href: "/faculty/courses",
+              },
+              {
+                label: "Student Performance",
+                icon: TrendingUp,
+                href: "/faculty/student-performance",
+              },
+              {
+                label: "Reports & Analytics",
+                icon: BarChart2,
+                href: "/faculty/reports",
+              },
+              {
+                label: "E-Library",
+                icon: BookOpen,
+                href: "/faculty/e-library",
               },
             ].map((action, i) => (
               <Link

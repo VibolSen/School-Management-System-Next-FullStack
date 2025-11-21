@@ -12,6 +12,10 @@ import {
   BarChart3,
   TrendingUp,
   Activity,
+  ClipboardList,
+  Send,
+  UserPlus,
+  DollarSign,
 } from "lucide-react";
 import {
   BarChart,
@@ -122,18 +126,21 @@ const HRDashboard = () => {
             value={totalStaff.toString()}
             icon={<Briefcase className="w-6 h-6 text-purple-500" />}
             description="All staff members"
+            href="/hr/staff"
           />
           <DashboardCard
             title="Total Departments"
             value={totalDepartments.toString()}
             icon={<Building2 className="w-6 h-6 text-orange-500" />}
             description="All departments"
+            href="/admin/departments"
           />
           <DashboardCard
             title="Total Teachers"
             value={dashboardData.totalTeachers?.toString() || "N/A"}
             icon={<Users className="w-6 h-6 text-blue-500" />}
             description="Total teaching staff"
+            href="/admin/teachers"
           />
         </section>
 
@@ -145,7 +152,7 @@ const HRDashboard = () => {
             </h3>
             <TrendingUp className="w-5 h-5 text-gray-400" />
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
             {[
               {
                 label: "Manage Staff",
@@ -166,6 +173,26 @@ const HRDashboard = () => {
                 label: "Settings",
                 icon: Settings,
                 href: "/hr/settings",
+              },
+              {
+                label: "Job Postings",
+                icon: ClipboardList,
+                href: "/hr/job-postings",
+              },
+              {
+                label: "Leave",
+                icon: Send,
+                href: "/hr/leave",
+              },
+              {
+                label: "Manage Attendance",
+                icon: UserPlus,
+                href: "/hr/manage-attendance",
+              },
+              {
+                label: "Payroll",
+                icon: DollarSign,
+                href: "/hr/payroll",
               },
             ].map((action, i) => (
               <Link

@@ -15,6 +15,12 @@ import {
   Activity,
   Shield,
   TrendingUp,
+  Megaphone,
+  ClipboardList,
+  FileText,
+  Book,
+  DollarSign,
+  Calendar,
 } from "lucide-react";
 import AnalyticsChart from "./AnalyticsChart";
 
@@ -122,36 +128,42 @@ export default function AdministratorDashboard() {
             value={dashboardData.studentCount}
             icon={<Users className="w-6 h-6 text-blue-500" />}
             description="Active enrolled students"
+            href="/admin/students"
           />
           <DashboardCard
             title="Teachers"
             value={dashboardData.teacherCount}
             icon={<UserCheck className="w-6 h-6 text-green-500" />}
             description="Teaching staff"
+            href="/admin/teachers"
           />
           <DashboardCard
             title="Staff"
             value={dashboardData.staffCount}
             icon={<Briefcase className="w-6 h-6 text-purple-500" />}
             description="Administrative staff"
+            href="/admin/staff"
           />
           <DashboardCard
             title="Departments"
             value={dashboardData.departmentCount}
             icon={<Building2 className="w-6 h-6 text-orange-500" />}
             description="Academic departments"
+            href="/admin/departments"
           />
           <DashboardCard
             title="Courses"
             value={dashboardData.courseCount}
             icon={<Library className="w-6 h-6 text-indigo-500" />}
             description="Available courses"
+            href="/admin/courses"
           />
           <DashboardCard
             title="Groups"
             value={dashboardData.groupCount}
             icon={<Group className="w-6 h-6 text-pink-500" />}
             description="Student groups"
+            href="/admin/groups"
           />
         </section>
 
@@ -164,7 +176,7 @@ export default function AdministratorDashboard() {
             <TrendingUp className="w-5 h-5 text-gray-400" />
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
             {[
               {
                 label: "Manage Users",
@@ -185,6 +197,36 @@ export default function AdministratorDashboard() {
                 label: "Analytics",
                 icon: Activity,
                 href: "/admin/course-analytics",
+              },
+              {
+                label: "Announcements",
+                icon: Megaphone,
+                href: "/admin/announcements",
+              },
+              {
+                label: "Assignments",
+                icon: ClipboardList,
+                href: "/admin/assignment-management",
+              },
+              {
+                label: "Exams",
+                icon: FileText,
+                href: "/admin/exam-management",
+              },
+              {
+                label: "E-Library",
+                icon: Book,
+                href: "/admin/e-library",
+              },
+              {
+                label: "Payroll",
+                icon: DollarSign,
+                href: "/admin/payroll",
+              },
+              {
+                label: "Schedule",
+                icon: Calendar,
+                href: "/admin/schedule",
               },
             ].map((action, i) => (
               <Link
