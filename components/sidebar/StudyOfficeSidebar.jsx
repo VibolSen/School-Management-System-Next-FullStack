@@ -146,7 +146,7 @@ export default function StudyOfficeSidebar({ initialOpen = true }) {
 
       <aside
         className={`bg-blue-900 text-white flex flex-col transition-all duration-300 ease-in-out z-40 h-full ${
-          isOpen ? "w-64" : "w-20"
+          isOpen ? "min-w-max" : "w-20"
         } overflow-hidden`}
       >
         <div className="flex items-center p-4 border-b border-blue-800 h-16 relative">
@@ -165,7 +165,7 @@ export default function StudyOfficeSidebar({ initialOpen = true }) {
                   d="M12 6.253v11.494m-5.22-8.242l10.44 4.99m-10.44-4.99l10.44 4.99M3 10.519l9-4.266 9 4.266"
                 />
               </svg>
-              <h1 className="ml-2 text-xl font-bold whitespace-nowrap">
+              <h1 className="ml-2 text-xl font-bold">
                 Study Office Portal
               </h1>
             </div>

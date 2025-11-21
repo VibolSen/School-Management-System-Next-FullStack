@@ -116,7 +116,7 @@ const StudentSidebar = ({
 
       <aside
         className={`bg-blue-900 text-white flex flex-col transition-all duration-300 ease-in-out z-40 h-full ${
-          isOpen ? "w-64" : "w-20"
+          isOpen ? "min-w-max" : "w-20"
         } overflow-hidden`}
       >
         <div className="flex items-center p-4 border-b border-blue-800 h-16 relative">

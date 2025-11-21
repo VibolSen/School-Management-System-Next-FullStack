@@ -48,7 +48,7 @@ const NavLink = ({ icon, label, href, isCollapsed, isActive }) => (
       </span>
 
       <span
-        className={`ml-1 font-medium whitespace-nowrap transition-all duration-300 ease-in-out
+        className={`ml-1 font-medium transition-all duration-300 ease-in-out
           ${
             isCollapsed
               ? "opacity-0 absolute left-full ml-2 bg-blue-900 text-white px-2 py-1 rounded text-sm invisible group-hover:visible group-hover:opacity-100 z-50 shadow-md"
@@ -204,7 +204,7 @@ export default function AdminSidebar({ initialOpen = true }) {
       {/* Sidebar */}
       <aside
         className={`bg-gradient-to-b from-blue-950 via-blue-900 to-blue-800 text-white flex flex-col fixed md:relative transition-all duration-500 ease-in-out z-40 h-full shadow-2xl
-          ${isOpen ? "w-64" : "w-16"} overflow-hidden`}
+          ${isOpen ? "min-w-max" : "w-16"} overflow-hidden`}
       >
         {/* Header */}
         <div
