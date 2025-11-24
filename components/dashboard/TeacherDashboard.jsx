@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import DashboardCard from "@/components/dashboard/DashboardCard";
-import { Users, Library, Award } from "lucide-react";
+import { Users, Library, Award, TrendingUp } from "lucide-react";
 import { FiClipboard, FiAward } from "react-icons/fi";
 
 const TeacherDashboard = ({ loggedInUser }) => {
@@ -82,71 +82,87 @@ const TeacherDashboard = ({ loggedInUser }) => {
     : "Teacher";
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* Header */}
-        <header className="bg-white p-8 rounded-2xl shadow-lg text-gray-800">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-3">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-                Welcome back, {welcomeName}!
-              </h1>
-              <p className="text-gray-600 text-lg">
-                Here is an overview of your teaching activities.
-              </p>
-              {lastUpdated && (
-                <p className="text-gray-500 text-sm">
-                  Last updated: {lastUpdated.toLocaleTimeString()}
-                </p>
-              )}
-            </div>
+        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white/70 backdrop-blur-sm rounded-2xl p-5 shadow-sm border border-gray-200">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              Teacher Dashboard
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Welcome back, <span className="font-semibold text-gray-800">{welcomeName}</span>
+            </p>
+          </div>
+          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full border border-emerald-200 shadow-sm">
+            <FiClipboard className="w-5 h-5" /> {/* Using FiClipboard as a generic icon for operational status */}
+            <span className="text-sm font-medium">All systems operational</span>
+          </div>
+        </header>
 
-            {/* Quick Actions */}
-            <div className="flex flex-wrap gap-3">
+        {/* Quick Actions - Will be placed here after modifying the header */}
+        <section className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-xl font-semibold text-gray-900">
+              Quick Actions
+            </h3>
+            <TrendingUp className="w-5 h-5 text-gray-400" />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
               <Link
                 href="/teacher/assignment"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer"
               >
-                <FiClipboard className="w-4 h-4" />
-                <span className="font-medium">Assignments</span>
+                <div className="p-3 bg-gray-100 group-hover:bg-gray-200 rounded-xl transition-colors">
+                  <FiClipboard className="w-6 h-6 text-gray-700" />
+                </div>
+                <span className="text-sm font-medium text-gray-800 text-center">
+                    Assignments
+                  </span>
               </Link>
               <Link
                 href="/teacher/gradebook"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer"
               >
-                <FiAward className="w-4 h-4" />
-                <span className="font-medium">Gradebook</span>
+                <div className="p-3 bg-gray-100 group-hover:bg-gray-200 rounded-xl transition-colors">
+                  <FiAward className="w-6 h-6 text-gray-700" />
+                </div>
+                <span className="text-sm font-medium text-gray-800 text-center">
+                    Gradebook
+                  </span>
               </Link>
             </div>
-          </div>
-        </header>
+        </section>
 
         {/* Cards Section */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <DashboardCard
             title="My Students"
             value={dashboardData.totalStudents}
-            icon={<Users className="w-6 h-6 text-blue-500" />}
+            icon={<Users className="w-6 h-6 text-blue-600" />}
             description="Total students assigned to you"
+            bgColor="bg-blue-50"
           />
           <DashboardCard
             title="My Courses"
             value={dashboardData.totalCourses}
-            icon={<Library className="w-6 h-6 text-green-500" />}
+            icon={<Library className="w-6 h-6 text-green-600" />}
             description="Courses you are currently teaching"
+            bgColor="bg-green-50"
           />
           <DashboardCard
             title="Average Grade"
             value={`${dashboardData.averageGrade}%`}
-            icon={<Award className="w-6 h-6 text-purple-500" />}
+            icon={<Award className="w-6 h-6 text-purple-600" />}
             description="Overall average grade of your students"
+            bgColor="bg-purple-50"
           />
         </section>
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Students per Course */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-sm border border-gray-200">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">
               Students per Course
             </h2>
@@ -173,7 +189,7 @@ const TeacherDashboard = ({ loggedInUser }) => {
           </div>
 
           {/* Grade Distribution */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-sm border border-gray-200">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">
               Grade Distribution
             </h2>

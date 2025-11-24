@@ -84,21 +84,21 @@ export default function FacultyDashboard() {
   ];
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white/70 backdrop-blur-sm rounded-2xl p-5 shadow-sm border border-gray-200">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">
-              Welcome back, <span className="font-medium">{welcomeName}</span>
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              Faculty Dashboard
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Welcome back, <span className="font-semibold text-gray-800">{welcomeName}</span>
             </p>
           </div>
-          <div className="flex items-center gap-2 bg-white border rounded-md px-4 py-2 shadow-sm">
-            <Activity className="w-5 h-5 text-green-500" />
-            <span className="text-sm text-gray-700">
-              All systems operational
-            </span>
+          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full border border-emerald-200 shadow-sm">
+            <Activity className="w-5 h-5" />
+            <span className="text-sm font-medium">All systems operational</span>
           </div>
         </header>
 
@@ -111,6 +111,7 @@ export default function FacultyDashboard() {
                     icon={<Users className="w-6 h-6 text-green-500" />}
                     description="Students in your courses"
                     href="/faculty/students"
+                    bgColor="bg-green-50"
                   />
                   <DashboardCard
                     title="My Courses"
@@ -118,6 +119,7 @@ export default function FacultyDashboard() {
                     icon={<Book className="w-6 h-6 text-blue-500" />}
                     description="Courses you are teaching"
                     href="/faculty/courses"
+                    bgColor="bg-blue-50"
                   />
                   <DashboardCard
                     title="My Departments"
@@ -125,18 +127,20 @@ export default function FacultyDashboard() {
                     icon={<Building2 className="w-6 h-6 text-purple-500" />}
                     description="Departments you are associated with"
                     href="/faculty/departments"
+                    bgColor="bg-purple-50"
                   />
                   <DashboardCard
                     title="My Groups"
                     value={dashboardData.groupCount || 0}
-                    icon={<Users className="w-6 h-6 text-green-500" />}
+                    icon={<Users className="w-6 h-6 text-pink-600" />}
                     description="Groups you manage"
                     href="/faculty/groups"
+                    bgColor="bg-pink-50"
                   />
                 </section>
 
         {/* Quick Actions */}
-        <section className="bg-white rounded-lg border p-6 shadow-sm">
+        <section className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Quick Actions
           </h3>
@@ -186,19 +190,21 @@ export default function FacultyDashboard() {
               <Link
                 href={action.href}
                 key={i}
-                className="flex flex-col items-center gap-2 p-4 rounded-lg border hover:bg-gray-50 transition"
+                className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer"
               >
-                <div className="p-2 bg-gray-100 rounded-md">
-                  <action.icon className="w-5 h-5 text-gray-600" />
+                <div className="p-3 bg-gray-100 group-hover:bg-gray-200 rounded-xl transition-colors">
+                  <action.icon className="w-6 h-6 text-gray-700" />
                 </div>
-                <span className="text-sm text-gray-700">{action.label}</span>
+                <span className="text-sm font-medium text-gray-800 text-center">
+                    {action.label}
+                  </span>
               </Link>
             ))}
           </div>
         </section>
 
         {/* My Schedule */}
-        <section className="bg-white rounded-lg border p-6 shadow-sm">
+        <section className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Today's Schedule
           </h3>
@@ -222,7 +228,7 @@ export default function FacultyDashboard() {
         </section>
 
         {/* Analytics Chart */}
-        <section className="bg-white rounded-lg border p-6 shadow-sm">
+        <section className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Overview
           </h3>

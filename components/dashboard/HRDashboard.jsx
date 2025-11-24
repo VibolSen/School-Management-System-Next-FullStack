@@ -101,21 +101,21 @@ const HRDashboard = () => {
     : "HR Manager";
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto p-6 space-y-8">
         {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white/70 backdrop-blur-sm rounded-2xl p-5 shadow-sm border border-gray-200">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">HR Dashboard</h1>
-            <p className="text-gray-600">
-              Welcome back, <span className="font-medium">{welcomeName}</span>
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              HR Dashboard
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Welcome back, <span className="font-semibold text-gray-800">{welcomeName}</span>
             </p>
           </div>
-          <div className="flex items-center gap-2 bg-white border rounded-md px-4 py-2 shadow-sm">
-            <Activity className="w-5 h-5 text-green-500" />
-            <span className="text-sm text-gray-700">
-              All systems operational
-            </span>
+          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full border border-emerald-200 shadow-sm">
+            <Activity className="w-5 h-5" />
+            <span className="text-sm font-medium">All systems operational</span>
           </div>
         </header>
 
@@ -145,7 +145,7 @@ const HRDashboard = () => {
         </section>
 
         {/* Quick Actions */}
-        <section className="bg-white rounded-lg border p-6 shadow-sm">
+        <section className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">
               Quick Actions
@@ -198,12 +198,14 @@ const HRDashboard = () => {
               <Link
                 href={action.href}
                 key={i}
-                className="flex flex-col items-center gap-2 p-4 rounded-lg border hover:bg-gray-50 transition"
+                className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer"
               >
-                <div className="p-2 bg-gray-100 rounded-md">
-                  <action.icon className="w-5 h-5 text-gray-600" />
+                <div className="p-3 bg-gray-100 group-hover:bg-gray-200 rounded-xl transition-colors">
+                  <action.icon className="w-6 h-6 text-gray-700" />
                 </div>
-                <span className="text-sm text-gray-700">{action.label}</span>
+                <span className="text-sm font-medium text-gray-800 text-center">
+                    {action.label}
+                  </span>
               </Link>
             ))}
           </div>
@@ -211,7 +213,7 @@ const HRDashboard = () => {
 
         {/* Charts Section */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-md">
+          <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-sm border border-gray-200">
             <h2 className="text-xl font-semibold mb-4 text-slate-800">
               Staff by Role
             </h2>
@@ -238,7 +240,7 @@ const HRDashboard = () => {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-md">
+          <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-sm border border-gray-200">
             <h2 className="text-xl font-semibold mb-4 text-slate-800">
               Courses by Department
             </h2>
@@ -262,7 +264,7 @@ const HRDashboard = () => {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-md">
+          <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-sm border border-gray-200">
             <h2 className="text-xl font-semibold mb-4 text-slate-800">
               Students per Group
             </h2>
