@@ -129,7 +129,16 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Authorization: ADMIN can delete any user, HR can delete any non-student
+    // Authorization checks for user deletion
+    if (userToDelete.role === "ADMIN") {
+      return NextResponse.json({ error: "Cannot delete an ADMIN user." }, { status: 403 });
+    }
+
+    if (loggedInUser.id === id && loggedInUser.role === "ADMIN") {
+      return NextResponse.json({ error: "ADMIN users cannot delete themselves." }, { status: 403 });
+    }
+
+    // Existing authorization: ADMIN can delete any user, HR can delete any non-student
     if (
       loggedInUser.role !== "ADMIN" &&
       !(loggedInUser.role === "HR" && userToDelete.role !== "STUDENT") &&

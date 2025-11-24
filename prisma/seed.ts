@@ -7,16 +7,17 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Start seeding...');
 
-  // Hash a default password
+  // Hash passwords
   const defaultPassword = await bcrypt.hash('password123', 10);
+  const vibolPassword = await bcrypt.hash('Vibol2020', 10); // Hash for the new admin
 
   // Create Users
   const admin = await prisma.user.create({
     data: {
-      email: 'admin@step.com',
-      firstName: 'Admin',
-      lastName: 'User',
-      password: defaultPassword,
+      email: 'vibolsen2002@gmail.com', // Updated email
+      firstName: 'Vibol', // Updated first name
+      lastName: 'Sen', // Updated last name
+      password: vibolPassword, // Updated password
       role: Role.ADMIN,
     },
   });
