@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 import Features from "./Features";
 import Testimonials from "./Testimonials";
 import Partners from "./Partners";
-import CallToAction from "./CallToAction";
 import FAQ from "./FAQ";
 
 export default function HomePage() {
@@ -41,15 +40,6 @@ export default function HomePage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <button className="group relative px-7 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl shadow-xl shadow-blue-500/25 transition-all duration-500 hover:scale-105 hover:shadow-blue-500/40">
-                  <span className="relative z-10 text-base">
-                    Start Learning Today
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 rounded-xl" />
-                </button>
-                <button className="px-7 py-3 border-2 border-slate-300 text-slate-700 font-bold rounded-xl hover:border-blue-500 hover:text-blue-600 transition-all duration-300 hover:scale-105 hover:shadow-lg text-base">
-                  Watch Demo
-                </button>
               </div>
             </div>
 
@@ -82,9 +72,6 @@ export default function HomePage() {
 
       {/* Partners Section */}
       <Partners />
-
-      {/* Call to Action Section */}
-      <CallToAction />
 
       {/* FAQ Section */}
       <FAQ />

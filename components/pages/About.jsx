@@ -53,7 +53,7 @@ const AboutUs = () => {
     {
       name: "Mr. Sen Vibol",
       image: "/profile.jpg",
-      role: "Lead Backend Developer & System Architect",
+      role: "Full-Stack Developer",
       description:
         "Passionate about creating robust, scalable systems to streamline educational administration.",
       social: {
@@ -63,26 +63,11 @@ const AboutUs = () => {
         linkedin: "#",
       },
     },
-    {
-      name: "John Doe",
-      image: "/profile/john.jpg",
-      role: "Lead Frontend Developer",
-      description:
-        "Passionate about creating beautiful and intuitive user interfaces.",
-      social: {
-        facebook: "#",
-        telegram: "#",
-        github: "#",
-        linkedin: "#",
-      },
-    },
-
-
   ];
 
   return (
     <div className="min-h-screen">
-      {/* Floating Background Elements */}
+      {/* Floating Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <motion.div
           variants={floatingVariants}
@@ -131,14 +116,6 @@ const AboutUs = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-3xl opacity-90 dark:opacity-80"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-3xl"></div>
 
-          {/* Decorative Elements */}
-          <div className="absolute top-10 left-10 text-white/30">
-            <Sparkles size={60} />
-          </div>
-          <div className="absolute bottom-10 right-10 text-white/30">
-            <Star size={50} />
-          </div>
-
           <div className="relative z-10 text-white">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
@@ -169,157 +146,101 @@ const AboutUs = () => {
               transition={{ delay: 0.7, duration: 0.8 }}
             >
               Empowering educational institutions with a seamless, integrated,
-              and powerful management solution. Our mission is to simplify
-              administration and foster a better learning environment.
+              and powerful management solution.
             </motion.p>
-
-            <motion.div
-              className="flex justify-center gap-4 mt-8"
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.9, duration: 0.8 }}
-            >
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                <Users className="w-5 h-5" />
-                <span className="text-sm font-medium">Team Members</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                <BookOpen className="w-5 h-5" />
-                <span className="text-sm font-medium">15+ Core Modules</span>
-              </div>
-            </motion.div>
           </div>
         </motion.section>
 
-      
-  {/* Team Section */}
-<motion.section className="py-20" variants={itemVariants}>
-  <div className="text-center mb-16">
-    <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      whileInView={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.6 }}
-      className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full text-sm font-medium mb-4 shadow-lg"
-    >
-      <Users className="w-4 h-4" />
-      Meet Our Team
-    </motion.div>
-    <h2 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4">
-      The Architects of EduSys
-    </h2>
-    <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-      We are a dedicated team of developers and designers passionate
-      about leveraging technology to solve challenges in education.
-    </p>
-  </div>
+        {/* Team Section */}
+        <motion.section className="py-20" variants={itemVariants}>
+          <div className="text-center mb-16">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full text-sm font-medium mb-4 shadow-lg"
+            >
+              <Users className="w-4 h-4" />
+              Meet Our Team
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              The Architects of EduSys
+            </h2>
+          </div>
 
-  {/* Display all team members */}
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-    {teamMembers.map((member, index) => (
-      <motion.div
-        key={index}
-        className="group relative"
-        variants={itemVariants}
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: index * 0.2 }}
-        whileHover={{ y: -10 }}
-      >
-        <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 relative overflow-hidden">
-          {/* Background Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="flex justify-center">
+            <div className="grid grid-cols-1 gap-12">
+              {teamMembers.map((member, index) => (
+                <motion.div
+                  key={index}
+                  className="group relative"
+                  variants={itemVariants}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  whileHover={{ y: -10 }}
+                  transition={{ duration: 0.6, delay: index * 0.2 }}
+                >
+                  <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl transition-all duration-500 border border-gray-200 dark:border-gray-700">
+                    <div className="relative mb-6 w-32 h-32 mx-auto">
+                      <Image
+                        src={member.image}
+                        alt={member.name}
+                        width={128}
+                        height={128}
+                        className="rounded-full w-full h-full object-cover border-4 border-white dark:border-gray-700"
+                      />
+                    </div>
 
-          <div className="relative z-10 text-center">
-            <div className="relative mb-6">
-              <div className="w-32 h-32 mx-auto relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse"></div>
-                <Image
-                  src={member.image || "/placeholder.svg"}
-                  alt={member.name}
-                  width={128}
-                  height={128}
-                  className="rounded-full w-full h-full object-cover border-4 border-white dark:border-gray-700 relative z-10"
-                />
-                <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-full shadow-lg">
-                  <GraduationCap className="w-4 h-4" />
-                </div>
-              </div>
-            </div>
+                    <h3 className="text-xl font-bold mb-2 text-center">
+                      {member.name}
+                    </h3>
+                    <p className="text-blue-600 dark:text-blue-400 font-semibold mb-3 text-center">
+                      {member.role}
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
+                      {member.description}
+                    </p>
 
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
-              {member.name}
-            </h3>
-            <p className="text-blue-600 dark:text-blue-400 font-semibold mb-3">
-              {member.role}
-            </p>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mb-6 leading-relaxed">
-              {member.description}
-            </p>
-
-            <div className="flex justify-center gap-4">
-              <motion.a
-                href={member.social.facebook}
-                className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                aria-label="Facebook"
-              >
-                <Facebook className="w-5 h-5" />
-              </motion.a>
-              <motion.a
-                href={member.social.telegram}
-                className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                aria-label="Telegram"
-              >
-                <Send className="w-5 h-5" />
-              </motion.a>
-              <motion.a
-                href={member.social.github}
-                className="p-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                aria-label="GitHub"
-              >
-                <Github className="w-5 h-5" />
-              </motion.a>
-              <motion.a
-                href={member.social.linkedin}
-                className="p-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="w-5 h-5" />
-              </motion.a>
+                    <div className="flex justify-center gap-4">
+                      <motion.a
+                        href={member.social.facebook}
+                        whileHover={{ scale: 1.1 }}
+                        className="p-3 bg-blue-500 text-white rounded-full"
+                      >
+                        <Facebook className="w-5 h-5" />
+                      </motion.a>
+                      <motion.a
+                        href={member.social.telegram}
+                        whileHover={{ scale: 1.1 }}
+                        className="p-3 bg-blue-500 text-white rounded-full"
+                      >
+                        <Send className="w-5 h-5" />
+                      </motion.a>
+                      <motion.a
+                        href={member.social.github}
+                        whileHover={{ scale: 1.1 }}
+                        className="p-3 bg-gray-200 dark:bg-gray-700 rounded-full"
+                      >
+                        <Github className="w-5 h-5" />
+                      </motion.a>
+                      <motion.a
+                        href={member.social.linkedin}
+                        whileHover={{ scale: 1.1 }}
+                        className="p-3 bg-gray-200 dark:bg-gray-700 rounded-full"
+                      >
+                        <Linkedin className="w-5 h-5" />
+                      </motion.a>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
-        </div>
-      </motion.div>
-    ))}
-  </div>
-</motion.section>
+        </motion.section>
 
         {/* Vision Section */}
-        <motion.section
-          className="py-20"
-          variants={itemVariants}
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 dark:from-blue-900/30 dark:via-indigo-900/30 dark:to-purple-900/30 rounded-3xl p-12 relative overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-10 left-10">
-                <School size={100} className="text-blue-400" />
-              </div>
-              <div className="absolute bottom-10 right-10">
-                <GraduationCap size={120} className="text-purple-400" />
-              </div>
-            </div>
-
+        <motion.section className="py-20" variants={itemVariants}>
+          <div className="bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 dark:from-blue-900/30 p-12 rounded-3xl relative">
             <div className="relative z-10 max-w-4xl mx-auto text-center">
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -331,182 +252,13 @@ const AboutUs = () => {
                 Our Vision
               </motion.div>
 
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-6">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
                 Revolutionizing School Administration
               </h2>
-
-              <p className="text-lg text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-                <strong>Our Core Philosophy</strong>
+              <p className="text-lg mb-8">
+                We are committed to building a reliable and user-friendly
+                platform for modern education.
               </p>
-
-              <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                Our team is a blend of skilled engineers and education
-                enthusiasts. We are committed to building a reliable and
-                user-friendly platform that meets the evolving needs of modern
-                educational institutions.
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Heart className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="font-bold text-gray-800 dark:text-white mb-2">
-                    Passion
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Driven by a passion for education and technology.
-                  </p>
-                </div>
-                <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="font-bold text-gray-800 dark:text-white mb-2">
-                    Community
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Connecting staff, students, and parents on one platform.
-                  </p>
-                </div>
-                <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Sparkles className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="font-bold text-gray-800 dark:text-white mb-2">
-                    Innovation
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Constantly improving to stay ahead of educational trends.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex justify-center gap-4">
-                <motion.a
-                  href="#"
-                  className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="Telegram"
-                >
-                  <Send className="w-6 h-6" />
-                </motion.a>
-                <motion.a
-                  href="#"
-                  className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
-                  whileHover={{ scale: 1.1, rotate: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="Facebook"
-                >
-                  <Facebook className="w-6 h-6" />
-                </motion.a>
-                <motion.a
-                  href="#"
-                  className="p-4 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="GitHub"
-                >
-                  <Github className="w-6 h-6" />
-                </motion.a>
-                <motion.a
-                  href="#"
-                  className="p-4 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded-full hover:bg-red-200 dark:hover:bg-red-800 transition-colors duration-300"
-                  whileHover={{ scale: 1.1, rotate: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="YouTube"
-                >
-                  <Youtube className="w-6 h-6" />
-                </motion.a>
-              </div>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* Our Core Values Section */}
-        <motion.section className="py-20" variants={itemVariants}>
-          <div className="text-center mb-16">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full text-sm font-medium mb-4 shadow-lg"
-            >
-              <Sparkles className="w-4 h-4" />
-              Our Core Values
-            </motion.div>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4">
-              The Principles That Guide Us
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-              Our values are the foundation of our culture and the inspiration for our work.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Heart className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 dark:text-white text-center mb-4">
-                Integrity
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-center leading-relaxed">
-                We are committed to honesty, transparency, and accountability in everything we do.
-              </p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Star className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 dark:text-white text-center mb-4">
-                Excellence
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-center leading-relaxed">
-                We strive for the highest standards of quality and continuously seek to improve and innovate.
-              </p>
-            </div>
-            <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <Sparkles className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 dark:text-white text-center mb-4">
-                Innovation
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-center leading-relaxed">
-                We embrace creativity and new ideas to develop cutting-edge solutions for education.
-              </p>
-            </div>
-          </div>
-        </motion.section>
-
-        {/* Call to Action */}
-        <motion.section
-          className="text-center py-16"
-          variants={itemVariants}
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-black/10"></div>
-            <div className="relative z-10">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Ready to Transform Your School?
-              </h2>
-              <p className="text-xl mb-8 opacity-90">
-                Discover how EduSys can streamline your operations and enhance
-                your institution's efficiency.
-              </p>
-              <motion.button
-                className="bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all duration-300 inline-flex items-center gap-2 shadow-lg"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Send className="w-5 h-5" />
-                Request a Demo
-              </motion.button>
             </div>
           </div>
         </motion.section>
