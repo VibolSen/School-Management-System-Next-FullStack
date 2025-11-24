@@ -67,8 +67,7 @@ export default function HomePage() {
       {/* Features Section */}
       <Features />
 
-      {/* Testimonials Section */}
-      <Testimonials />
+
 
       {/* Partners Section */}
       <Partners />
