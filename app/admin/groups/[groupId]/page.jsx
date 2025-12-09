@@ -1,11 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import ManageGroupMembers from "./ManageGroupMembers";
+import GroupDetailPage from "@/components/group/GroupDetailPage"; // Adjust path as needed
 import Link from "next/link";
 
 const prisma = new PrismaClient();
 
 async function getGroupData(groupId) {
-  // Fetch the specific group and its currently enrolled students
   const group = await prisma.group.findUnique({
     where: { id: groupId },
     include: {
@@ -16,7 +15,6 @@ async function getGroupData(groupId) {
     },
   });
 
-  // Fetch all users who are students
   const allStudents = await prisma.user.findMany({
     where: { role: "STUDENT" },
     select: { id: true, firstName: true, lastName: true, email: true },
@@ -25,10 +23,8 @@ async function getGroupData(groupId) {
   return { group, allStudents };
 }
 
-// ✅ FIXED VERSION
-export default async function ManageGroupPage({ params }) {
-  // Await params before destructuring
-  const { groupId } = await params;
+export default async function GroupDetailPageRoute({ params }) {
+  const { groupId } = params; // params is directly available here
 
   const { group, allStudents } = await getGroupData(groupId);
 
@@ -47,5 +43,5 @@ export default async function ManageGroupPage({ params }) {
     );
   }
 
-  return <ManageGroupMembers initialGroup={group} allStudents={allStudents} />;
+  return <GroupDetailPage initialGroup={group} allStudents={allStudents} />;
 }

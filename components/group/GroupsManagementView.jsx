@@ -3,14 +3,18 @@
 import React, { useState, useEffect, useCallback } from "react";
 import GroupsTable from "./GroupTable";
 import GroupModal from "./GroupModal";
+import ManageGroupMembersModal from "./ManageGroupMembersModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import Notification from "@/components/Notification";
 
 export default function GroupManagementView({ role }) {
   const [groups, setGroups] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [allStudents, setAllStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isManageMembersModalOpen, setIsManageMembersModalOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
+  const [groupForMemberManagement, setGroupForMemberManagement] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [notification, setNotification] = useState({
@@ -27,15 +31,18 @@ export default function GroupManagementView({ role }) {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [groupsRes, coursesRes] = await Promise.all([
+      const [groupsRes, coursesRes, studentsRes] = await Promise.all([
         fetch("/api/groups"),
         fetch("/api/courses"),
+        fetch("/api/users?role=STUDENT"),
       ]);
       if (!groupsRes.ok) throw new Error("Failed to fetch groups.");
       if (!coursesRes.ok) throw new Error("Failed to fetch courses.");
+      if (!studentsRes.ok) throw new Error("Failed to fetch students.");
 
       setGroups(await groupsRes.json());
       setCourses(await coursesRes.json());
+      setAllStudents(await studentsRes.json());
     } catch (err) {
       showMessage(err.message, "error");
     } finally {
@@ -68,6 +75,32 @@ export default function GroupManagementView({ role }) {
       showMessage(`Group ${isEditing ? "updated" : "created"} successfully!`);
       await fetchData();
       handleCloseModal();
+    } catch (err) {
+      showMessage(err.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveMembers = async (studentIds) => {
+    if (!groupForMemberManagement) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `/api/groups?id=${groupForMemberManagement.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ studentIds }),
+        }
+      );
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Failed to save members.");
+      }
+      showMessage("Group members updated successfully!");
+      await fetchData();
+      handleCloseManageMembersModal();
     } catch (err) {
       showMessage(err.message, "error");
     } finally {
@@ -110,9 +143,19 @@ export default function GroupManagementView({ role }) {
     setItemToDelete(group);
   };
 
+  const handleManageMembersClick = (group) => {
+    setGroupForMemberManagement(group);
+    setIsManageMembersModalOpen(true);
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingGroup(null);
+  };
+
+  const handleCloseManageMembersModal = () => {
+    setIsManageMembersModalOpen(false);
+    setGroupForMemberManagement(null);
   };
 
   return (
@@ -130,6 +173,7 @@ export default function GroupManagementView({ role }) {
         onAddGroupClick={handleAddClick}
         onEdit={handleEditClick}
         onDelete={handleDeleteRequest}
+        onManageMembers={handleManageMembersClick}
         isLoading={isLoading}
         role={role}
       />
@@ -140,6 +184,16 @@ export default function GroupManagementView({ role }) {
           onSave={handleSave}
           groupToEdit={editingGroup}
           courses={courses}
+          isLoading={isLoading}
+        />
+      )}
+      {isManageMembersModalOpen && (
+        <ManageGroupMembersModal
+          isOpen={isManageMembersModalOpen}
+          onClose={handleCloseManageMembersModal}
+          group={groupForMemberManagement}
+          allStudents={allStudents}
+          onSaveChanges={handleSaveMembers}
           isLoading={isLoading}
         />
       )}

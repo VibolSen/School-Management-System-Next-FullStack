@@ -50,9 +50,9 @@ export async function GET() {
     const groups = await prisma.group.findMany({
       where: whereClause,
       orderBy: { name: "asc" },
-      // ✅ MODIFIED: Include related course and a count of students
       include: {
         courses: true,
+        students: true, // Include the actual student objects
         _count: {
           select: { students: true },
         },
@@ -119,30 +119,92 @@ export async function PUT(req) {
     }
 
     const id = req.nextUrl.searchParams.get('id');
-    const { name, courseIds } = await req.json();
+    const body = await req.json();
+    const { name, courseIds, studentIds } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Group ID is required" }, { status: 400 });
     }
-    if (!name) {
-      return NextResponse.json({ error: "Group name is required" }, { status: 400 });
-    }
-    if (!courseIds || courseIds.length === 0) {
-      return NextResponse.json({ error: "At least one course is required" }, { status: 400 });
-    }
 
-    const updatedGroup = await prisma.group.update({
-      where: { id: id },
-      data: {
-        name,
-        courses: {
-          set: courseIds.map((id) => ({ id })),
+    let updatedGroup;
+
+    if (studentIds !== undefined) {
+      // Logic for connecting/disconnecting students
+      const existingGroup = await prisma.group.findUnique({
+        where: { id },
+        include: { students: true },
+      });
+
+      if (!existingGroup) {
+        return NextResponse.json({ error: "Group not found" }, { status: 404 });
+      }
+
+      // Disconnect students who are no longer in studentIds
+      const studentsToDisconnect = existingGroup.students.filter(
+        (student) => !studentIds.includes(student.id)
+      );
+      if (studentsToDisconnect.length > 0) {
+        await prisma.group.update({
+          where: { id },
+          data: {
+            students: {
+              disconnect: studentsToDisconnect.map(student => ({ id: student.id })),
+            },
+          },
+        });
+      }
+      
+
+      // Connect students who are in studentIds but not in existingGroup
+      const existingStudentIds = new Set(existingGroup.students.map(s => s.id));
+      const studentsToConnect = studentIds.filter(
+        (studentId) => !existingStudentIds.has(studentId)
+      );
+      
+      if (studentsToConnect.length > 0) {
+        updatedGroup = await prisma.group.update({
+          where: { id },
+          data: {
+            students: {
+              connect: studentsToConnect.map((studentId) => ({ id: studentId })),
+            },
+          },
+          include: { students: true, courses: true },
+        });
+      } else {
+        // If no students to connect, just fetch the group
+        updatedGroup = await prisma.group.findUnique({
+          where: { id },
+          include: { students: true, courses: true },
+        });
+      }
+
+
+    } else {
+      // Existing logic for updating group details (name, courseIds)
+      if (!name) {
+        return NextResponse.json({ error: "Group name is required" }, { status: 400 });
+      }
+      if (!courseIds || courseIds.length === 0) {
+        return NextResponse.json({ error: "At least one course is required" }, { status: 400 });
+      }
+
+      updatedGroup = await prisma.group.update({
+        where: { id: id },
+        data: {
+          name,
+          courses: {
+            set: courseIds.map((courseId) => ({ id: courseId })),
+          },
         },
-      },
-    });
+        include: { students: true, courses: true }, // Include for consistent return
+      });
+    }
 
     if (!updatedGroup) {
-      return NextResponse.json({ error: "Group not found" }, { status: 404 });
+      // This case should ideally not be hit if a group is found for update,
+      // but good for explicit handling.
+      return NextResponse.json({ error: "Group not found after update" }, { status: 404 });
     }
 
     return NextResponse.json(updatedGroup);
@@ -154,6 +216,7 @@ export async function PUT(req) {
     );
   }
 }
+
 
 export async function DELETE(req) {
   try {

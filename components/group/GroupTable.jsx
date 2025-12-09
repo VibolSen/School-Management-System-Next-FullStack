@@ -47,6 +47,7 @@ export default function GroupsTable({
   onAddGroupClick,
   onEdit,
   onDelete,
+  onManageMembers,
   isLoading,
   role,
 }) {
@@ -198,27 +199,23 @@ export default function GroupsTable({
                     )}
                   </td>
                   <td className="px-6 py-4 text-center">
-                    {role === "admin" ? (
-                      <Link
-                        href={`/admin/groups/${group.id}`}
-                        className="hover:underline"
-                      >
-                        <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
-                          {group._count?.students ?? 0}
-                        </span>
-                      </Link>
-                    ) : (
-                      <Link
-                        href={`/faculty/groups/${group.id}`}
-                        className="hover:underline"
-                      >
-                        <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
-                          {group._count?.students ?? 0}
-                        </span>
-                      </Link>
-                    )}
+                    <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                      {group._count?.students ?? 0}
+                    </span>
                   </td>
                   <td className="px-6 py-4 text-center space-x-2">
+                    <Link
+                      href={`/admin/groups/${group.id}`}
+                      className="text-blue-600 hover:text-blue-900"
+                    >
+                      View
+                    </Link>
+                    <button
+                      onClick={() => onManageMembers(group)}
+                      className="text-green-600 hover:text-green-900"
+                    >
+                      Add
+                    </button>
                     <button
                       onClick={() => onEdit(group)}
                       className="text-indigo-600 hover:text-indigo-900"
