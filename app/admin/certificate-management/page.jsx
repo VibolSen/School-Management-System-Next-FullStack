@@ -208,85 +208,89 @@ const CertificateManagementPage = () => {
     
       return (
         <div className="space-y-6 animate-fadeIn">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-800">Certificate Management</h1>
-      </div>
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-slate-800">
+              Certificate Management
+            </h1>
+          </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <h2 className="text-xl font-semibold text-slate-800">Certificate Management</h2>
-        <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
-          <input
-            type="text"
-            placeholder="Search by recipient, course..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+            <h2 className="text-xl font-semibold text-slate-800">
+              Certificate Directory
+            </h2>
+            <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
+              <input
+                type="text"
+                placeholder="Search by recipient, course..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+              <select
+                value={filterCourse}
+                onChange={(e) => setFilterCourse(e.target.value)}
+                className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+              >
+                <option value="">All Courses</option>
+                {courses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleAddCertificate}
+                className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+              >
+                Add New Certificate
+              </button>
+            </div>
+          </div>
+
+          <CertificateModal
+            isOpen={showForm}
+            onClose={handleCancel}
+            onSubmit={handleSubmit}
+            editingCertificate={editingCertificate}
+            isLoading={isLoading}
           />
-          <select
-            value={filterCourse}
-            onChange={(e) => setFilterCourse(e.target.value)}
-            className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
-          >
-            <option value="">All Courses</option>
-            {courses.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={handleAddCertificate}
-            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
-          >
-            Add New Certificate
-          </button>
+
+          {isLoading ? (
+            <p>Loading certificates...</p>
+          ) : filteredCertificates.length === 0 ? (
+            <p>No certificates found.</p>
+          ) : (
+            <CertificateTable
+              certificates={filteredCertificates}
+              getCourseName={getCourseName}
+              handleEditCertificate={handleEditCertificate}
+              handleDeleteCertificate={handleDeleteClick} // Use handleDeleteClick for confirmation
+              sortField={sortField}
+              sortOrder={sortOrder}
+              handleSort={handleSort}
+              onAddCertificateClick={handleAddCertificate} // Pass the add handler
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              filterCourse={filterCourse}
+              setFilterCourse={setFilterCourse}
+              courses={courses}
+            />
+          )}
+          <ConfirmationDialog
+            isOpen={isConfirmModalOpen}
+            title="Confirm Deletion"
+            message={`Are you sure you want to delete the certificate for ${certificateToDelete?.recipient}? This cannot be undone.`}
+            onConfirm={handleConfirmDelete}
+            onCancel={handleCancelDelete}
+            isLoading={isLoading}
+          />
+
+          <Notification
+            {...notification}
+            onClose={() => setNotification({ ...notification, show: false })}
+          />
         </div>
-      </div>
-
-      <CertificateModal
-        isOpen={showForm}
-        onClose={handleCancel}
-        onSubmit={handleSubmit}
-        editingCertificate={editingCertificate}
-        isLoading={isLoading}
-      />
-
-      {isLoading ? (
-        <p>Loading certificates...</p>
-      ) : filteredCertificates.length === 0 ? (
-        <p>No certificates found.</p>
-      ) : (
-        <CertificateTable
-          certificates={filteredCertificates}
-          getCourseName={getCourseName}
-          handleEditCertificate={handleEditCertificate}
-          handleDeleteCertificate={handleDeleteClick} // Use handleDeleteClick for confirmation
-          sortField={sortField}
-          sortOrder={sortOrder}
-          handleSort={handleSort}
-          onAddCertificateClick={handleAddCertificate} // Pass the add handler
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          filterCourse={filterCourse}
-          setFilterCourse={setFilterCourse}
-          courses={courses}
-        />
-      )}    
-                <ConfirmationDialog
-                  isOpen={isConfirmModalOpen}
-                  title="Confirm Deletion"
-                  message={`Are you sure you want to delete the certificate for ${certificateToDelete?.recipient}? This cannot be undone.`}
-                  onConfirm={handleConfirmDelete}
-                  onCancel={handleCancelDelete}
-                  isLoading={isLoading}
-                />
-          
-                <Notification
-                  {...notification}
-                  onClose={() => setNotification({ ...notification, show: false })}
-                />
-              </div>
-            );
+      );
           };
           
           export default CertificateManagementPage;

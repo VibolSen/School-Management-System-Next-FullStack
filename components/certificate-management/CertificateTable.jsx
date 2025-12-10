@@ -35,36 +35,6 @@ export default function CertificateTable({
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md">
-            <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-              <h2 className="text-xl font-semibold text-slate-800">Certificate Management</h2>
-              <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Search by recipient, course..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-                <select
-                  value={filterCourse}
-                  onChange={(e) => setFilterCourse(e.target.value)}
-                  className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
-                >
-                  <option value="">All Courses</option>
-                  {courses.map((course) => (
-                    <option key={course.id} value={course.id}>
-                      {course.name}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  onClick={onAddCertificateClick}
-                  className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
-                >
-                  Add New Certificate
-                </button>
-              </div>
-            </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left text-slate-500">
           <thead className="text-xs text-slate-700 uppercase bg-slate-100">
