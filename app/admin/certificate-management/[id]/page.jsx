@@ -1,14 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { Award } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { Award, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const CertificateDetailPage = () => {
   const { id } = useParams();
+  const router = useRouter();
   const [certificate, setCertificate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [courses, setCourses] = useState([]);
+
+  const goBack = () => {
+    router.back();
+  };
 
   useEffect(() => {
     const fetchCertificate = async () => {
@@ -71,6 +77,12 @@ const CertificateDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center py-10 px-4">
+      <div className="absolute top-4 left-4 flex gap-2">
+        <Button onClick={goBack} variant="outline" size="sm">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Management
+        </Button>
+      </div>
       <div className="relative bg-white w-full max-w-4xl aspect-[1.414/1] rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.05)] p-12 border border-gray-200 text-center">
         {/* Header */}
         <div className="mb-8">
