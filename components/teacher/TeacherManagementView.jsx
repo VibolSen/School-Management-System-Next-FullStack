@@ -104,19 +104,22 @@ export default function TeacherManagementView() {
 
   // Modal control functions remain the same
   const handleAddClick = () => {
-    /* ... */
+    setEditingTeacher(null);
+    setIsModalOpen(true);
   };
   const handleEditClick = (teacher) => {
-    /* ... */
+    setEditingTeacher(teacher);
+    setIsModalOpen(true);
   };
   const handleDeleteRequest = (teacher) => {
-    /* ... */
+    setTeacherToDelete(teacher);
   };
   const handleCloseModal = () => {
-    /* ... */
+    setIsModalOpen(false);
+    setEditingTeacher(null);
   };
   const handleCancelDelete = () => {
-    /* ... */
+    setTeacherToDelete(null);
   };
   // ✅ REMOVED: handleToggleStatus is obsolete.
 
@@ -140,7 +143,7 @@ export default function TeacherManagementView() {
         canManageTeachers={canManageTeachers}
         currentUserRole={currentUser?.role}
       />
-      {canManageTeachers && isModalOpen && (
+      {isModalOpen && (
         <AddTeacherModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}

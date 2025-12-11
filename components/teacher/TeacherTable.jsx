@@ -37,14 +37,12 @@ export default function TeacherTable({
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full md:w-64 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
-          {canManageTeachers && (
-            <button
-              onClick={onAddTeacherClick}
-              className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
-            >
-              Add Teacher
-            </button>
-          )}
+          <button
+            onClick={onAddTeacherClick}
+            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+          >
+            Add Teacher
+          </button>
         </div>
       </div>
       <div className="overflow-x-auto">

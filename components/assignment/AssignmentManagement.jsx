@@ -182,7 +182,7 @@ export default function AssignmentManagement() {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-blue-100 rounded-xl">
                 <svg
@@ -208,7 +208,7 @@ export default function AssignmentManagement() {
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-green-100 rounded-xl">
                 <svg
@@ -234,7 +234,7 @@ export default function AssignmentManagement() {
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-white">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-purple-100 rounded-xl">
                 <svg

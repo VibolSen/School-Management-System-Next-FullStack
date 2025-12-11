@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 
 const initialFormState = {
   firstName: "",
@@ -73,66 +74,66 @@ export default function AddTeacherModal({
 
   const modalContent = (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="p-6 border-b flex justify-between items-center">
-            <h2 className="text-xl font-bold text-slate-800">
+      <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-gray-800">
               {isEditMode ? "Edit Teacher" : "Add New Teacher"}
             </h2>
             <button
               type="button"
               onClick={onClose}
-              className="text-slate-500 ..."
+              className="text-gray-600 hover:text-gray-900"
             >
-              &times;
+              <X size={24} />
             </button>
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm ...">First Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
               <input
                 type="text"
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                className={`w-full ... ${
-                  errors.firstName ? "border-red-500" : "border-slate-300"
+                className={`w-full px-3 py-2 border rounded-md text-sm shadow-sm p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                  errors.firstName ? "border-red-500" : "border-gray-300"
                 }`}
               />
               {errors.firstName && (
-                <p className="text-xs ...">{errors.firstName}</p>
+                <p className="text-xs text-red-500 mt-1">{errors.firstName}</p>
               )}
             </div>
             <div>
-              <label className="block text-sm ...">Last Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
               <input
                 type="text"
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                className={`w-full ... ${
-                  errors.lastName ? "border-red-500" : "border-slate-300"
+                className={`w-full px-3 py-2 border rounded-md text-sm shadow-sm p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                  errors.lastName ? "border-red-500" : "border-gray-300"
                 }`}
               />
               {errors.lastName && (
-                <p className="text-xs ...">{errors.lastName}</p>
+                <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>
               )}
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm ...">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full ... ${
-                  errors.email ? "border-red-500" : "border-slate-300"
+                className={`w-full px-3 py-2 border rounded-md text-sm shadow-sm p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                  errors.email ? "border-red-500" : "border-gray-300"
                 }`}
               />
-              {errors.email && <p className="text-xs ...">{errors.email}</p>}
+              {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm ...">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password {isEditMode ? "(Optional)" : "*"}
               </label>
               <input
@@ -145,20 +146,20 @@ export default function AddTeacherModal({
                 }
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full ... ${
-                  errors.password ? "border-red-500" : "border-slate-300"
+                className={`w-full px-3 py-2 border rounded-md text-sm shadow-sm p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                  errors.password ? "border-red-500" : "border-gray-300"
                 }`}
               />
               {errors.password && (
-                <p className="text-xs ...">{errors.password}</p>
+                <p className="text-xs text-red-500 mt-1">{errors.password}</p>
               )}
             </div>
           </div>
-          <div className="p-6 bg-slate-50 border-t flex justify-end gap-4">
-            <button type="button" onClick={onClose} className="...">
+          <div className="flex justify-end space-x-3">
+            <button type="button" onClick={onClose} className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
               Cancel
             </button>
-            <button type="submit" className="...">
+            <button type="submit" className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
               {isEditMode ? "Save Changes" : "Add Teacher"}
             </button>
           </div>
