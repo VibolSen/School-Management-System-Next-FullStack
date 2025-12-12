@@ -1,21 +1,113 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 
 const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAssignDirectorClick }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortColumn, setSortColumn] = useState('name');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [filterDepartments, setFilterDepartments] = useState('all');
+
+  const handleSort = (column) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedFaculties = useMemo(() => {
+    let sortableFaculties = [...faculties];
+    if (sortColumn) {
+      sortableFaculties.sort((a, b) => {
+        const aValue = a[sortColumn];
+        const bValue = b[sortColumn];
+
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return sortDirection === 'asc'
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        }
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+          return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+        }
+        return 0;
+      });
+    }
+    return sortableFaculties;
+  }, [faculties, sortColumn, sortDirection]);
+
+  const filteredFaculties = useMemo(() => {
+    return sortedFaculties.filter((faculty) => {
+      const matchesSearch = faculty.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const departmentCount = (faculty.departments || []).length;
+
+      let matchesFilter = true;
+      if (filterDepartments === 'none') {
+        matchesFilter = departmentCount === 0;
+      } else if (filterDepartments === '1') {
+        matchesFilter = departmentCount === 1;
+      } else if (filterDepartments === '2-5') {
+        matchesFilter = departmentCount >= 2 && departmentCount <= 5;
+      } else if (filterDepartments === '6+') {
+        matchesFilter = departmentCount >= 6;
+      }
+
+      return matchesSearch && matchesFilter;
+    });
+  }, [sortedFaculties, searchTerm, filterDepartments]);
+
+  const renderSortIndicator = (column) => {
+    if (sortColumn === column) {
+      return sortDirection === 'asc' ? (
+        <ChevronUp className="w-4 h-4 ml-1" />
+      ) : (
+        <ChevronDown className="w-4 h-4 ml-1" />
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="overflow-x-auto bg-white p-4 rounded shadow-sm">
-      <h3 className="text-xl font-semibold mb-3">Existing Faculties</h3>
+      <div className="flex flex-col md:flex-row justify-between items-center mb-3 gap-2">
+        <h3 className="text-xl font-semibold">Existing Faculties</h3>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Search by name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+          <select
+            value={filterDepartments}
+            onChange={(e) => setFilterDepartments(e.target.value)}
+            className="px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="all">All Departments</option>
+            <option value="none">No Departments</option>
+            <option value="1">1 Department</option>
+            <option value="2-5">2-5 Departments</option>
+            <option value="6+">6+ Departments</option>
+          </select>
+        </div>
+      </div>
       {isLoading ? (
         <p>Loading faculties...</p>
-      ) : faculties.length === 0 ? (
+      ) : filteredFaculties.length === 0 ? (
         <p>No faculties found.</p>
       ) : (
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Faculty Name
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                onClick={() => handleSort('name')}>
+                <div className="flex items-center">
+                  Faculty Name {renderSortIndicator('name')}
+                </div>
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Departments
@@ -29,7 +121,7 @@ const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAssi
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {faculties.map((faculty) => (
+            {filteredFaculties.map((faculty) => (
               <tr key={faculty.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {faculty.name}
