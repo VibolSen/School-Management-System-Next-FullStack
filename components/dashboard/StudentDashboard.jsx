@@ -148,6 +148,18 @@ const StudentDashboard = ({ loggedInUser }) => {
               { label: "Exams", icon: FileText, href: "/student/exams" },
               { label: "Schedule", icon: Calendar, href: "/student/schedule" },
               { label: "e-Library", icon: Library, href: "/student/e-library" },
+              { label: "My Profile", icon: Users, href: "/student/profile" },
+              { label: "My Courses", icon: BookOpen, href: "/student/courses" },
+              {
+                label: "My Certificates",
+                icon: FileText,
+                href: "/student/certificates",
+              },
+              {
+                label: "My Points",
+                icon: TrendingUp,
+                href: "/student/points",
+              },
             ].map((action, i) => (
               <Link
                 href={action.href}
