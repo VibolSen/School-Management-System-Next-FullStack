@@ -29,10 +29,22 @@ export default function ProfilePageContent({
     imageFile: null,
   });
 
-  // ✅ Added missing states
-  const [imagePreview, setImagePreview] = useState("/default-cover.jpg");
+  const [imagePreview, setImagePreview] = useState(
+    initialUser?.profile?.avatar || "/default-cover.jpg"
+  );
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    if (initialUser?.profile?.avatar) {
+      setImagePreview(initialUser.profile.avatar);
+    }
+    setForm({
+      firstName: initialUser?.firstName || "",
+      lastName: initialUser?.lastName || "",
+      imageFile: null,
+    });
+  }, [initialUser]);
 
   // Password change states
   const [oldPassword, setOldPassword] = useState("");
