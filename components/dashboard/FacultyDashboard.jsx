@@ -79,7 +79,6 @@ export default function FacultyDashboard() {
 
   const chartData = [
     { name: "Courses", count: dashboardData.courseCount || 0 },
-    { name: "Students", count: dashboardData.studentCount || 0 },
     { name: "Assignments", count: dashboardData.assignmentCount || 0 },
   ];
 
@@ -105,14 +104,7 @@ export default function FacultyDashboard() {
         {/* Cards Section */}
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                  <DashboardCard
-                    title="My Students"
-                    value={dashboardData.studentCount || 0}
-                    icon={<Users className="w-6 h-6 text-green-500" />}
-                    description="Students in your courses"
-                    href="/faculty/students"
-                    bgColor="bg-green-50"
-                  />
+
                   <DashboardCard
                     title="My Courses"
                     value={dashboardData.courseCount || 0}
@@ -152,10 +144,11 @@ export default function FacultyDashboard() {
                 href: "/faculty/profile",
               },
               {
-                label: "My Schedule",
-                icon: Calendar,
-                href: "/faculty/schedule",
+                label: "My Attendance",
+                icon: ClipboardList,
+                href: "/faculty/my-attendance",
               },
+
               {
                 label: "Gradebook",
                 icon: BarChart2,
@@ -203,27 +196,17 @@ export default function FacultyDashboard() {
           </div>
         </section>
 
-        {/* My Schedule */}
+
+
+        {/* My Attendance */}
         <section className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Today's Schedule
+            My Attendance
           </h3>
           <div className="space-y-4">
-            {dashboardData.schedule?.length > 0 ? (
-              dashboardData.schedule.map((item, i) => (
-                <div key={i} className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
-                  <div className="font-semibold text-sm text-blue-600 bg-blue-100 px-3 py-1 rounded-md">
-                    {item.time}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-800">{item.course}</p>
-                    <p className="text-sm text-gray-500">{item.location}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500 text-center py-4">No classes scheduled for today.</p>
-            )}
+            <p className="text-gray-500 text-center py-4">
+              Attendance data is not available yet.
+            </p>
           </div>
         </section>
 
