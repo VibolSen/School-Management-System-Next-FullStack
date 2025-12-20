@@ -179,6 +179,9 @@ export default function Navbar() {
           <Link href="/about" className="hover:text-foreground transition-colors">
             About
           </Link>
+          <Link href="/careers" className="hover:text-foreground transition-colors">
+            Careers
+          </Link>
           <Link href="/contact" className="hover:text-foreground transition-colors">
             Contact
           </Link>
