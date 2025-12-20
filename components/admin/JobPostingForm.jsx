@@ -3,6 +3,10 @@
 import { useState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import StatusMessage from "@/components/StatusMessage";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function JobPostingForm({
   isOpen,
@@ -81,8 +85,8 @@ export default function JobPostingForm({
       };
 
       const url = initialData
-        ? `/api/admin/job-postings/${initialData.id}` // Changed API endpoint
-        : "/api/admin/job-postings"; // Changed API endpoint
+        ? `/api/admin/job-postings/${initialData.id}`
+        : "/api/admin/job-postings";
       const method = initialData ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -115,15 +119,16 @@ export default function JobPostingForm({
       <div className="relative p-8 border w-full max-w-2xl md:max-w-3xl shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-2xl font-bold text-gray-900">
-            {initialData ? "Edit Job Posting (Admin)" : "Create New Job Posting (Admin)"} {/* Changed title */}
+            {initialData ? "Edit Job Posting" : "Create New Job Posting"}
           </h3>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
             aria-label="Close"
           >
             <X className="w-6 h-6" />
-          </button>
+          </Button>
         </div>
 
         {statusMessage && (
@@ -135,142 +140,143 @@ export default function JobPostingForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
-            <input
+            <Label htmlFor="title">Title <span className="text-red-500">*</span></Label>
+            <Input
               type="text"
               name="title"
               id="title"
               value={formData.title}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
-            <textarea
+            <Label htmlFor="description">Description <span className="text-red-500">*</span></Label>
+            <Textarea
               name="description"
               id="description"
               value={formData.description}
               onChange={handleChange}
               rows="3"
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            ></textarea>
+            ></Textarea>
           </div>
 
           {/* Requirements */}
           <div>
-            <label htmlFor="requirements" className="block text-sm font-medium text-gray-700">Requirements (comma-separated)</label>
-            <input
+            <Label htmlFor="requirements">Requirements <span className="text-red-500">*</span></Label>
+            <Input
               type="text"
               name="requirements"
               id="requirements"
               value={formData.requirements}
               onChange={handleChange}
+              placeholder="e.g., Degree in CS, 3+ years experience, good communication"
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
+             <p className="text-xs text-gray-500 mt-1">Separate multiple requirements with commas.</p>
           </div>
 
           {/* Responsibilities */}
           <div>
-            <label htmlFor="responsibilities" className="block text-sm font-medium text-gray-700">Responsibilities (comma-separated)</label>
-            <input
+            <Label htmlFor="responsibilities">Responsibilities <span className="text-red-500">*</span></Label>
+            <Input
               type="text"
               name="responsibilities"
               id="responsibilities"
               value={formData.responsibilities}
               onChange={handleChange}
+              placeholder="e.g., Develop new features, Collaborate with team, Write documentation"
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
+            <p className="text-xs text-gray-500 mt-1">Separate multiple responsibilities with commas.</p>
           </div>
 
-          {/* Location */}
-          <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
-            <input
-              type="text"
-              name="location"
-              id="location"
-              value={formData.location}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Location */}
+            <div>
+              <Label htmlFor="location">Location <span className="text-red-500">*</span></Label>
+              <Input
+                type="text"
+                name="location"
+                id="location"
+                value={formData.location}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            {/* Department (Optional) */}
+            <div>
+              <Label htmlFor="department">Department</Label>
+              <Input
+                type="text"
+                name="department"
+                id="department"
+                value={formData.department}
+                onChange={handleChange}
+              />
+            </div>
           </div>
 
-          {/* Department (Optional) */}
-          <div>
-            <label htmlFor="department" className="block text-sm font-medium text-gray-700">Department (Optional)</label>
-            <input
-              type="text"
-              name="department"
-              id="department"
-              value={formData.department}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            />
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Salary Range (Optional) */}
+            <div>
+              <Label htmlFor="salaryRange">Salary Range</Label>
+              <Input
+                type="text"
+                name="salaryRange"
+                id="salaryRange"
+                value={formData.salaryRange}
+                onChange={handleChange}
+                placeholder="e.g., $50,000 - $70,000"
+              />
+            </div>
 
-          {/* Salary Range (Optional) */}
-          <div>
-            <label htmlFor="salaryRange" className="block text-sm font-medium text-gray-700">Salary Range (Optional)</label>
-            <input
-              type="text"
-              name="salaryRange"
-              id="salaryRange"
-              value={formData.salaryRange}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            />
-          </div>
-
-          {/* Employment Type */}
-          <div>
-            <label htmlFor="employmentType" className="block text-sm font-medium text-gray-700">Employment Type</label>
-            <select
-              name="employmentType"
-              id="employmentType"
-              value={formData.employmentType}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            >
-              <option value="Full-time">Full-time</option>
-              <option value="Part-time">Part-time</option>
-              <option value="Contract">Contract</option>
-              <option value="Internship">Internship</option>
-            </select>
+            {/* Employment Type */}
+            <div>
+              <Label htmlFor="employmentType">Employment Type <span className="text-red-500">*</span></Label>
+              <select
+                name="employmentType"
+                id="employmentType"
+                value={formData.employmentType}
+                onChange={handleChange}
+                required
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              >
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Contract">Contract</option>
+                <option value="Internship">Internship</option>
+              </select>
+            </div>
           </div>
 
           {/* Application Deadline */}
           <div>
-            <label htmlFor="applicationDeadline" className="block text-sm font-medium text-gray-700">Application Deadline</label>
-            <input
+            <Label htmlFor="applicationDeadline">Application Deadline <span className="text-red-500">*</span></Label>
+            <Input
               type="date"
               name="applicationDeadline"
               id="applicationDeadline"
               value={formData.applicationDeadline}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
 
           {/* Status (for editing) */}
           {initialData && (
             <div>
-              <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status</label>
+              <Label htmlFor="status">Status</Label>
               <select
                 name="status"
                 id="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
               >
                 <option value="OPEN">Open</option>
                 <option value="CLOSED">Closed</option>
@@ -280,30 +286,21 @@ export default function JobPostingForm({
           )}
 
           <div className="flex justify-end space-x-3 mt-6">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              disabled={isLoading}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={isLoading}
-              className={`px-4 py-2 text-sm font-medium text-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                isLoading
-                  ? "bg-indigo-400 cursor-not-allowed"
-                  : "bg-indigo-600 hover:bg-indigo-700"
-              }`}
             >
-              {isLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
-              ) : initialData ? (
-                "Update Job Posting (Admin)"
-              ) : (
-                "Create Job Posting (Admin)"
-              )}
-            </button>
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {initialData ? "Update Job Posting" : "Create Job Posting"}
+            </Button>
           </div>
         </form>
       </div>
