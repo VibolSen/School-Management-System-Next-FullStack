@@ -15,6 +15,42 @@ export default function Navbar() {
   const [facultiesOpen, setFacultiesOpen] = useState(false);
   const [open, setOpen] = useState(false); // Added for Courses dropdown
   const dropdownRef = useRef(null);
+  let facultiesTimeout;
+  let coursesTimeout;
+  let profileTimeout;
+
+  const handleFacultiesEnter = () => {
+    clearTimeout(facultiesTimeout);
+    setFacultiesOpen(true);
+  };
+
+  const handleFacultiesLeave = () => {
+    facultiesTimeout = setTimeout(() => {
+      setFacultiesOpen(false);
+    }, 200);
+  };
+
+  const handleCoursesEnter = () => {
+    clearTimeout(coursesTimeout);
+    setOpen(true);
+  };
+
+  const handleCoursesLeave = () => {
+    coursesTimeout = setTimeout(() => {
+      setOpen(false);
+    }, 200);
+  };
+
+  const handleProfileEnter = () => {
+    clearTimeout(profileTimeout);
+    setProfileDropdownOpen(true);
+  };
+
+  const handleProfileLeave = () => {
+    profileTimeout = setTimeout(() => {
+      setProfileDropdownOpen(false);
+    }, 200);
+  };
 
   useEffect(() => {
     async function fetchCourses() {
@@ -80,7 +116,7 @@ export default function Navbar() {
           </Link>
 
           {/* Program Dropdown */}
-          <div className="relative" onMouseEnter={() => setFacultiesOpen(true)} onMouseLeave={() => setFacultiesOpen(false)} ref={dropdownRef}>
+          <div className="relative" onMouseEnter={handleFacultiesEnter} onMouseLeave={handleFacultiesLeave}>
             <button
               onClick={() => setFacultiesOpen((prev) => !prev)}
               className="hover:text-foreground transition-colors flex items-center gap-1"
@@ -110,7 +146,7 @@ export default function Navbar() {
           </div>
 
           {/* Courses Dropdown */}
-          <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} ref={dropdownRef}>
+          <div className="relative" onMouseEnter={handleCoursesEnter} onMouseLeave={handleCoursesLeave}>
             <button
               onClick={() => setOpen((prev) => !prev)}
               className="hover:text-foreground transition-colors flex items-center gap-1"
@@ -153,7 +189,7 @@ export default function Navbar() {
           {!loading &&
             (user ? (
               <>
-                <div className="relative" ref={profileDropdownRef} onMouseEnter={() => setProfileDropdownOpen(true)} onMouseLeave={() => setProfileDropdownOpen(false)}>
+                <div className="relative" onMouseEnter={handleProfileEnter} onMouseLeave={handleProfileLeave}>
                   <button
                     onClick={() => setProfileDropdownOpen((prev) => !prev)}
                     className="flex items-center gap-2 hover:text-foreground transition-colors"
