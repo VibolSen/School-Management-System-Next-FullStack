@@ -11,16 +11,41 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const teacherId = searchParams.get("teacherId");
+    const courseId = searchParams.get("id"); // Get the specific course ID
 
-    const loggedInUser = await getLoggedInUser(); // Use getLoggedInUser
+    const loggedInUser = await getLoggedInUser();
+
+    if (courseId) {
+      // Fetch a single course by ID
+      const course = await prisma.course.findUnique({
+        where: { id: courseId },
+        include: {
+          courseDepartments: {
+            include: {
+              department: true,
+            },
+          },
+          leadBy: {
+            select: { id: true, firstName: true, lastName: true },
+          },
+          _count: {
+            select: { groups: true },
+          },
+        },
+      });
+
+      if (!course) {
+        return NextResponse.json({ error: "Course not found" }, { status: 404 });
+      }
+      return NextResponse.json(course);
+    }
 
     let whereClause = {};
     if (teacherId) {
-      whereClause.leadById = teacherId; // Changed from teacherId to leadById
+      whereClause.leadById = teacherId;
     }
 
     if (loggedInUser && loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE" && loggedInUser.role !== "FACULTY") {
-      // If the user is not an admin, study office, or faculty, they can only see their own courses
       whereClause.leadById = loggedInUser.id;
     }
 
