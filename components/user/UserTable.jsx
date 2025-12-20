@@ -98,22 +98,24 @@ export default function UserTable({
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md">
+    <div className="bg-white p-6 rounded-xl shadow-xl border border-slate-200 transition-all duration-300 ease-in-out">
       {/* Header & Filters */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <h2 className="text-xl font-semibold text-slate-800">User Directory</h2>
+        <h2 className="text-xl font-semibold text-blue-700 transition-colors duration-300">
+          User Directory
+        </h2>
         <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
           <input
             type="text"
             placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           />
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+            className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           >
             <option value="All">All Roles</option>
             {allRoles
@@ -128,7 +130,7 @@ export default function UserTable({
             <button
               onClick={onAddUserClick}
               disabled={isLoading}
-              className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+              className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
             >
               Add User
             </button>
@@ -142,7 +144,7 @@ export default function UserTable({
           <thead className="text-xs text-slate-700 uppercase bg-slate-100">
             <tr>
               <th
-                className="px-6 py-3 cursor-pointer"
+                className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
                 onClick={() => handleSort("firstName")}
               >
                 <div className="flex items-center gap-1.5">
@@ -156,9 +158,19 @@ export default function UserTable({
                   />
                 </div>
               </th>
-              <th className="px-6 py-3">Email</th>
               <th
-                className="px-6 py-3 cursor-pointer"
+                className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                onClick={() => handleSort("email")}
+              >
+                Email{" "}
+                <SortIndicator
+                  direction={
+                    sortConfig.key === "email" ? sortConfig.direction : null
+                  }
+                />
+              </th>
+              <th
+                className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
                 onClick={() => handleSort("role")}
               >
                 <div className="flex items-center gap-1.5">
@@ -188,15 +200,20 @@ export default function UserTable({
               </tr>
             ) : (
               sortedUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-slate-50 transition-all duration-200">
+                <tr
+                  key={user.id}
+                  className="hover:bg-blue-50 transition-all duration-200 ease-in-out transform hover:scale-[1.005]"
+                >
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <div className="w-9 h-9 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-600 text-xs mr-3">
+                      <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600 text-xs mr-3">
                         {user.firstName.charAt(0)}
                         {user.lastName.charAt(0)}
                       </div>
                       <div>
-                        <div className="font-medium text-slate-800">{`${user.firstName} ${user.lastName}`}</div>
+                        <div className="font-medium text-slate-800">
+                          {`${user.firstName} ${user.lastName}`}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -214,7 +231,7 @@ export default function UserTable({
                     {currentUserRole === "ADMIN" && (
                       <button
                         onClick={() => onEditClick(user)}
-                        className="text-indigo-600 hover:text-indigo-900"
+                        className="text-indigo-600 hover:text-indigo-900 hover:scale-105 transition-all duration-200"
                         disabled={isLoading}
                       >
                         Edit
@@ -223,7 +240,7 @@ export default function UserTable({
                     {currentUserRole && (
                       <Link href={`/${currentUserRole.toLowerCase()}/users/${user.id}`}>
                         <button
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-600 hover:text-blue-800 hover:scale-105 transition-all duration-200"
                           disabled={isLoading}
                         >
                           View Profile
@@ -233,7 +250,7 @@ export default function UserTable({
                     {currentUserRole === "ADMIN" && (
                       <button
                         onClick={() => onDeleteClick(user.id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600 hover:text-red-800 hover:scale-105 transition-all duration-200"
                         disabled={isLoading}
                       >
                         Delete

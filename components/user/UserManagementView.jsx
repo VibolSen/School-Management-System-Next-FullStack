@@ -156,9 +156,10 @@ export default function UserManagementView() {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
-
-      <h1 className="text-3xl font-bold text-slate-800">User Management</h1>
+        <div className="space-y-6 animate-fadeIn duration-700">
+          <h1 className="text-4xl font-extrabold text-blue-700 animate-scale-in">
+            User Management
+          </h1>
       <UserTable
         users={users}
         allRoles={ROLES} // ✅ MODIFIED: Pass the static roles array

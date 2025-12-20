@@ -1,17 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Eye, EyeOff } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"; // Import dialog components
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { createPortal } from "react-dom";
+import { Eye, EyeOff } from "lucide-react"; // Used for password visibility toggle
+
+const initialFormState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  role: "", // Added role to initial form state
+};
 
 export default function UserModal({
   isOpen,
@@ -21,17 +20,16 @@ export default function UserModal({
   roles,
   isLoading = false,
 }) {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    role: "",
-  });
+  const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState({});
+  const [mounted, setMounted] = useState(false); // To handle createPortal
   const [showPassword, setShowPassword] = useState(false);
 
   const isEditMode = !!userToEdit;
+
+  useEffect(() => {
+    setMounted(true); // For createPortal
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -41,7 +39,7 @@ export default function UserModal({
           lastName: userToEdit.lastName || "",
           email: userToEdit.email || "",
           role: userToEdit.role || roles?.[0] || "",
-          password: "",
+          password: "", // Password not pre-filled for security
         });
       } else {
         setFormData({
@@ -71,7 +69,7 @@ export default function UserModal({
       newErrors.email = "A valid email is required";
     if (!formData.role) newErrors.role = "Role is required";
     if (!isEditMode && (!formData.password || formData.password.length < 6)) {
-      newErrors.password = "Password must be at least 6 characters";
+      newErrors.password = "Password must be at least 6 characters.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -82,88 +80,123 @@ export default function UserModal({
     if (validateForm()) {
       const dataToSend = { ...formData };
       if (isEditMode && !dataToSend.password) {
-        delete dataToSend.password;
+        delete dataToSend.password; // Don't send empty password on edit
       }
       onSave(dataToSend);
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null; // Use mounted state for createPortal
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>{isEditMode ? "Edit User" : "Add New User"}</DialogTitle>
-        </DialogHeader>
+  const modalContent = (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-full overflow-y-auto animate-fade-in-scale">
+        <div className="p-6 border-b">
+          <div className="flex justify-between items-center">
+            <h2 id="add-user-modal-title" className="text-xl font-bold text-slate-800">
+              {isEditMode ? "Edit User" : "Add New User"}
+            </h2>
+            <button
+              onClick={onClose}
+              className="text-slate-500 hover:text-slate-800"
+              aria-label="Close modal"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
         <form onSubmit={handleSubmit} noValidate>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="firstName" className="text-right">
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* First Name */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
                 First Name
-              </Label>
-              <Input
-                id="firstName"
+              </label>
+              <input
+                type="text"
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                className="col-span-3 px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border rounded-md text-sm ${
+                  errors.firstName
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
               />
               {errors.firstName && (
-                <p className="col-span-4 text-xs text-red-500 text-right">
-                  {errors.firstName}
-                </p>
+                <p className="text-xs text-red-500 mt-1">{errors.firstName}</p>
               )}
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="lastName" className="text-right">
+
+            {/* Last Name */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
                 Last Name
-              </Label>
-              <Input
-                id="lastName"
+              </label>
+              <input
+                type="text"
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                className="col-span-3 px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border rounded-md text-sm ${
+                  errors.lastName
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
               />
               {errors.lastName && (
-                <p className="col-span-4 text-xs text-red-500 text-right">
-                  {errors.lastName}
-                </p>
+                <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>
               )}
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
-                Email
-              </Label>
-              <Input
-                id="email"
-                name="email"
+
+            {/* Email */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Email Address
+              </label>
+              <input
                 type="email"
+                name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`col-span-3 px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-                  errors.email ? "border-red-500" : ""
-                }`}
+                className={`w-full px-3 py-2 border rounded-md text-sm ${
+                  errors.email
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
               />
               {errors.email && (
-                <p className="col-span-4 text-xs text-red-500 text-right">
-                  {errors.email}
-                </p>
+                <p className="text-xs text-red-500 mt-1">{errors.email}</p>
               )}
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="role" className="text-right">
+
+            {/* Role */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
                 Role
-              </Label>
+              </label>
               <select
-                id="role"
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className={`col-span-3 px-3 py-2 border rounded-md text-sm bg-white border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-                  errors.role ? "border-red-500" : ""
-                }`}
+                className={`w-full px-3 py-2 border rounded-md text-sm bg-white ${
+                  errors.role
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
               >
                 <option value="" disabled>
                   Select Role
@@ -177,60 +210,72 @@ export default function UserModal({
                   ))}
               </select>
               {errors.role && (
-                <p className="col-span-4 text-xs text-red-500 text-right">
-                  {errors.role}
-                </p>
+                <p className="text-xs text-red-500 mt-1">{errors.role}</p>
               )}
             </div>
-            {!isEditMode && (
-              <div className="grid grid-cols-4 items-center gap-4 relative">
-                <Label htmlFor="password" className="text-right">
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Minimum 6 characters"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`col-span-3 px-3 py-2 border rounded-md text-sm border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-                    errors.password ? "border-red-500" : ""
-                  }`}
-                />
-                <button
-                  type="button"
-                  className="absolute right-0 top-0 h-full px-3 py-2 text-gray-400 hover:text-gray-600"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-                {errors.password && (
-                  <p className="col-span-4 text-xs text-red-500 text-right">
-                    {errors.password}
-                  </p>
+
+            {/* Password */}
+            <div className="md:col-span-2 relative">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Password {isEditMode ? "(Optional)" : ""}
+              </label>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder={
+                  isEditMode
+                    ? "Leave blank to keep current password"
+                    : "Minimum 6 characters"
+                }
+                value={formData.password}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md text-sm ${
+                  errors.password
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
                 )}
-              </div>
-            )}
+              </button>
+              {errors.password && (
+                <p className="text-xs text-red-500 mt-1">{errors.password}</p>
+              )}
+            </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={onClose} disabled={isLoading}>
+
+          {/* Actions */}
+          <div className="p-6 bg-slate-50 border-t rounded-b-xl flex justify-end items-center gap-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
+            >
               Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
               {isLoading
                 ? "Saving..."
                 : isEditMode
                 ? "Save Changes"
                 : "Save User"}
-            </Button>
-          </DialogFooter>
+            </button>
+          </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
