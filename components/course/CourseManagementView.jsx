@@ -14,18 +14,19 @@ export default function CourseManagementView() {
   const [editingCourse, setEditingCourse] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
   };
 
   const fetchData = useCallback(async () => {
@@ -124,16 +125,22 @@ export default function CourseManagementView() {
     setEditingCourse(null);
   };
 
-  return (
-    <div className="space-y-6">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
 
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-800">Course Management</h1>
-      </div>
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
+
+  return (
+    <div className="space-y-6 animate-fadeIn duration-700">
+
+        <h1 className="text-4xl font-extrabold text-blue-700 animate-scale-in">
+          Course Directory
+        </h1>
 
       <CoursesTable
         courses={courses}
@@ -164,6 +171,26 @@ export default function CourseManagementView() {
         title="Delete Course"
         message={`Are you sure you want to delete the "${itemToDelete?.name}" course? This action cannot be undone.`}
         isLoading={isLoading}
+      />
+      <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="success"
+      />
+      <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="danger"
       />
     </div>
   );

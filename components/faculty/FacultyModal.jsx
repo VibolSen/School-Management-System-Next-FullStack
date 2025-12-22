@@ -14,6 +14,7 @@ export default function FacultyModal({
   const [name, setName] = useState("");
   const [headId, setHeadId] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const isEditMode = !!facultyToEdit;
 
@@ -31,10 +32,19 @@ export default function FacultyModal({
     }
   }, [isOpen, facultyToEdit]);
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!name.trim()) newErrors.name = "Faculty name is required";
+    if (!headId) newErrors.headId = "Director is required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name.trim()) return;
-    onSave({ name, headId });
+    if (validateForm()) {
+      onSave({ name, headId });
+    }
   };
 
   if (!isOpen || !mounted) return null;
@@ -79,12 +89,22 @@ export default function FacultyModal({
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border rounded-md text-sm ${
+                  errors.name
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (errors.name) setErrors((prev) => ({ ...prev, name: "" }));
+                }}
                 disabled={isLoading}
                 required
               />
+              {errors.name && (
+                <p className="text-xs text-red-500 mt-1">{errors.name}</p>
+              )}
             </div>
 
             {/* Director / Head */}
@@ -93,9 +113,16 @@ export default function FacultyModal({
                 Director (Faculty User)
               </label>
               <select
-                className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className={`w-full px-3 py-2 border rounded-md text-sm bg-white ${
+                  errors.headId
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
                 value={headId}
-                onChange={(e) => setHeadId(e.target.value)}
+                onChange={(e) => {
+                  setHeadId(e.target.value);
+                  if (errors.headId) setErrors((prev) => ({ ...prev, headId: "" }));
+                }}
                 disabled={isLoading}
                 required={!isEditMode}
               >
@@ -106,6 +133,9 @@ export default function FacultyModal({
                   </option>
                 ))}
               </select>
+              {errors.headId && (
+                <p className="text-xs text-red-500 mt-1">{errors.headId}</p>
+              )}
             </div>
           </div>
 
@@ -114,14 +144,14 @@ export default function FacultyModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-100"
+              className="px-4 py-2 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
               disabled={isLoading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-semibold text-white hover:bg-blue-700"
+              className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               disabled={isLoading}
             >
               {isEditMode ? "Save Changes" : "Save Faculty"}

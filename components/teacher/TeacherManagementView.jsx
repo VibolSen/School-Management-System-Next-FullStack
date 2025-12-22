@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import AddTeacherModal from "./AddTeacherModal";
+import TeacherModal from "./TeacherModal";
 import TeacherTable from "./TeacherTable";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
-import Notification from "@/components/Notification";
 
 import { useUser } from "@/context/UserContext";
 
@@ -18,25 +17,24 @@ export default function TeacherManagementView() {
   const [editingTeacher, setEditingTeacher] = useState(null);
   const [teacherToDelete, setTeacherToDelete] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "info",
-  });
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification((prev) => ({ ...prev, show: false })),
-      3000
-    );
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
   };
 
-  // ✅ MODIFIED: Simplified to fetch only teachers using our dedicated API.
   const fetchTeachers = useCallback(async () => {
     setIsLoading(true);
     try {
-      // We no longer need to fetch all users and filter; the API does it for us.
       const teachersRes = await fetch("/api/users/teachers");
       if (!teachersRes.ok) throw new Error("Failed to fetch teachers");
 
@@ -53,14 +51,12 @@ export default function TeacherManagementView() {
     fetchTeachers();
   }, [fetchTeachers]);
 
-  // ✅ MODIFIED: The save handler now automatically includes the 'TEACHER' role.
   const handleSaveTeacher = async (teacherData) => {
     setIsLoading(true);
     const isEditing = !!editingTeacher;
     const url = isEditing ? `/api/users/teachers/${editingTeacher.id}` : "/api/users/teachers";
     const method = isEditing ? "PUT" : "POST";
 
-    // Ensure the 'TEACHER' role is always set
     const payload = { ...teacherData, role: TEACHER_ROLE };
 
     try {
@@ -75,7 +71,7 @@ export default function TeacherManagementView() {
         throw new Error(errData.error || "Failed to save teacher data");
       }
       showMessage(`Teacher ${isEditing ? "added" : "updated"} successfully!`);
-      await fetchTeachers(); // Refresh data
+      await fetchTeachers();
       handleCloseModal();
     } catch (err) {
       showMessage(err.message, "error");
@@ -102,7 +98,6 @@ export default function TeacherManagementView() {
     }
   };
 
-  // Modal control functions remain the same
   const handleAddClick = () => {
     setEditingTeacher(null);
     setIsModalOpen(true);
@@ -121,16 +116,21 @@ export default function TeacherManagementView() {
   const handleCancelDelete = () => {
     setTeacherToDelete(null);
   };
-  // ✅ REMOVED: handleToggleStatus is obsolete.
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
 
   return (
-    <div className="space-y-6">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
+    <div className="space-y-6 animate-fadeIn duration-700">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-800">
+        <h1 className="text-4xl font-extrabold text-blue-700 animate-scale-in">
           Teacher Management
         </h1>
       </div>
@@ -144,7 +144,7 @@ export default function TeacherManagementView() {
         currentUserRole={currentUser?.role}
       />
       {isModalOpen && (
-        <AddTeacherModal
+        <TeacherModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           onSaveTeacher={handleSaveTeacher}
@@ -160,6 +160,26 @@ export default function TeacherManagementView() {
           message={`Are you sure you want to delete ${teacherToDelete?.firstName} ${teacherToDelete?.lastName}?`}
         />
       )}
+      <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="success"
+      />
+      <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="danger"
+      />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 
-// Helper component for sort direction arrows
+// Helper component for sort direction arrows for a cleaner look
 const SortIndicator = ({ direction }) => {
   if (!direction) return null;
   return (
@@ -87,32 +87,34 @@ export default function StaffTable({
     setSortConfig({ key, direction });
   };
 
-  // Role color mapping for consistency
+  // Role color mapping
   const roleColors = {
     ADMIN: "bg-purple-100 text-purple-800",
     HR: "bg-blue-100 text-blue-800",
     FACULTY: "bg-green-100 text-green-800",
     TEACHER: "bg-amber-100 text-amber-800",
-    STUDENT: "bg-pink-100 text-pink-800",
+    STUDENT: "bg-indigo-100 text-indigo-800",
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md">
+    <div className="bg-white p-6 rounded-xl shadow-xl border border-slate-200 transition-all duration-300 ease-in-out">
       {/* Header & Filters */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <h2 className="text-xl font-semibold text-slate-800">Staff Roster</h2>
+        <h2 className="text-xl font-semibold text-blue-700 transition-colors duration-300">
+          Staff Directory
+        </h2>
         <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
           <input
             type="text"
-            placeholder="Search by name, email..."
+            placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           />
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+            className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           >
             <option value="All">All Roles</option>
             {allRoles.map((role) => (
@@ -121,13 +123,15 @@ export default function StaffTable({
               </option>
             ))}
           </select>
-          <button
-            onClick={onAddStaffClick}
-            disabled={isLoading}
-            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
-          >
-            Add Staff
-          </button>
+          {currentUserRole === "ADMIN" && (
+            <button
+              onClick={onAddStaffClick}
+              disabled={isLoading}
+              className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
+            >
+              Add Staff
+            </button>
+          )}
         </div>
       </div>
 
@@ -137,7 +141,7 @@ export default function StaffTable({
           <thead className="text-xs text-slate-700 uppercase bg-slate-100">
             <tr>
               <th
-                className="px-6 py-3 cursor-pointer"
+                className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
                 onClick={() => handleSort("firstName")}
               >
                 <div className="flex items-center gap-1.5">
@@ -151,9 +155,19 @@ export default function StaffTable({
                   />
                 </div>
               </th>
-              <th className="px-6 py-3">Email</th>
               <th
-                className="px-6 py-3 cursor-pointer"
+                className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                onClick={() => handleSort("email")}
+              >
+                Email{" "}
+                <SortIndicator
+                  direction={
+                    sortConfig.key === "email" ? sortConfig.direction : null
+                  }
+                />
+              </th>
+              <th
+                className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
                 onClick={() => handleSort("role")}
               >
                 <div className="flex items-center gap-1.5">
@@ -183,19 +197,24 @@ export default function StaffTable({
               </tr>
             ) : (
               sortedStaff.map((staff) => (
-                <tr key={staff.id} className="hover:bg-slate-50">
+                <tr
+                  key={staff.id}
+                  className="hover:bg-blue-50 transition-all duration-200 ease-in-out transform hover:scale-[1.005]"
+                >
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <div className="w-9 h-9 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-600 text-xs mr-3">
+                      <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600 text-xs mr-3">
                         {staff.firstName.charAt(0)}
                         {staff.lastName.charAt(0)}
                       </div>
                       <div>
-                        <div className="font-medium text-slate-800">{`${staff.firstName} ${staff.lastName}`}</div>
+                        <div className="font-medium text-slate-800">
+                          {`${staff.firstName} ${staff.lastName}`}
+                        </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">{staff.email}</td>
+                  <td className="px-6 py-4 text-slate-600">{staff.email}</td>
                   <td className="px-6 py-4">
                     <span
                       className={`px-2 py-1 text-xs font-semibold rounded-full ${
@@ -206,30 +225,34 @@ export default function StaffTable({
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium space-x-2 text-center">
-                    <button
-                      onClick={() => onEditClick(staff)}
-                      className="text-indigo-600 hover:text-indigo-900"
-                      disabled={isLoading}
-                    >
-                      Edit
-                    </button>
+                    {currentUserRole === "ADMIN" && (
+                      <button
+                        onClick={() => onEditClick(staff)}
+                        className="text-indigo-600 hover:text-indigo-900 hover:scale-105 transition-all duration-200"
+                        disabled={isLoading}
+                      >
+                        Edit
+                      </button>
+                    )}
                     {currentUserRole && (
-                      <Link href={`/${currentUserRole.toLowerCase()}/staff/${staff.id}`}>
+                      <Link href={`/${currentUserRole.toLowerCase()}/users/${staff.id}`}>
                         <button
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-600 hover:text-blue-800 hover:scale-105 transition-all duration-200"
                           disabled={isLoading}
                         >
                           View Profile
                         </button>
                       </Link>
                     )}
-                    <button
-                      onClick={() => onDeleteClick(staff.id)}
-                      className="text-red-600 hover:text-red-900"
-                      disabled={isLoading}
-                    >
-                      Delete
-                    </button>
+                    {currentUserRole === "ADMIN" && (
+                      <button
+                        onClick={() => onDeleteClick(staff.id)}
+                        className="text-red-600 hover:text-red-800 hover:scale-105 transition-all duration-200"
+                        disabled={isLoading}
+                      >
+                        Delete
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))

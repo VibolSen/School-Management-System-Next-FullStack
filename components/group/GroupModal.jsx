@@ -48,6 +48,8 @@ export default function GroupModal({
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Group name is required.";
+    if (!formData.courseIds || formData.courseIds.length === 0)
+      newErrors.courseIds = "At least one course is required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -63,7 +65,7 @@ export default function GroupModal({
 
   const modalContent = (
     <div className="fixed inset-0 w-screen h-screen bg-black bg-opacity-50 z-50 flex justify-center items-center">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl animate-fade-in-scale">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg animate-fade-in-scale">
         <div className="p-6 border-b">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-slate-800">

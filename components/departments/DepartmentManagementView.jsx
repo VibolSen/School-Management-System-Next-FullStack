@@ -4,30 +4,30 @@ import React, { useState, useEffect, useCallback } from "react";
 import DepartmentsTable from "./DepartmentsTable";
 import DepartmentModal from "./DepartmentModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
-import Notification from "@/components/Notification";
 
 export default function DepartmentManagementView() {
   const [departments, setDepartments] = useState([]);
-  const [faculties, setFaculties] = useState([]); // New state for faculties
+  const [faculties, setFaculties] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const API_ENDPOINT = "/api/departments";
-  const FACULTY_API_ENDPOINT = "/api/faculty"; // New API endpoint for faculties
+  const FACULTY_API_ENDPOINT = "/api/faculty";
 
   const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
   };
 
   const fetchDepartments = useCallback(async () => {
@@ -57,7 +57,7 @@ export default function DepartmentManagementView() {
 
   useEffect(() => {
     fetchDepartments();
-    fetchFaculties(); // Fetch faculties on mount
+    fetchFaculties();
   }, [fetchDepartments, fetchFaculties]);
 
   const handleSaveDepartment = async (formData) => {
@@ -97,14 +97,12 @@ export default function DepartmentManagementView() {
       const response = await fetch(`${API_ENDPOINT}?id=${itemToDelete.id}`, {
         method: "DELETE",
       });
-      // A successful DELETE often returns 204 No Content
       if (!response.ok) {
         let errorMessage = "Failed to delete the department.";
         try {
           const errorData = await response.json();
           errorMessage = errorData.error || errorMessage;
         } catch (jsonError) {
-          // The response body is not JSON. Use the default error message.
         }
         throw new Error(errorMessage);
       }
@@ -139,15 +137,20 @@ export default function DepartmentManagementView() {
     setEditingDepartment(null);
   };
 
-  return (
-    <div className="space-y-6">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
 
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
+
+  return (
+    <div className="space-y-6 animate-fadeIn duration-700">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-800">
+        <h1 className="text-4xl font-extrabold text-blue-700 animate-scale-in">
           Department Management
         </h1>
       </div>
@@ -167,7 +170,7 @@ export default function DepartmentManagementView() {
           onSave={handleSaveDepartment}
           departmentToEdit={editingDepartment}
           isLoading={isLoading}
-          faculties={faculties} // Pass faculties here
+          faculties={faculties}
         />
       )}
 
@@ -178,6 +181,26 @@ export default function DepartmentManagementView() {
         title="Delete Department"
         message={`Are you sure you want to delete the "${itemToDelete?.name}" department? This action cannot be undone.`}
         isLoading={isLoading}
+      />
+      <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="success"
+      />
+      <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="danger"
       />
     </div>
   );

@@ -1,23 +1,35 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useUser } from "@/context/UserContext"; // Import useUser
+import { useUser } from "@/context/UserContext";
 import { Loader2 } from "lucide-react";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
-import StatusMessage from "@/components/StatusMessage";
 import JobPostingForm from "@/components/admin/JobPostingForm";
 import JobPostingTable from "@/components/admin/JobPostingTable";
 
 export default function JobPostingsManagementView() {
-  const { user: currentUser } = useUser(); // Get the current user
+  const { user: currentUser } = useUser();
   const [jobPostings, setJobPostings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [jobToDelete, setJobToDelete] = useState(null);
-  const [statusMessage, setStatusMessage] = useState(null);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingJob, setEditingJob] = useState(null);
+
+  const showMessage = (message, type = "success") => {
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
+  };
 
   const fetchJobPostings = useCallback(async () => {
     setIsLoading(true);
@@ -31,7 +43,7 @@ export default function JobPostingsManagementView() {
       setJobPostings(data);
     } catch (err) {
       setError(err.message);
-      setStatusMessage({ type: "error", message: err.message });
+      showMessage(err.message, "error");
     } finally {
       setIsLoading(false);
     }
@@ -59,13 +71,14 @@ export default function JobPostingsManagementView() {
   const handleSaveSuccess = () => {
     fetchJobPostings();
     handleCloseForm();
+    showMessage("Job posting saved successfully!");
   };
 
   const handleDeleteClick = (jobId) => {
     const job = jobPostings.find((j) => j.id === jobId);
     if (job) {
-        setJobToDelete(job);
-        setShowDeleteConfirm(true);
+      setJobToDelete(job);
+      setShowDeleteConfirm(true);
     }
   };
 
@@ -81,10 +94,10 @@ export default function JobPostingsManagementView() {
       if (!res.ok) {
         throw new Error(data.message || "Failed to delete job posting");
       }
-      setStatusMessage({ type: "success", message: "Job posting deleted successfully!" });
+      showMessage("Job posting deleted successfully!");
       fetchJobPostings(); // Refresh the list
     } catch (err) {
-      setStatusMessage({ type: "error", message: err.message });
+      showMessage(err.message, "error");
     } finally {
       setJobToDelete(null);
     }
@@ -93,6 +106,16 @@ export default function JobPostingsManagementView() {
   const handleCancelDelete = () => {
     setShowDeleteConfirm(false);
     setJobToDelete(null);
+  };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
   };
 
   if (isLoading && jobPostings.length === 0) {
@@ -104,7 +127,7 @@ export default function JobPostingsManagementView() {
     );
   }
 
-  if (error) {
+  if (error && jobPostings.length === 0) {
     return (
       <div className="text-center p-6">
         <h2 className="text-xl font-semibold text-red-600">Error</h2>
@@ -114,23 +137,19 @@ export default function JobPostingsManagementView() {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Job Postings Management</h1>
+    <div className="container mx-auto p-6 animate-fadeIn duration-700">
+      <h1 className="text-4xl font-extrabold text-blue-700 animate-scale-in mb-6">
+        Job Postings Management
+      </h1>
 
-      {statusMessage && (
-        <div className="mb-4">
-          <StatusMessage type={statusMessage.type} message={statusMessage.message} />
-        </div>
-      )}
-
-        <JobPostingTable
-            jobPostings={jobPostings}
-            onAddJobClick={handleAddJob}
-            onEditClick={handleEditJob}
-            onDeleteClick={handleDeleteClick}
-            isLoading={isLoading}
-            currentUserRole={currentUser?.role} // Pass the role to the table
-        />
+      <JobPostingTable
+        jobPostings={jobPostings}
+        onAddJobClick={handleAddJob}
+        onEditClick={handleEditJob}
+        onDeleteClick={handleDeleteClick}
+        isLoading={isLoading}
+        currentUserRole={currentUser?.role}
+      />
 
       <ConfirmationDialog
         isOpen={showDeleteConfirm}
@@ -138,6 +157,28 @@ export default function JobPostingsManagementView() {
         onConfirm={handleConfirmDelete}
         title="Confirm Deletion"
         message={`Are you sure you want to delete the job posting "${jobToDelete?.title}"? This action cannot be undone.`}
+      />
+
+      <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="success"
+      />
+
+      <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="danger"
       />
 
       <JobPostingForm

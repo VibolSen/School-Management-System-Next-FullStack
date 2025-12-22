@@ -17,15 +17,19 @@ export default function GroupManagementView({ role }) {
   const [groupForMemberManagement, setGroupForMemberManagement] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(() => setNotification({ ...notification, show: false }), 3000);
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
   };
 
   const fetchData = useCallback(async () => {
@@ -158,15 +162,21 @@ export default function GroupManagementView({ role }) {
     setGroupForMemberManagement(null);
   };
 
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
+
   return (
-    <div className="space-y-6">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-800">Group Management</h1>
-      </div>
+    <div className="space-y-6 animate-fadeIn duration-700">
+        <h1 className="text-4xl font-extrabold text-blue-700 animate-scale-in">
+          Group Directory
+        </h1>
       <GroupsTable
         groups={groups}
         courses={courses}
@@ -204,6 +214,26 @@ export default function GroupManagementView({ role }) {
         title="Delete Group"
         message={`Are you sure you want to delete the "${itemToDelete?.name}" group?`}
         isLoading={isLoading}
+      />
+      <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="success"
+      />
+      <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="danger"
       />
     </div>
   );

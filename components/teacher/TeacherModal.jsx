@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { Eye, EyeOff } from "lucide-react"; // Used for password visibility toggle
 
 const initialFormState = {
   firstName: "",
@@ -10,20 +11,22 @@ const initialFormState = {
   password: "",
 };
 
-export default function AddTeacherModal({
+export default function TeacherModal({
   isOpen,
   onClose,
   onSaveTeacher,
   teacherToEdit,
+  isLoading = false,
 }) {
   const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState({});
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false); // To handle createPortal
+  const [showPassword, setShowPassword] = useState(false);
 
   const isEditMode = !!teacherToEdit;
 
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // For createPortal
   }, []);
 
   useEffect(() => {
@@ -33,7 +36,7 @@ export default function AddTeacherModal({
           firstName: teacherToEdit.firstName || "",
           lastName: teacherToEdit.lastName || "",
           email: teacherToEdit.email || "",
-          password: "",
+          password: "", // Password not pre-filled for security
         });
       } else {
         setFormData(initialFormState);
@@ -45,20 +48,16 @@ export default function AddTeacherModal({
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const validate = () => {
+  const validateForm = () => {
     const newErrors = {};
     if (!formData.firstName.trim())
-      newErrors.firstName = "First name is required.";
-    if (!formData.lastName.trim())
-      newErrors.lastName = "Last name is required.";
-    if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "A valid email is required.";
-    }
+      newErrors.firstName = "First name is required";
+    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "A valid email is required";
     if (!isEditMode && (!formData.password || formData.password.length < 6)) {
       newErrors.password = "Password must be at least 6 characters.";
     }
@@ -68,28 +67,24 @@ export default function AddTeacherModal({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validate()) return;
-
-    const dataToSend = { ...formData };
-    if (isEditMode && !dataToSend.password) {
-      delete dataToSend.password;
+    if (validateForm()) {
+      const dataToSend = { ...formData };
+      if (isEditMode && !dataToSend.password) {
+        delete dataToSend.password; // Don't send empty password on edit
+      }
+      onSaveTeacher(dataToSend);
     }
-
-    onSaveTeacher(dataToSend);
   };
 
-  if (!isOpen || !mounted) return null;
+  if (!isOpen || !mounted) return null; // Use mounted state for createPortal
 
   const modalContent = (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-full overflow-y-auto animate-fade-in-scale">
         <div className="p-6 border-b">
           <div className="flex justify-between items-center">
-            <h2
-              id="add-teacher-modal-title"
-              className="text-xl font-bold text-slate-800"
-            >
-              {isEditMode ? "Edit Teacher Details" : "Add New Teacher"}
+            <h2 id="add-teacher-modal-title" className="text-xl font-bold text-slate-800">
+              {isEditMode ? "Edit Teacher" : "Add New Teacher"}
             </h2>
             <button
               onClick={onClose}
@@ -179,12 +174,12 @@ export default function AddTeacherModal({
             </div>
 
             {/* Password */}
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 relative">
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Password {isEditMode ? "(Optional)" : ""}
               </label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder={
                   isEditMode
@@ -199,6 +194,17 @@ export default function AddTeacherModal({
                     : "border-slate-300"
                 } focus:outline-none focus:ring-1 focus:ring-blue-500`}
               />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
               {errors.password && (
                 <p className="text-xs text-red-500 mt-1">{errors.password}</p>
               )}
@@ -218,7 +224,11 @@ export default function AddTeacherModal({
               type="submit"
               className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              {isEditMode ? "Save Changes" : "Save Teacher"}
+              {isLoading
+                ? "Saving..."
+                : isEditMode
+                ? "Save Changes"
+                : "Save Teacher"}
             </button>
           </div>
         </form>

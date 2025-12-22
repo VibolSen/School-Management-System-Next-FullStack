@@ -5,7 +5,9 @@ import FacultyManagement from '@/components/faculty/FacultyManagement';
 
 const AdminFacultyPage = () => {
   return (
-    <FacultyManagement />
+    <div className="flex flex-col gap-5">
+      <FacultyManagement />
+    </div>
   );
 };
 

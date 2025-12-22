@@ -15,16 +15,6 @@ export async function GET(request) {
       orderBy: {
         postedDate: "desc",
       },
-      include: {
-        hiringManager: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-          },
-        },
-      },
     });
 
     return NextResponse.json(jobPostings);

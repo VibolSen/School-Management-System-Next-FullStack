@@ -13,21 +13,22 @@ export default function FacultyManagement() {
   const [editingFaculty, setEditingFaculty] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: '',
-    type: '',
-  });
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const API_ENDPOINT = '/api/faculty';
   const FACULTY_USERS_API_ENDPOINT = '/api/users?role=FACULTY'; // API endpoint for faculty users
 
-  const showMessage = (message, type = 'success') => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: '', type: '' }),
-      3000
-    );
+  const showMessage = (message, type = "success") => {
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
   };
 
   const fetchFaculties = useCallback(async () => {
@@ -143,30 +144,29 @@ export default function FacultyManagement() {
     setEditingFaculty(null);
   };
 
-  return (
-    <div className="space-y-6 p-4">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
 
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-800">
-          Faculty Management
-        </h1>
-        <button
-          onClick={handleAddClick}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          Add New Faculty
-        </button>
-      </div>
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
+
+  return (
+    <div className="space-y-6 animate-fadeIn duration-700">
+
+          <h1 className="text-4xl font-extrabold text-blue-700 animate-scale-in">
+            Faculty Management
+          </h1>
 
       <FacultyTable
         faculties={faculties}
         onEditClick={handleEditClick}
         onDeleteClick={handleDeleteRequest}
         onAssignDirectorClick={handleAssignDirectorClick}
+        onAddFacultyClick={handleAddClick}
         isLoading={isLoading}
       />
 
@@ -188,6 +188,26 @@ export default function FacultyManagement() {
         title="Delete Faculty"
         message={`Are you sure you want to delete the "${itemToDelete?.name}" faculty? This action cannot be undone.`}
         isLoading={isLoading}
+      />
+      <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="success"
+      />
+      <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="danger"
       />
     </div>
   );

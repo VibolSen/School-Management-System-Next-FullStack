@@ -25,22 +25,22 @@ export default function StudentTable({
   }, [students, searchTerm]);
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md">
+    <div className="bg-white p-6 rounded-xl shadow-xl border border-slate-200 transition-all duration-300 ease-in-out">
       {/* Header & Filters */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <h2 className="text-xl font-semibold text-slate-800">Student Roster</h2>
+        <h2 className="text-xl font-semibold text-blue-700 transition-colors duration-300">Student Roster</h2>
         <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
           <input
             type="text"
             placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           />
           {canManageStudents && (
             <button
               onClick={onAddStudentClick}
-              className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+              className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
             >
               Add Student
             </button>
@@ -74,10 +74,10 @@ export default function StudentTable({
               </tr>
             ) : (
               filteredStudents.map((student) => (
-                <tr key={student.id} className="hover:bg-slate-50">
+                <tr key={student.id} className="hover:bg-blue-50 transition-all duration-200 ease-in-out transform hover:scale-[1.005]">
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <div className="w-9 h-9 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-600 text-xs mr-3">
+                      <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600 text-xs mr-3">
                         {student.firstName.charAt(0)}
                         {student.lastName.charAt(0)}
                       </div>
@@ -86,7 +86,7 @@ export default function StudentTable({
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">{student.email}</td>
+                  <td className="px-6 py-4 text-slate-600">{student.email}</td>
                   <td className="px-6 py-4">
                     <span className="px-2 py-1 text-xs font-semibold text-indigo-800 bg-indigo-100 rounded-full">
                       {student.role}
@@ -96,13 +96,13 @@ export default function StudentTable({
                     <td className="px-6 py-4 text-sm font-medium space-x-2 text-center">
                       <button
                         onClick={() => onEditClick(student)}
-                        className="text-indigo-600 hover:text-indigo-900"
+                        className="text-indigo-600 hover:text-indigo-900 hover:scale-105 transition-all duration-200"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => onDeleteClick(student.id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600 hover:text-red-900 hover:scale-105 transition-all duration-200"
                       >
                         Delete
                       </button>

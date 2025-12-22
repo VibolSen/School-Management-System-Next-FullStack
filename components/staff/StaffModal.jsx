@@ -2,63 +2,72 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { Eye, EyeOff } from "lucide-react"; // Used for password visibility toggle
 
 const initialFormState = {
   firstName: "",
   lastName: "",
   email: "",
   password: "",
+  role: "", // Added role to initial form state
 };
 
-export default function AddStudentModal({
+export default function StaffModal({
   isOpen,
   onClose,
-  onSaveStudent,
-  studentToEdit,
+  onSave,
+  staffToEdit,
+  roles,
+  isLoading = false,
 }) {
   const [formData, setFormData] = useState(initialFormState);
   const [errors, setErrors] = useState({});
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false); // To handle createPortal
+  const [showPassword, setShowPassword] = useState(false);
 
-  const isEditMode = !!studentToEdit;
+  const isEditMode = !!staffToEdit;
 
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // For createPortal
   }, []);
 
   useEffect(() => {
     if (isOpen) {
-      if (studentToEdit) {
+      if (staffToEdit) {
         setFormData({
-          firstName: studentToEdit.firstName || "",
-          lastName: studentToEdit.lastName || "",
-          email: studentToEdit.email || "",
-          password: "",
+          firstName: staffToEdit.firstName || "",
+          lastName: staffToEdit.lastName || "",
+          email: staffToEdit.email || "",
+          role: staffToEdit.role || roles?.[0] || "",
+          password: "", // Password not pre-filled for security
         });
       } else {
-        setFormData(initialFormState);
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          password: "",
+          role: roles?.[0] || "",
+        });
       }
       setErrors({});
     }
-  }, [isOpen, studentToEdit]);
+  }, [isOpen, staffToEdit, roles]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const validate = () => {
+  const validateForm = () => {
     const newErrors = {};
     if (!formData.firstName.trim())
-      newErrors.firstName = "First name is required.";
-    if (!formData.lastName.trim())
-      newErrors.lastName = "Last name is required.";
-    if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "A valid email is required.";
-    }
+      newErrors.firstName = "First name is required";
+    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "A valid email is required";
+    if (!formData.role) newErrors.role = "Role is required";
     if (!isEditMode && (!formData.password || formData.password.length < 6)) {
       newErrors.password = "Password must be at least 6 characters.";
     }
@@ -68,27 +77,24 @@ export default function AddStudentModal({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validate()) return;
-
-    const dataToSend = { ...formData };
-    if (isEditMode && !dataToSend.password) {
-      delete dataToSend.password;
+    if (validateForm()) {
+      const dataToSend = { ...formData };
+      if (isEditMode && !dataToSend.password) {
+        delete dataToSend.password; // Don't send empty password on edit
+      }
+      onSave(dataToSend);
     }
-    onSaveStudent(dataToSend);
   };
 
-  if (!isOpen || !mounted) return null;
+  if (!isOpen || !mounted) return null; // Use mounted state for createPortal
 
   const modalContent = (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-full overflow-y-auto animate-fade-in-scale">
         <div className="p-6 border-b">
           <div className="flex justify-between items-center">
-            <h2
-              id="add-student-modal-title"
-              className="text-xl font-bold text-slate-800"
-            >
-              {isEditMode ? "Edit Student Details" : "Add New Student"}
+            <h2 id="add-staff-modal-title" className="text-xl font-bold text-slate-800">
+              {isEditMode ? "Edit Staff" : "Add New Staff"}
             </h2>
             <button
               onClick={onClose}
@@ -111,6 +117,7 @@ export default function AddStudentModal({
             </button>
           </div>
         </div>
+
         <form onSubmit={handleSubmit} noValidate>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* First Name */}
@@ -176,13 +183,44 @@ export default function AddStudentModal({
               )}
             </div>
 
-            {/* Password */}
+            {/* Role */}
             <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Role
+              </label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md text-sm bg-white ${
+                  errors.role
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-slate-300"
+                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
+              >
+                <option value="" disabled>
+                  Select Role
+                </option>
+                {(roles || [])
+                  .filter((role) => role !== "ADMIN")
+                  .map((role) => (
+                    <option key={role} value={role}>
+                      {role}
+                    </option>
+                  ))}
+              </select>
+              {errors.role && (
+                <p className="text-xs text-red-500 mt-1">{errors.role}</p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="md:col-span-2 relative">
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Password {isEditMode ? "(Optional)" : ""}
               </label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder={
                   isEditMode
@@ -197,6 +235,17 @@ export default function AddStudentModal({
                     : "border-slate-300"
                 } focus:outline-none focus:ring-1 focus:ring-blue-500`}
               />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
               {errors.password && (
                 <p className="text-xs text-red-500 mt-1">{errors.password}</p>
               )}
@@ -216,7 +265,11 @@ export default function AddStudentModal({
               type="submit"
               className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              {isEditMode ? "Save Changes" : "Save Student"}
+              {isLoading
+                ? "Saving..."
+                : isEditMode
+                ? "Save Changes"
+                : "Save Staff"}
             </button>
           </div>
         </form>

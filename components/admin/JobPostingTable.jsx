@@ -93,22 +93,24 @@ export default function JobPostingTable({
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md">
+    <div className="bg-white p-6 rounded-xl shadow-xl border border-slate-200 transition-all duration-300 ease-in-out">
       {/* Header & Filters */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <h2 className="text-xl font-semibold text-slate-800">Job Postings</h2>
+        <h2 className="text-xl font-semibold text-blue-700 transition-colors duration-300">
+          Job Postings
+        </h2>
         <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
           <input
             type="text"
             placeholder="Search by title..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+            className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           >
             <option value="All">All Statuses</option>
             <option value="OPEN">Open</option>
@@ -119,7 +121,7 @@ export default function JobPostingTable({
             <button
               onClick={onAddJobClick}
               disabled={isLoading}
-              className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+              className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
             >
               Add Job
             </button>
@@ -129,28 +131,28 @@ export default function JobPostingTable({
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort("title")}>
-                    <div className="flex items-center gap-1.5">Title <SortIndicator direction={sortConfig.key === "title" ? sortConfig.direction : null}/></div>
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort("location")}>
-                    <div className="flex items-center gap-1.5">Location <SortIndicator direction={sortConfig.key === "location" ? sortConfig.direction : null}/></div>
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort("employmentType")}>
-                    <div className="flex items-center gap-1.5">Employment Type <SortIndicator direction={sortConfig.key === "employmentType" ? sortConfig.direction : null}/></div>
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort("applicationDeadline")}>
-                    <div className="flex items-center gap-1.5">Application Deadline <SortIndicator direction={sortConfig.key === "applicationDeadline" ? sortConfig.direction : null}/></div>
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort("status")}>
-                    <div className="flex items-center gap-1.5">Status <SortIndicator direction={sortConfig.key === "status" ? sortConfig.direction : null}/></div>
-                </th>
-                {canManage && <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>}
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+        <table className="w-full text-sm text-left text-slate-500">
+          <thead className="text-xs text-slate-700 uppercase bg-slate-100">
+            <tr>
+              <th className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200" onClick={() => handleSort("title")}>
+                  <div className="flex items-center gap-1.5">Title <SortIndicator direction={sortConfig.key === "title" ? sortConfig.direction : null}/></div>
+              </th>
+              <th className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200" onClick={() => handleSort("location")}>
+                  <div className="flex items-center gap-1.5">Location <SortIndicator direction={sortConfig.key === "location" ? sortConfig.direction : null}/></div>
+              </th>
+              <th className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200" onClick={() => handleSort("employmentType")}>
+                  <div className="flex items-center gap-1.5">Employment Type <SortIndicator direction={sortConfig.key === "employmentType" ? sortConfig.direction : null}/></div>
+              </th>
+              <th className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200" onClick={() => handleSort("applicationDeadline")}>
+                  <div className="flex items-center gap-1.5">Application Deadline <SortIndicator direction={sortConfig.key === "applicationDeadline" ? sortConfig.direction : null}/></div>
+              </th>
+              <th className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200" onClick={() => handleSort("status")}>
+                  <div className="flex items-center gap-1.5">Status <SortIndicator direction={sortConfig.key === "status" ? sortConfig.direction : null}/></div>
+              </th>
+              {canManage && <th className="px-6 py-3 text-center">Actions</th>}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
               {isLoading && sortedJobPostings.length === 0 ? (
               <tr>
                 <td colSpan={canManage ? 6 : 5} className="text-center py-8 text-gray-500">
@@ -165,11 +167,11 @@ export default function JobPostingTable({
               </tr>
             ) : (
               sortedJobPostings.map((job) => (
-                <tr key={job.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{job.title}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{job.location}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{job.employmentType}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <tr key={job.id} className="hover:bg-blue-50 transition-all duration-200 ease-in-out transform hover:scale-[1.005]">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800">{job.title}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{job.location}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{job.employmentType}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                     {format(new Date(job.applicationDeadline), "PPP")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -181,16 +183,16 @@ export default function JobPostingTable({
                       {job.status}
                     </span>
                   </td>
-                  {canManage && <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  {canManage && <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                     <button
                       onClick={() => onEditClick(job)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-3"
+                      className="text-indigo-600 hover:text-indigo-900 mr-3 hover:scale-105 transition-all duration-200"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => onDeleteClick(job.id)}
-                      className="text-red-600 hover:text-red-900"
+                      className="text-red-600 hover:text-red-900 hover:scale-105 transition-all duration-200"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
