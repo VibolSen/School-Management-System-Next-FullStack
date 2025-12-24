@@ -200,6 +200,7 @@ const StudentDashboard = ({ loggedInUser }) => {
               ))}
             </ul>
           </div>
+          <NotificationsView loggedInUser={loggedInUser} />
         </div>
       </div>
     </div>

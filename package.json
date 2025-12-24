@@ -18,7 +18,7 @@
     "@heroicons/react": "^2.2.0",
     "@mui/icons-material": "^7.3.2",
     "@mui/material": "^7.3.2",
-    "@prisma/client": "^6.16.3",
+    "@prisma/client": "6.19.0",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
@@ -64,7 +64,7 @@
     "eslint": "^8",
     "eslint-config-next": "^15.5.2",
     "postcss": "^8",
-    "prisma": "^6.16.3",
+    "prisma": "6.19.0",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"

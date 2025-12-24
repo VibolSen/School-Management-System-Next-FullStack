@@ -83,13 +83,13 @@ export default function NotificationsView({ loggedInUser }) {
   const unreadCount = notifications.filter((notif) => !notif.isRead).length;
 
   return (
-    <div className="p-6 bg-gray-200 min-h-screen"> {/* ✅ Background changed to gray */}
+    <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-sm border border-gray-200">
       <Notification
         {...message}
         onClose={() => setMessage({ ...message, show: false })}
       />
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-black">Your Notifications</h1> {/* ✅ Text color black */}
+        <h2 className="text-xl font-semibold text-slate-800">Your Notifications</h2>
         {notifications.length > 0 && (
           <button
             onClick={handleMarkAllAsRead}
@@ -102,7 +102,7 @@ export default function NotificationsView({ loggedInUser }) {
       </div>
 
       {isLoading ? (
-        <p className="text-black">Loading notifications...</p> 
+        <p className="text-black">Loading notifications...</p>
       ) : error ? (
         <p className="text-red-600">Error: {error}</p>
       ) : notifications.length === 0 ? (
@@ -116,15 +116,15 @@ export default function NotificationsView({ loggedInUser }) {
           {notifications.map((notif) => (
             <div
               key={notif.id}
-              className={`bg-gray-100 rounded-lg shadow-md p-4 flex items-center justify-between transition-colors duration-200 hover:bg-gray-300 ${
+              className={`bg-slate-50 rounded-lg shadow-md p-4 flex items-center justify-between transition-colors duration-200 hover:bg-gray-300 ${
                 !notif.isRead ? "border-l-4 border-blue-500" : ""
-              }`} // ✅ Card background now gray
+              }`}
             >
               <div className="flex-1">
                 <p
                   className={`font-semibold ${
                     !notif.isRead ? "text-blue-700" : "text-black"
-                  }`} // ✅ Default black text
+                  }`}
                 >
                   {notif.message}
                 </p>
