@@ -45,7 +45,7 @@ export default function ScheduleCalendarView({ schedules, onSelectEvent }) {
             const endDateTime = moment(currentDate).format('YYYY-MM-DD') + 'T' + moment(session.endTime).format('HH:mm:ss');
 
             scheduleEvents.push({
-              id: schedule.id,
+              id: session.id, // Use session.id for unique event identification
               title: schedule.title,
               start: new Date(startDateTime),
               end: new Date(endDateTime),
