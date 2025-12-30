@@ -15,6 +15,7 @@ export async function GET() {
         creator: true,
         assignedToTeacher: true,
         assignedToGroup: true,
+        sessions: true, // Include associated sessions
       },
     });
 
@@ -34,60 +35,44 @@ export async function POST(request) {
     }
 
     const data = await request.json();
-    const { title, startTime, endTime, date, assignedToTeacherId, assignedToGroupId } = data;
+    const { title, assignedToTeacherId, assignedToGroupId, isRecurring, startDate, endDate, daysOfWeek, sessions } = data;
 
-    const schedule = await prisma.schedule.create({
+    // Validate sessions
+    if (!sessions || !Array.isArray(sessions) || sessions.length === 0) {
+      return NextResponse.json({ error: 'At least one session is required' }, { status: 400 });
+    }
+
+    const createdSchedule = await prisma.schedule.create({
       data: {
         title,
-        startTime,
-        endTime,
-        date,
+        isRecurring,
+        startDate: isRecurring ? new Date(startDate) : null,
+        endDate: isRecurring ? new Date(endDate) : null,
+        daysOfWeek: isRecurring ? daysOfWeek : [],
         creatorId: session.id,
         assignedToTeacherId,
         assignedToGroupId,
+        sessions: {
+          create: sessions.map(s => ({
+            startTime: new Date(`1970-01-01T${s.startTime}:00Z`), // Use a dummy date for time-only fields
+            endTime: new Date(`1970-01-01T${s.endTime}:00Z`),   // Use a dummy date for time-only fields
+          })),
+        },
+      },
+      include: {
+        sessions: true,
       },
     });
 
-    return NextResponse.json(schedule, { status: 201 });
+    return NextResponse.json(createdSchedule, { status: 201 });
+
   } catch (error) {
-    console.error('Error creating schedule:', error);
+    console.error('Error creating schedule(s):', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
-export async function PUT(request) {
-  try {
-    const session = await getLoggedInUser();
 
-    if (!session || (session.role !== 'ADMIN' && session.role !== 'STUDY_OFFICE')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const data = await request.json();
-    const { id, title, startTime, endTime, date, assignedToTeacherId, assignedToGroupId } = data;
-
-    if (!id) {
-      return NextResponse.json({ error: 'Schedule ID is required for PUT request' }, { status: 400 });
-    }
-
-    const updatedSchedule = await prisma.schedule.update({
-      where: { id },
-      data: {
-        title,
-        startTime,
-        endTime,
-        date,
-        assignedToTeacherId,
-        assignedToGroupId,
-      },
-    });
-
-    return NextResponse.json(updatedSchedule);
-  } catch (error) {
-    console.error('Error updating schedule:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
-}
 
 export async function DELETE(request) {
   try {

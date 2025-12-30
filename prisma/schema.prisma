@@ -296,12 +296,22 @@ model Enrollment {
   @@unique([studentId, courseId])
 }
 
+model Session {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  startTime   DateTime
+  endTime     DateTime
+  schedule    Schedule  @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  scheduleId  String    @db.ObjectId
+}
+
 model Schedule {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String
-  startTime   DateTime
-  endTime     DateTime
-  date        DateTime
+
+  isRecurring Boolean   @default(false)
+  startDate   DateTime? 
+  endDate     DateTime? 
+  daysOfWeek  String[] 
 
   creator     User      @relation("SchedulesCreated", fields: [creatorId], references: [id])
   creatorId   String    @db.ObjectId
@@ -311,6 +321,8 @@ model Schedule {
 
   assignedToGroup   Group?   @relation("SchedulesAssignedToGroup", fields: [assignedToGroupId], references: [id])
   assignedToGroupId String? @db.ObjectId
+
+  sessions    Session[]
 }
 
 model CourseDepartment {

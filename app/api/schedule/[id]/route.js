@@ -16,6 +16,7 @@ export async function GET(request, { params }) {
         creator: true,
         assignedToTeacher: true,
         assignedToGroup: true,
+        sessions: true, // Include associated sessions
       },
     });
 
@@ -34,35 +35,56 @@ export async function PUT(request, { params }) {
   try {
     const session = await getLoggedInUser();
 
-    if (!session) {
+    if (!session || (session.role !== 'ADMIN' && session.role !== 'STUDY_OFFICE')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const schedule = await prisma.schedule.findUnique({
+    const existingSchedule = await prisma.schedule.findUnique({
       where: { id: params.id },
       select: { creatorId: true },
     });
 
-    if (!schedule) {
+    if (!existingSchedule) {
       return NextResponse.json({ error: 'Schedule not found' }, { status: 404 });
     }
 
-    if (session.role !== 'ADMIN' && session.id !== schedule.creatorId) {
+    if (session.role !== 'ADMIN' && session.id !== existingSchedule.creatorId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     const data = await request.json();
-    const { title, startTime, endTime, date, assignedToTeacherId, assignedToGroupId } = data;
+    const { title, assignedToTeacherId, assignedToGroupId, isRecurring, startDate, endDate, daysOfWeek, sessions } = data;
 
+    // Validate sessions
+    if (!sessions || !Array.isArray(sessions) || sessions.length === 0) {
+      return NextResponse.json({ error: 'At least one session is required' }, { status: 400 });
+    }
+
+    // Delete existing sessions for this schedule
+    await prisma.session.deleteMany({
+      where: { scheduleId: params.id },
+    });
+
+    // Update the schedule and create new sessions
     const updatedSchedule = await prisma.schedule.update({
       where: { id: params.id },
       data: {
         title,
-        startTime,
-        endTime,
-        date,
+        isRecurring,
+        startDate: isRecurring ? new Date(startDate) : null,
+        endDate: isRecurring ? new Date(endDate) : null,
+        daysOfWeek: isRecurring ? daysOfWeek : [],
         assignedToTeacherId,
         assignedToGroupId,
+        sessions: {
+          create: sessions.map(s => ({
+            startTime: new Date(`1970-01-01T${s.startTime}:00Z`), // Use a dummy date for time-only fields
+            endTime: new Date(`1970-01-01T${s.endTime}:00Z`),   // Use a dummy date for time-only fields
+          })),
+        },
+      },
+      include: {
+        sessions: true,
       },
     });
 
