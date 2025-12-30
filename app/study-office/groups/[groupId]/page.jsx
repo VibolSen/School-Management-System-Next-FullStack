@@ -24,7 +24,7 @@ async function getGroupData(groupId) {
 }
 
 export default async function GroupDetailPageRoute({ params }) {
-  const { groupId } = params; 
+  const { groupId } = params; // params is directly available here
 
   const { group, allStudents } = await getGroupData(groupId);
 
@@ -34,7 +34,7 @@ export default async function GroupDetailPageRoute({ params }) {
         <h1 className="text-2xl font-bold">Group Not Found</h1>
         <p>The group you are looking for does not exist.</p>
         <Link
-          href="/faculty/groups"
+          href="/study-office/groups"
           className="text-blue-600 hover:underline mt-4 inline-block"
         >
           &larr; Back to Groups
@@ -43,5 +43,5 @@ export default async function GroupDetailPageRoute({ params }) {
     );
   }
 
-  return <GroupDetailPage initialGroup={group} allStudents={allStudents} role="faculty" />;
+  return <GroupDetailPage initialGroup={group} allStudents={allStudents} role="study-office" />;
 }

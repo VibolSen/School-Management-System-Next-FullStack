@@ -207,7 +207,7 @@ export default function GroupsTable({
                   </td>
                   <td className="px-6 py-4 text-center space-x-2">
                     <Link
-                      href={`/admin/groups/${group.id}`}
+                      href={`/${role}/groups/${group.id}`}
                       className="text-blue-600 hover:text-blue-900 hover:scale-105 transition-all duration-200"
                     >
                       View

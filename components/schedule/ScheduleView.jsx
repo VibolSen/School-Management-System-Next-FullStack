@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ScheduleModal from './ScheduleModal';
 import ScheduleCalendarView from './ScheduleCalendarView';
+import ScheduleCardView from './ScheduleCardView';
 import { useUser } from '@/context/UserContext';
 import Notification from '@/components/Notification';
 
@@ -150,17 +151,33 @@ export default function ScheduleView() {
             Delete Selected ({selectedSchedules.length})
           </button>
         )}
-        <div>
+        <div className="flex space-x-2">
           <button
             onClick={() => setView('calendar')}
             className={`py-2 px-4 rounded-md text-sm font-medium ${view === 'calendar' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'}`}
           >
             Calendar View
           </button>
+          <button
+            onClick={() => setView('card')}
+            className={`py-2 px-4 rounded-md text-sm font-medium ${view === 'card' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'}`}
+          >
+            Card View
+          </button>
         </div>
       </div>
 
-      <ScheduleCalendarView schedules={schedules} onSelectEvent={handleSelectEvent} />
+      {view === 'calendar' ? (
+        <ScheduleCalendarView schedules={schedules} onSelectEvent={handleSelectEvent} />
+      ) : (
+        <ScheduleCardView
+          schedules={schedules}
+          onEdit={handleEditClick}
+          onDelete={handleDeleteSchedule}
+          onSelectSchedule={handleSelectSchedule}
+          selectedSchedules={selectedSchedules}
+        />
+      )}
 
       <ScheduleModal
         isOpen={isModalOpen}

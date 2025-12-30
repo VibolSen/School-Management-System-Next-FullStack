@@ -6,7 +6,7 @@ import ManageGroupMembersModal from "./ManageGroupMembersModal";
 import GroupModal from "./GroupModal";
 import Notification from "../Notification";
 
-export default function GroupDetailPage({ initialGroup, allStudents }) {
+export default function GroupDetailPage({ initialGroup, allStudents, role }) {
   const [group, setGroup] = useState(initialGroup);
   const [isManageMembersModalOpen, setIsManageMembersModalOpen] =
     useState(false);
@@ -43,7 +43,8 @@ export default function GroupDetailPage({ initialGroup, allStudents }) {
       handleCloseManageMembersModal();
     } catch (err) {
       showMessage(err.message, "error");
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };
@@ -68,7 +69,8 @@ export default function GroupDetailPage({ initialGroup, allStudents }) {
       handleCloseEditGroupModal();
     } catch (err) {
       showMessage(err.message, "error");
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };
@@ -87,7 +89,7 @@ export default function GroupDetailPage({ initialGroup, allStudents }) {
       {/* Back Button */}
       <div className="mb-6">
           <Link
-            href="/admin/groups"
+            href={`/${role}/groups`}
             className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-200"
           >
             <svg

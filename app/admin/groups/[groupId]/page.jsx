@@ -43,5 +43,5 @@ export default async function GroupDetailPageRoute({ params }) {
     );
   }
 
-  return <GroupDetailPage initialGroup={group} allStudents={allStudents} />;
+  return <GroupDetailPage initialGroup={group} allStudents={allStudents} role="admin" />;
 }
