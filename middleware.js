@@ -11,7 +11,7 @@ const roleProtectedPaths = {
   hr: ["/hr", "/hr/dashboard"],
   faculty: ["/faculty", "/faculty/dashboard"],
   teacher: ["/teacher", "/teacher/dashboard"],
-  student: ["/student", "/student/dashboard", "/invoices", "/invoices/[id]"],
+  student: ["/student", "/student/dashboard", "/student/invoices", "/student/invoices/[id]"],
   study_office: ["/study-office", "/study-office/dashboard", "/study-office/students", "/study-office/courses", "/study-office/courses/[id]"],
 };
 

@@ -94,7 +94,7 @@ const STUDENT_NAV_ITEMS = [
   {
     label: "My Invoices",
     icon: <FiDollarSign className="w-5 h-5" />,
-    href: "/invoices",
+    href: "/student/invoices",
   },
   {
     label: "My Points",
