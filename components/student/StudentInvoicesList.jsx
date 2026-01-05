@@ -67,7 +67,7 @@ const StudentInvoicesList = ({ invoices }) => {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <Link
-                  href={`/invoices/${invoice.id}`}
+                  href={`/student/invoices/${invoice.id}`}
                   className="text-blue-600 hover:text-blue-900 flex items-center"
                 >
                   <FiEye className="mr-1" /> View

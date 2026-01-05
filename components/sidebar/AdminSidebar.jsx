@@ -19,6 +19,7 @@ import {
   FiCalendar,
   FiAward,
   FiCreditCard,
+  FiDollarSign,
 } from "react-icons/fi";
 
 // -------------------------
@@ -154,6 +155,11 @@ const ADMIN_NAV_ITEMS = [
     label: "Payroll",
     icon: <FiCreditCard className="w-5 h-5" />,
     href: "/admin/payroll",
+  },
+  {
+    label: "Financial Management",
+    icon: <FiDollarSign className="w-5 h-5" />,
+    href: "/admin/finance",
   },
   {
     label: "Schedule",
