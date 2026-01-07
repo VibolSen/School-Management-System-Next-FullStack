@@ -10,12 +10,29 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    let where = {};
+
+    // If the logged-in user is a student, filter schedules by their assigned groups
+    if (session.role === 'STUDENT' && session.groupIds && session.groupIds.length > 0) {
+      where = {
+        assignedToGroupId: {
+          in: session.groupIds,
+        },
+      };
+    } else if (session.role === 'TEACHER' && session.id) {
+        where = {
+            assignedToTeacherId: session.id,
+        };
+    }
+
+
     const schedules = await prisma.schedule.findMany({
+      where, // Apply the filter
       include: {
         creator: true,
         assignedToTeacher: true,
         assignedToGroup: true,
-        sessions: true, // Include associated sessions
+        sessions: true,
       },
     });
 

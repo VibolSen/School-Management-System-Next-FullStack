@@ -23,25 +23,19 @@ export async function GET() {
         include: {
           creator: true,
           assignedToGroup: true,
+          sessions: true,
         },
       });
     } else if (userRole === 'STUDENT') {
-      const student = await prisma.user.findUnique({
-        where: { id: userId },
-        include: {
-          groups: { select: { id: true } },
-        },
-      });
-
-      if (student && student.groups.length > 0) {
-        const groupIds = student.groups.map(group => group.id);
+      if (session.groupIds && session.groupIds.length > 0) {
         schedules = await prisma.schedule.findMany({
           where: {
-            assignedToGroupId: { in: groupIds },
+            assignedToGroupId: { in: session.groupIds },
           },
           include: {
             creator: true,
             assignedToGroup: true,
+            sessions: true,
           },
         });
       }
