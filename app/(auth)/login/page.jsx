@@ -219,7 +219,7 @@ const handleSubmit = async (e) => {
                   href="/register"
                   className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
                 >
-                  Sign up here
+                  Register here
                 </a>
               </p>
             </div>

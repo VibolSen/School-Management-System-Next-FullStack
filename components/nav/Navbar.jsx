@@ -228,10 +228,10 @@ export default function Navbar() {
               </>
                         ) : (
               <Link
-                href="https://t.me/vibolsen"
+                href="/login"
                 className="px-5 py-2 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
               >
-                Ask Me
+                Login
               </Link>
             ))} 
         </div>
