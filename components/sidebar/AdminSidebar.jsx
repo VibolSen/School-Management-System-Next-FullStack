@@ -162,7 +162,7 @@ const ADMIN_NAV_ITEMS = [
     href: "/admin/finance",
   },
   {
-    label: "Schedule",
+    label: "Schedule Management",
     icon: <FiCalendar className="w-5 h-5" />,
     href: "/admin/schedule",
   },

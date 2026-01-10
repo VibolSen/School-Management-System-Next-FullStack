@@ -63,8 +63,8 @@ export async function POST(request) {
       data: {
         title,
         isRecurring,
-        startDate: isRecurring ? new Date(startDate) : null,
-        endDate: isRecurring ? new Date(endDate) : null,
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: isRecurring && endDate ? new Date(endDate) : null,
         daysOfWeek: isRecurring ? daysOfWeek : [],
         creatorId: session.id,
         assignedToTeacherId,

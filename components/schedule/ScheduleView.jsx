@@ -132,52 +132,55 @@ export default function ScheduleView() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-semibold mb-4">Manage Schedules</h2>
-      <div className="flex justify-between mb-4">
-        {(user?.role === 'ADMIN' || user?.role === 'STUDY_OFFICE') && (
-          <button
-            onClick={handleCreateClick}
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Create New Schedule
-          </button>
-        )}
-        {(user?.role === 'ADMIN' || user?.role === 'STUDY_OFFICE') && selectedSchedules.length > 0 && (
-          <button
-            onClick={handleDeleteSelected}
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-          >
-            Delete Selected ({selectedSchedules.length})
-          </button>
-        )}
-        <div className="flex space-x-2">
-          <button
-            onClick={() => setView('calendar')}
-            className={`py-2 px-4 rounded-md text-sm font-medium ${view === 'calendar' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'}`}
-          >
-            Calendar View
-          </button>
-          <button
-            onClick={() => setView('card')}
-            className={`py-2 px-4 rounded-md text-sm font-medium ${view === 'card' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-800'}`}
-          >
-            Card View
-          </button>
+    <div >
+        <h2 className="text-3xl font-extrabold text-gray-900 mb-6 text-center lg:text-left">
+          Schedule Management
+        </h2>
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+          {(user?.role === 'ADMIN' || user?.role === 'STUDY_OFFICE') && (
+            <button
+              onClick={handleCreateClick}
+              className="flex-shrink-0 inline-flex items-center py-2 px-5 rounded-lg text-sm font-medium text-white bg-indigo-500 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-105"
+            >
+              Create New Schedule
+            </button>
+          )}
+          {(user?.role === 'ADMIN' || user?.role === 'STUDY_OFFICE') && selectedSchedules.length > 0 && (
+            <button
+              onClick={handleDeleteSelected}
+              className="flex-shrink-0 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl shadow-lg text-white bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-300 transform hover:scale-105"
+            >
+              Delete Selected ({selectedSchedules.length})
+            </button>
+          )}
+          <div className="flex space-x-2 p-1 bg-gray-100 rounded-xl shadow-inner">
+            <button
+              onClick={() => setView('calendar')}
+              className={`py-2 px-5 rounded-lg text-sm font-medium transition-all duration-300 ${view === 'calendar' ? 'bg-indigo-500 text-white shadow-md' : 'text-gray-700 hover:bg-gray-200'}`}
+            >
+              Calendar View
+            </button>
+            <button
+              onClick={() => setView('card')}
+              className={`py-2 px-5 rounded-lg text-sm font-medium transition-all duration-300 ${view === 'card' ? 'bg-indigo-500 text-white shadow-md' : 'text-gray-700 hover:bg-gray-200'}`}
+            >
+              Card View
+            </button>
+          </div>
         </div>
-      </div>
-
-      {view === 'calendar' ? (
-        <ScheduleCalendarView schedules={schedules} onSelectEvent={handleSelectEvent} />
-      ) : (
-        <ScheduleCardView
-          schedules={schedules}
-          onEdit={handleEditClick}
-          onDelete={handleDeleteSchedule}
-          onSelectSchedule={handleSelectSchedule}
-          selectedSchedules={selectedSchedules}
-        />
-      )}
+        <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-md mt-4">
+          {view === 'calendar' ? (
+            <ScheduleCalendarView schedules={schedules} onSelectEvent={handleSelectEvent} />
+          ) : (
+            <ScheduleCardView
+              schedules={schedules}
+              onEdit={handleEditClick}
+              onDelete={handleDeleteSchedule}
+              onSelectSchedule={handleSelectSchedule}
+              selectedSchedules={selectedSchedules}
+            />
+          )}
+        </div>
 
       <ScheduleModal
         isOpen={isModalOpen}
