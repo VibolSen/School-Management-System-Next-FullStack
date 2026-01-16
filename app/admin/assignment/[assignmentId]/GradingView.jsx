@@ -93,7 +93,8 @@ export default function GradingView({ initialAssignment }) {
 
   const handleGradeSubmission = async (submissionId, grade, feedback) => {
     try {
-      const res = await fetch(`/api/teacher/submissions/${submissionId}`, {
+      // Adjusted API endpoint for admin
+      const res = await fetch(`/api/admin/submissions/${submissionId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ grade, feedback }),
@@ -127,7 +128,7 @@ export default function GradingView({ initialAssignment }) {
           {assignment.title}
         </h1>
         <Link
-          href="/teacher/assignment"
+          href="/admin/assignment-management" // Adjusted back link for admin
           className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
         >
           <span className="flex items-center gap-1">

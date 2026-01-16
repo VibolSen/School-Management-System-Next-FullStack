@@ -15,7 +15,7 @@ const StatusBadge = ({ status }) => {
   };
   return (
     <span
-      className={`px-2 py-1 text-xs font-semibold rounded-full ${
+      className={`px-1.5 py-0.5 text-xs font-semibold rounded-full ${
         styles[status] || "bg-gray-100 text-gray-800"
       }`}
     >
@@ -66,24 +66,24 @@ export default function MyAssignmentsView({ loggedInUser }) {
   }, [fetchAssignments]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Notification
         {...notification}
         onClose={() => setNotification({ ...notification, show: false })}
       />
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-800">My Assignments</h1>
+        <h1 className="text-2xl font-bold text-slate-800">My Assignments</h1>
       </div>
 
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
-        <h2 className="text-xl font-semibold text-slate-800 mb-4">
+      <div className="bg-white p-4 rounded-lg shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-800 mb-3">
           Pending & Graded Work
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           {isLoading ? (
-            <p className="text-center py-8">Loading your assignments...</p>
+            <p className="text-center py-6">Loading your assignments...</p>
           ) : submissions.length === 0 ? (
-            <p className="text-center text-slate-500 py-8">
+            <p className="text-center text-slate-500 py-6">
               You have no assignments yet. Great job!
             </p>
           ) : (

@@ -358,6 +358,7 @@ export default function AssignmentsView({ loggedInUser }) {
                     }
                     onEdit={() => handleEdit(assignment)}
                     onDelete={() => handleDelete(assignment.id)}
+                    userRole={loggedInUser?.role} // Add this line
                   />
                 </div>
               ))}

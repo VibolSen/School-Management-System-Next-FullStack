@@ -299,7 +299,7 @@ const AssignmentCard = ({
           )}
 
           {/* Action Buttons */}
-          {showActions && userRole === "ADMIN" && (
+          {showActions && (userRole === "ADMIN" || userRole === "TEACHER") && (
             <div className="flex justify-end space-x-2 pt-3 border-t border-slate-100">
               <button
                 onClick={onEdit}
