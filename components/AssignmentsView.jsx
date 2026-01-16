@@ -144,20 +144,20 @@ export default function AssignmentsView({ loggedInUser }) {
 
   // MAIN RENDER
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-4">
+      <div className="max-w-7xl mx-auto space-y-6">
         <Notification
           {...notification}
           onClose={() => setNotification({ ...notification, show: false })}
         />
 
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Assignments
             </h1>
-            <p className="text-slate-600 mt-2">
+            <p className="text-slate-600 mt-1">
               Create and manage assignments for your classes
             </p>
           </div>
@@ -169,11 +169,11 @@ export default function AssignmentsView({ loggedInUser }) {
                 ? "You must have a group to create an assignment"
                 : "Create new assignment"
             }
-            className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-1">
               <svg
-                className="w-5 h-5"
+                className="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -196,12 +196,12 @@ export default function AssignmentsView({ loggedInUser }) {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-white">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
                 <svg
-                  className="w-6 h-6 text-blue-600"
+                  className="w-5 h-5 text-blue-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -215,19 +215,19 @@ export default function AssignmentsView({ loggedInUser }) {
                 </svg>
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-800">
+                <p className="text-xl font-bold text-slate-800">
                   {assignments.length}
                 </p>
-                <p className="text-slate-600 text-sm">Total Assignments</p>
+                <p className="text-slate-600 text-xs">Total Assignments</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-xl">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-white">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
                 <svg
-                  className="w-6 h-6 text-green-600"
+                  className="w-5 h-5 text-green-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -241,19 +241,19 @@ export default function AssignmentsView({ loggedInUser }) {
                 </svg>
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-800">
+                <p className="text-xl font-bold text-slate-800">
                   {teacherGroups.length}
                 </p>
-                <p className="text-slate-600 text-sm">Active Groups</p>
+                <p className="text-slate-600 text-xs">Active Groups</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-xl">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-white">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
                 <svg
-                  className="w-6 h-6 text-purple-600"
+                  className="w-5 h-5 text-purple-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -267,30 +267,30 @@ export default function AssignmentsView({ loggedInUser }) {
                 </svg>
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-800">
+                <p className="text-xl font-bold text-slate-800">
                   {new Date().toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                   })}
                 </p>
-                <p className="text-slate-600 text-sm">Today's Date</p>
+                <p className="text-slate-600 text-xs">Today's Date</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Assignments Grid */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-white p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-slate-800">
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-slate-800">
               All Assignments
             </h2>
             <button
               onClick={fetchData}
-              className="flex items-center gap-2 text-slate-600 hover:text-slate-800 transition-colors"
+              className="flex items-center gap-1 text-slate-600 hover:text-slate-800 transition-colors"
             >
               <svg
-                className="w-4 h-4"
+                className="w-3 h-3"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -307,15 +307,15 @@ export default function AssignmentsView({ loggedInUser }) {
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center items-center py-16">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="flex justify-center items-center py-10">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
             </div>
           ) : assignments.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="max-w-md mx-auto">
-                <div className="w-24 h-24 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+            <div className="text-center py-10">
+              <div className="max-w-sm mx-auto">
+                <div className="w-20 h-20 mx-auto mb-3 bg-blue-100 rounded-full flex items-center justify-center">
                   <svg
-                    className="w-12 h-12 text-blue-400"
+                    className="w-10 h-10 text-blue-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -328,23 +328,23 @@ export default function AssignmentsView({ loggedInUser }) {
                     />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-slate-700 mb-2">
+                <h3 className="text-base font-semibold text-slate-700 mb-2">
                   No Assignments Yet
                 </h3>
-                <p className="text-slate-500 mb-6">
+                <p className="text-slate-500 mb-4">
                   Create your first assignment to get started with your classes.
                 </p>
                 <button
                   onClick={() => setIsAddModalOpen(true)}
                   disabled={teacherGroups.length === 0}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  className="bg-blue-600 text-white px-4 py-1.5 rounded-lg font-normal hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
                   Create Your First Assignment
                 </button>
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {assignments.map((assignment, index) => (
                 <div
                   key={assignment.id}
@@ -383,12 +383,12 @@ export default function AssignmentsView({ loggedInUser }) {
       {/* Confirmation Modal */}
       {showConfirmation && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center p-4 animate-fadeIn">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md transform animate-scaleIn">
-            <div className="p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-red-100 rounded-lg">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md transform animate-scaleIn">
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-red-100 rounded-md">
                   <svg
-                    className="w-6 h-6 text-red-600"
+                    className="w-5 h-5 text-red-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -401,37 +401,37 @@ export default function AssignmentsView({ loggedInUser }) {
                     />
                   </svg>
                 </div>
-                <h2 className="text-xl font-bold text-slate-800">
+                <h2 className="text-lg font-bold text-slate-800">
                   Delete Assignment
                 </h2>
               </div>
-              <p className="text-slate-600">
+              <p className="text-slate-600 text-sm">
                 Are you sure you want to delete this assignment? This will also
                 remove all student submissions. This action cannot be undone.
               </p>
             </div>
-            <div className="p-6 bg-slate-50 border-t rounded-b-2xl flex justify-end gap-3">
+            <div className="p-4 bg-slate-50 border-t rounded-b-xl flex justify-end gap-2">
               <button
                 onClick={() => setShowConfirmation(false)}
                 disabled={isLoading}
-                className="px-6 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg font-normal hover:bg-slate-50 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
                 disabled={isLoading}
-                className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-medium shadow-sm hover:shadow transition-all disabled:opacity-50 flex items-center gap-2"
+                className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-normal shadow-sm hover:shadow transition-all disabled:opacity-50 flex items-center gap-1"
               >
                 {isLoading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
                     Deleting...
                   </>
                 ) : (
                   <>
                     <svg
-                      className="w-4 h-4"
+                      className="w-3 h-3"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

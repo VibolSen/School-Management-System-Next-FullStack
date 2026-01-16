@@ -97,7 +97,7 @@ export default function AssignmentModal({
 
   const modalContent = (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-2 ${
         isClosing ? "animate-fadeOut" : "animate-fadeIn"
       }`}
     >
@@ -109,21 +109,21 @@ export default function AssignmentModal({
 
       {/* Modal Container */}
       <div
-        className={`relative w-full max-w-2xl transform ${
+        className={`relative w-full max-w-xl transform ${
           isClosing ? "animate-scaleOut" : "animate-scaleIn"
         }`}
       >
         {/* Gradient Border Effect */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-25"></div>
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur opacity-25"></div>
 
-        <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden">
           {/* Header with Gradient */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-white/20 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <div className="p-1.5 bg-white/20 rounded-lg">
                   <svg
-                    className="w-6 h-6 text-white"
+                    className="w-5 h-5 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -137,10 +137,10 @@ export default function AssignmentModal({
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white">
+                  <h2 className="text-lg font-bold text-white">
                     {isEditMode ? "Edit Assignment" : "Create New Assignment"}
                   </h2>
-                  <p className="text-blue-100 text-sm mt-1">
+                  <p className="text-blue-100 text-xs mt-0.5">
                     {isEditMode
                       ? "Update the details for your assignment"
                       : "Fill in the details for your new assignment"}
@@ -150,10 +150,10 @@ export default function AssignmentModal({
               <button
                 onClick={handleClose}
                 disabled={isLoading}
-                className="p-2 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-all duration-200 disabled:opacity-50"
+                className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-md transition-all duration-200 disabled:opacity-50"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -170,13 +170,13 @@ export default function AssignmentModal({
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div className="p-6 max-h-[60vh] overflow-y-auto">
-              <div className="space-y-6">
+            <div className="p-4 max-h-[60vh] overflow-y-auto">
+              <div className="space-y-4">
                 {/* Title Input */}
                 <div className="group">
-                  <label className="flex items-center text-sm font-semibold text-slate-700 mb-3">
+                  <label className="flex items-center text-xs font-semibold text-slate-700 mb-2">
                     <svg
-                      className="w-4 h-4 mr-2 text-blue-500"
+                      className="w-3 h-3 mr-1 text-blue-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -195,7 +195,7 @@ export default function AssignmentModal({
                     name="title"
                     value={formData.title}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder-slate-400"
+                    className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200 placeholder-slate-400 text-sm"
                     placeholder="e.g., Chapter 5 Review Quiz"
                     disabled={isLoading}
                   />
@@ -203,9 +203,9 @@ export default function AssignmentModal({
 
                 {/* Description Input */}
                 <div className="group">
-                  <label className="flex items-center text-sm font-semibold text-slate-700 mb-3">
+                  <label className="flex items-center text-xs font-semibold text-slate-700 mb-2">
                     <svg
-                      className="w-4 h-4 mr-2 text-blue-500"
+                      className="w-3 h-3 mr-1 text-blue-500"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -223,20 +223,20 @@ export default function AssignmentModal({
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    rows={4}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 placeholder-slate-400 resize-none"
+                    rows={3}
+                    className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200 placeholder-slate-400 resize-none text-sm"
                     placeholder="Provide detailed instructions for your students..."
                     disabled={isLoading}
                   ></textarea>
                 </div>
 
                 {/* Details Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {/* Due Date */}
                   <div className="group">
-                    <label className="flex items-center text-sm font-semibold text-slate-700 mb-3">
+                    <label className="flex items-center text-xs font-semibold text-slate-700 mb-2">
                       <svg
-                        className="w-4 h-4 mr-2 text-blue-500"
+                        className="w-3 h-3 mr-1 text-blue-500"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -256,16 +256,16 @@ export default function AssignmentModal({
                       value={formData.dueDate}
                       onChange={handleChange}
                       min={new Date().toISOString().split("T")[0]}
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                      className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200 text-sm"
                       disabled={isLoading}
                     />
                   </div>
 
                   {/* Points */}
                   <div className="group">
-                    <label className="flex items-center text-sm font-semibold text-slate-700 mb-3">
+                    <label className="flex items-center text-xs font-semibold text-slate-700 mb-2">
                       <svg
-                        className="w-4 h-4 mr-2 text-blue-500"
+                        className="w-3 h-3 mr-1 text-blue-500"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -286,7 +286,7 @@ export default function AssignmentModal({
                       onChange={handleChange}
                       min="0"
                       max="1000"
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                      className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200 text-sm"
                       placeholder="100"
                       disabled={isLoading}
                     />
@@ -294,9 +294,9 @@ export default function AssignmentModal({
 
                   {/* Group Selection */}
                   <div className="group">
-                    <label className="flex items-center text-sm font-semibold text-slate-700 mb-3">
+                    <label className="flex items-center text-xs font-semibold text-slate-700 mb-2">
                       <svg
-                        className="w-4 h-4 mr-2 text-blue-500"
+                        className="w-3 h-3 mr-1 text-blue-500"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -314,7 +314,7 @@ export default function AssignmentModal({
                       name="groupId"
                       value={formData.groupId}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white appearance-none"
+                      className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200 bg-white appearance-none text-sm"
                       disabled={isEditMode || teacherGroups.length === 0 || isLoading}
                     >
                       {teacherGroups.length === 0 ? (
@@ -334,9 +334,9 @@ export default function AssignmentModal({
 
                 {/* Error Message */}
                 {error && (
-                  <div className="flex items-center p-4 bg-red-50 border border-red-200 rounded-xl">
+                  <div className="flex items-center p-3 bg-red-50 border border-red-200 rounded-lg">
                     <svg
-                      className="w-5 h-5 text-red-500 mr-3"
+                      className="w-4 h-4 text-red-500 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -348,26 +348,26 @@ export default function AssignmentModal({
                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <span className="text-red-600 font-medium">{error}</span>
+                    <span className="text-red-600 font-normal text-sm">{error}</span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Footer Actions */}
-            <div className="p-6 bg-slate-50 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div className="text-sm text-slate-500">
+            <div className="p-4 bg-slate-50 border-t flex flex-col sm:flex-row justify-between items-center gap-3">
+              <div className="text-xs text-slate-500">
                 Fields marked with * are required
               </div>
-              <div className="flex space-x-3">
+              <div className="flex space-x-2">
                 <button
                   type="button"
                   onClick={handleClose}
                   disabled={isLoading}
-                  className="px-6 py-3 bg-white border border-slate-300 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-all duration-200 disabled:opacity-50 flex items-center space-x-2"
+                  className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg font-normal hover:bg-slate-50 transition-all duration-200 disabled:opacity-50 flex items-center space-x-1"
                 >
                   <svg
-                    className="w-4 h-4"
+                    className="w-3 h-3"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -384,17 +384,17 @@ export default function AssignmentModal({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:transform-none flex items-center space-x-2"
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-normal shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:transform-none flex items-center space-x-1"
                 >
                   {isLoading ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                      <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
                       <span>{isEditMode ? "Saving..." : "Creating..."}</span>
                     </>
                   ) : (
                     <>
                       <svg
-                        className="w-4 h-4"
+                        className="w-3 h-3"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
