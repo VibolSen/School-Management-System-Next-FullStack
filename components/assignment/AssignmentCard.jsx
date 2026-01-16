@@ -11,6 +11,7 @@ const AssignmentCard = ({
   onDelete,
   showActions = true,
   status,
+  userRole, // Add userRole to props
 }) => {
   // Function to determine the color scheme based on status
   const getStatusStyles = (statusName) => {
@@ -298,7 +299,7 @@ const AssignmentCard = ({
           )}
 
           {/* Action Buttons */}
-          {showActions && (
+          {showActions && userRole === "ADMIN" && (
             <div className="flex justify-end space-x-2 pt-3 border-t border-slate-100">
               <button
                 onClick={onEdit}

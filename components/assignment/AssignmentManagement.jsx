@@ -6,6 +6,7 @@ import AssignmentModal from "../AssignmentModal";
 import Notification from "@/components/Notification";
 import AssignmentCard from "./AssignmentCard";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import { useUser } from "@/context/UserContext";
 
 export default function AssignmentManagement() {
   const [assignments, setAssignments] = useState([]);
@@ -22,6 +23,7 @@ export default function AssignmentManagement() {
     type: "",
   });
   const router = useRouter();
+  const { user, loading: userLoading } = useUser();
 
   const showMessage = useCallback((message, type = "success") => {
     setNotification({ show: true, message, type });
@@ -151,15 +153,16 @@ export default function AssignmentManagement() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Assignment Management
+              {user?.role === "TEACHER" ? "Assignments" : "Assignment Management"}
             </h1>
             <p className="text-slate-600 mt-2">
-              Manage all assignments across the school
+              {user?.role === "TEACHER" ? "View and manage your assigned tasks" : "Manage all assignments across the school"}
             </p>
           </div>
           <button
             onClick={() => setIsAddModalOpen(true)}
             className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            disabled={userLoading || (!user || (user.role !== "ADMIN" && user.role !== "TEACHER"))}
           >
             <span className="flex items-center gap-2">
               <svg
@@ -322,6 +325,7 @@ export default function AssignmentManagement() {
                 <button
                   onClick={() => setIsAddModalOpen(true)}
                   className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  disabled={userLoading || (!user || (user.role !== "ADMIN" && user.role !== "TEACHER"))}
                 >
                   Create New Assignment
                 </button>
@@ -342,6 +346,7 @@ export default function AssignmentManagement() {
                     }
                     onEdit={() => handleEdit(assignment)}
                     onDelete={() => handleDelete(assignment.id)}
+                    userRole={user?.role}
                   />
                 </div>
               ))}
