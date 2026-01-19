@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 // ✅ FIX #1: Modify this function to accept the entire params object
 async function getExamSubmissionData(params) {
   // Destructure inside the function
-  const { examSubmissionId } = params;
+  const { examSubmissionId } = await params; // Await params
   const examSubmission = await prisma.examSubmission.findUnique({
     where: { id: examSubmissionId },
     include: {
