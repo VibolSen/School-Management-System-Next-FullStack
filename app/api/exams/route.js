@@ -89,6 +89,25 @@ export async function POST(request) {
         teacherId: finalTeacherId,
       },
     });
+
+    // After creating the exam, create ExamSubmission entries for all students in the group
+    const group = await prisma.group.findUnique({
+      where: { id: groupId },
+      select: { studentIds: true },
+    });
+
+    if (group && group.studentIds.length > 0) {
+      const submissionsToCreate = group.studentIds.map((studentId) => ({
+        examId: newExam.id,
+        studentId: studentId,
+        status: "PENDING", // Default status
+      }));
+
+      await prisma.examSubmission.createMany({
+        data: submissionsToCreate,
+      });
+    }
+
     return NextResponse.json(newExam, { status: 201 });
   } catch (error) {
     console.error("Error creating exam:", error);

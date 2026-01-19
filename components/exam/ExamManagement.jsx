@@ -8,9 +8,10 @@ import Notification from "@/components/Notification";
 import ExamCard from "./ExamCard";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 
-export default function ExamManagement() {
+export default function ExamManagement({ loggedInUser }) {
   const [exams, setExams] = useState([]);
-  const [groups, setGroups] = useState([]);
+  const [allGroups, setAllGroups] = useState([]); // For admin
+  const [teacherGroups, setTeacherGroups] = useState([]); // For teacher
   const [isLoading, setIsLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -23,6 +24,8 @@ export default function ExamManagement() {
     type: "",
   });
   const router = useRouter();
+  const userRole = loggedInUser?.role?.toLowerCase(); // Ensure it's lowercase at definition
+  const teacherId = loggedInUser?.id;
 
   const showMessage = useCallback((message, type = "success") => {
     setNotification({ show: true, message, type });
@@ -32,37 +35,82 @@ export default function ExamManagement() {
     );
   }, []);
 
+  const [isUnauthorized, setIsUnauthorized] = useState(false); // New state variable
+
   const fetchData = useCallback(async () => {
+    console.log("fetchData called. loggedInUser:", loggedInUser, "userRole:", userRole); // Debug log
+
+    if (!loggedInUser) {
+      setIsUnauthorized(true);
+      setIsLoading(false);
+      return;
+    }
+    
+    // The userRole is already defined and lowercased at the component level
+    // No need to redefine here: const userRole = loggedInUser.role?.toLowerCase(); 
+
+    if (userRole !== "admin" && userRole !== "teacher") {
+      setIsUnauthorized(true);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const [examsRes, groupsRes] = await Promise.all([
-        fetch("/api/exams"),
-        fetch("/api/groups"),
-      ]);
+      let examsRes, groupsRes;
+      if (userRole === "admin") {
+        [examsRes, groupsRes] = await Promise.all([
+          fetch("/api/exams"),
+          fetch("/api/groups"),
+        ]);
+        setAllGroups(await groupsRes.json());
+      } else if (userRole === "teacher") {
+        [examsRes, groupsRes] = await Promise.all([
+          fetch(`/api/teacher/exams?teacherId=${teacherId}`),
+          fetch(`/api/teacher/my-groups?teacherId=${teacherId}`),
+        ]);
+        setTeacherGroups(await groupsRes.json());
+      }
 
       if (!examsRes.ok) throw new Error("Failed to fetch exams");
       if (!groupsRes.ok) throw new Error("Failed to fetch groups");
 
       setExams(await examsRes.json());
-      setGroups(await groupsRes.json());
     } catch (err) {
       showMessage(err.message, "error");
     } finally {
       setIsLoading(false);
     }
-  }, [showMessage]);
+  }, [loggedInUser, teacherId, showMessage]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
+  if (isUnauthorized) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-red-50 to-red-100 p-6">
+        <div className="text-center bg-white p-10 rounded-xl shadow-lg border border-red-200">
+          <h2 className="text-3xl font-bold text-red-700 mb-4">Access Denied</h2>
+          <p className="text-lg text-slate-700">
+            You do not have permission to view this page.
+          </p>
+          <p className="text-md text-slate-500 mt-2">
+            Please log in with an authorized account or contact support.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const handleSaveExam = async (formData) => {
     setIsLoading(true);
     try {
+      const payload = userRole === "teacher" ? { ...formData, teacherId } : formData;
       const res = await fetch("/api/exams", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         const errData = await res.json();
@@ -140,6 +188,14 @@ export default function ExamManagement() {
     }
   };
 
+  const currentGroups = userRole === "admin" ? allGroups : teacherGroups;
+  const showAddExamButton = userRole === "admin" || (userRole === "teacher" && teacherGroups.length > 0);
+  const addExamButtonTitle = userRole === "admin"
+    ? "Create new exam"
+    : teacherGroups.length === 0
+      ? "You must have a group to create an exam"
+      : "Create new exam";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -151,33 +207,39 @@ export default function ExamManagement() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Exam Management
+              {userRole === "admin" ? "Exam Management" : "My Exams"}
             </h1>
             <p className="text-slate-600 mt-2">
-              Manage all exams across the school
+              {userRole === "admin"
+                ? "Manage all exams across the school"
+                : "View and manage your assigned exams"}
             </p>
           </div>
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-          >
-            <span className="flex items-center gap-2">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Add New Exam
-            </span>
-          </button>
+          {showAddExamButton && (
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+              disabled={userRole === "teacher" && teacherGroups.length === 0}
+              title={addExamButtonTitle}
+            >
+              <span className="flex items-center gap-2">
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Add New Exam
+              </span>
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -226,7 +288,7 @@ export default function ExamManagement() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-800">
-                  {groups.length}
+                  {currentGroups.length}
                 </p>
                 <p className="text-slate-600 text-sm">Total Groups</p>
               </div>
@@ -266,7 +328,7 @@ export default function ExamManagement() {
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-white p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-slate-800">
-              All Exams
+              {userRole === "admin" ? "All Exams" : "My Exams"}
             </h2>
             <button
               onClick={fetchData}
@@ -315,14 +377,18 @@ export default function ExamManagement() {
                   No Exams Yet
                 </h3>
                 <p className="text-slate-500 mb-6">
-                  Create your first exam to get started.
+                  {userRole === "admin"
+                    ? "Create your first exam to get started."
+                    : "You haven't created any exams yet."}
                 </p>
-                <button
-                  onClick={() => setIsAddModalOpen(true)}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
-                >
-                  Create New Exam
-                </button>
+                {showAddExamButton && (
+                  <button
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  >
+                    Create New Exam
+                  </button>
+                )}
               </div>
             </div>
           ) : (
@@ -332,11 +398,18 @@ export default function ExamManagement() {
                   key={exam.id}
                   exam={exam}
                   onNavigate={() =>
-                    router.push(`/admin/exam-management/${exam.id}`)
+                    router.push(
+                      userRole === "admin"
+                        ? `/admin/exam-management/${exam.id}`
+                        : `/teacher/exam/${exam.id}`
+                    )
                   }
                   onEdit={() => handleEdit(exam)}
                   onDelete={() => handleDelete(exam.id)}
-                  showActions={true}
+                  showActions={
+                    userRole === "admin" ||
+                    (userRole === "teacher" && exam.teacherId === teacherId)
+                  }
                 />
               ))}
             </div>
@@ -348,8 +421,9 @@ export default function ExamManagement() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleSaveExam}
-        teacherGroups={groups}
+        teacherGroups={currentGroups}
         isLoading={isLoading}
+        teacherId={userRole === "teacher" ? teacherId : undefined}
       />
 
       {examToEdit && (
