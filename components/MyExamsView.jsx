@@ -3,8 +3,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Notification from "@/components/Notification"; // Assuming you have this component
+import Notification from "@/components/Notification";
 import ExamCard from "@/components/exam/ExamCard";
+import { Loader2, FileText } from "lucide-react"; // Import icons
 
 export default function MyExamsView({ loggedInUser }) {
   const [submissions, setSubmissions] = useState([]);
@@ -48,37 +49,54 @@ export default function MyExamsView({ loggedInUser }) {
   }, [fetchExams]);
 
   return (
-    <div className="space-y-6">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-slate-800">My Exams</h1>
-      </div>
-
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
-        <h2 className="text-xl font-semibold text-slate-800 mb-4">
-          Pending & Graded Exams
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {isLoading ? (
-            <p className="text-center py-8">Loading your exams...</p>
-          ) : submissions.length === 0 ? (
-            <p className="text-center text-slate-500 py-8">
-              You have no exams yet. Great job!
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-4">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <Notification
+          {...notification}
+          onClose={() => setNotification({ ...notification, show: false })}
+        />
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              My Exams
+            </h1>
+            <p className="text-slate-600 text-sm mt-1">
+              View your pending and graded exams.
             </p>
-          ) : (
-            submissions.map(({ id, status, grade, exam }) => (
-              <ExamCard
-                key={id}
-                exam={exam}
-                status={status}
-                onNavigate={() => router.push(`/student/exams/${id}`)}
-                showActions={false}
-              />
-            ))
-          )}
+          </div>
+        </div>
+
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200 p-6 space-y-5">
+          <h2 className="text-xl font-bold text-slate-800 mb-4">
+            Pending & Graded Exams
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {isLoading ? (
+              <div className="col-span-full flex justify-center items-center py-8">
+                <Loader2 className="h-10 w-10 animate-spin text-blue-600 mr-3" />
+                <p className="text-lg font-medium text-slate-700">Loading your exams...</p>
+              </div>
+            ) : submissions.length === 0 ? (
+              <div className="col-span-full text-center py-12 bg-white rounded-xl shadow-sm border border-slate-100">
+                <FileText className="w-20 h-20 text-blue-500 mx-auto mb-4" />
+                <p className="font-bold text-2xl text-slate-700">No Exams Found</p>
+                <p className="text-slate-600 mt-2">
+                  You have no exams yet. Great job!
+                </p>
+              </div>
+            ) : (
+              submissions.map(({ id, status, grade, exam }) => (
+                <ExamCard
+                  key={id}
+                  exam={exam}
+                  status={status}
+                  grade={grade} // Pass grade to ExamCard
+                  onNavigate={() => router.push(`/student/exams/${id}`)}
+                  showActions={false}
+                />
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>
