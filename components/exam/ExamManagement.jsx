@@ -197,19 +197,19 @@ export default function ExamManagement({ loggedInUser }) {
       : "Create new exam";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-4">
+      <div className="max-w-6xl mx-auto space-y-6">
         <Notification
           {...notification}
           onClose={() => setNotification({ ...notification, show: false })}
         />
 
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               {userRole === "admin" ? "Exam Management" : "My Exams"}
             </h1>
-            <p className="text-slate-600 mt-2">
+            <p className="text-slate-600 text-sm mt-1">
               {userRole === "admin"
                 ? "Manage all exams across the school"
                 : "View and manage your assigned exams"}
@@ -218,13 +218,13 @@ export default function ExamManagement({ loggedInUser }) {
           {showAddExamButton && (
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+              className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
               disabled={userRole === "teacher" && teacherGroups.length === 0}
               title={addExamButtonTitle}
             >
               <span className="flex items-center gap-2">
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -242,12 +242,12 @@ export default function ExamManagement({ loggedInUser }) {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-white">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
                 <svg
-                  className="w-6 h-6 text-blue-600"
+                  className="w-5 h-5 text-blue-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -261,19 +261,19 @@ export default function ExamManagement({ loggedInUser }) {
                 </svg>
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-800">
+                <p className="text-xl font-bold text-slate-800">
                   {exams.length}
                 </p>
-                <p className="text-slate-600 text-sm">Total Exams</p>
+                <p className="text-slate-600 text-xs">Total Exams</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-xl">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-white">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
                 <svg
-                  className="w-6 h-6 text-green-600"
+                  className="w-5 h-5 text-green-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -287,19 +287,19 @@ export default function ExamManagement({ loggedInUser }) {
                 </svg>
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-800">
+                <p className="text-xl font-bold text-slate-800">
                   {currentGroups.length}
                 </p>
-                <p className="text-slate-600 text-sm">Total Groups</p>
+                <p className="text-slate-600 text-xs">Total Groups</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-xl">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-white">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
                 <svg
-                  className="w-6 h-6 text-purple-600"
+                  className="w-5 h-5 text-purple-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -313,26 +313,26 @@ export default function ExamManagement({ loggedInUser }) {
                 </svg>
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-800">
+                <p className="text-xl font-bold text-slate-800">
                   {new Date().toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                   })}
                 </p>
-                <p className="text-slate-600 text-sm">Today's Date</p>
+                <p className="text-slate-600 text-xs">Today's Date</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-white p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-slate-800">
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-slate-800">
               {userRole === "admin" ? "All Exams" : "My Exams"}
             </h2>
             <button
               onClick={fetchData}
-              className="flex items-center gap-2 text-slate-600 hover:text-slate-800 transition-colors"
+              className="flex items-center gap-1 text-slate-600 hover:text-slate-800 transition-colors text-sm"
             >
               <svg
                 className="w-4 h-4"
@@ -352,15 +352,15 @@ export default function ExamManagement({ loggedInUser }) {
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center items-center py-16">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
             </div>
           ) : exams.length === 0 ? (
-            <div className="text-center py-16">
+            <div className="text-center py-12">
               <div className="max-w-md mx-auto">
-                <div className="w-24 h-24 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+                <div className="w-20 h-20 mx-auto mb-3 bg-blue-100 rounded-lg flex items-center justify-center">
                   <svg
-                    className="w-12 h-12 text-blue-400"
+                    className="w-10 h-10 text-blue-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -373,10 +373,10 @@ export default function ExamManagement({ loggedInUser }) {
                     />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-slate-700 mb-2">
+                <h3 className="text-xl font-semibold text-slate-700 mb-1">
                   No Exams Yet
                 </h3>
-                <p className="text-slate-500 mb-6">
+                <p className="text-slate-500 text-sm mb-4">
                   {userRole === "admin"
                     ? "Create your first exam to get started."
                     : "You haven't created any exams yet."}
@@ -384,7 +384,7 @@ export default function ExamManagement({ loggedInUser }) {
                 {showAddExamButton && (
                   <button
                     onClick={() => setIsAddModalOpen(true)}
-                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    className="bg-blue-600 text-white px-5 py-2 rounded-md font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm"
                   >
                     Create New Exam
                   </button>
@@ -392,7 +392,7 @@ export default function ExamManagement({ loggedInUser }) {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {exams.map((exam) => (
                 <ExamCard
                   key={exam.id}
