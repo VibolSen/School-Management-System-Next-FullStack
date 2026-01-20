@@ -1,0 +1,10 @@
+// app/study-office/gradebook/page.jsx
+import GradebookView from '@/components/gradebook/GradebookView';
+
+export default function StudyOfficeGradebookPage() {
+  return (
+    <div className="container mx-auto p-4">
+      <GradebookView />
+    </div>
+  );
+}

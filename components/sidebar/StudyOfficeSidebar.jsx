@@ -88,6 +88,11 @@ const STUDY_OFFICE_NAV_ITEMS = [
     href: "/study-office/schedule",
   },
   {
+    label: "Gradebook",
+    icon: <FiBookOpen className="w-5 h-5" />,
+    href: "/study-office/gradebook",
+  },
+  {
     label: "Student Performance",
     icon: <FiTrendingUp className="w-5 h-5" />,
     href: "/study-office/student-performance",

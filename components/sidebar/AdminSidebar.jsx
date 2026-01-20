@@ -142,6 +142,11 @@ const ADMIN_NAV_ITEMS = [
     href: "/admin/student-performance",
   },
   {
+    label: "Gradebook",
+    icon: <FiBookOpen className="w-5 h-5" />,
+    href: "/admin/gradebook",
+  },
+  {
     label: "Attendance",
     icon: <FiCalendar className="w-5 h-5" />,
     href: "/admin/attendance",

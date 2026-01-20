@@ -13,7 +13,7 @@ const GradebookView = () => {
   useEffect(() => {
     const fetchGradebookData = async () => {
       try {
-        const response = await fetch('/api/teacher/gradebook');
+        const response = await fetch('/api/gradebook');
         if (!response.ok) {
           throw new Error('Failed to fetch gradebook data');
         }
