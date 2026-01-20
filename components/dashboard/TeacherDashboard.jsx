@@ -14,7 +14,7 @@ import {
 } from "recharts";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import { Users, Library, Award, TrendingUp } from "lucide-react";
-import { FiClipboard, FiAward } from "react-icons/fi";
+import { FiClipboard, FiAward, FiCalendar, FiUsers, FiFileText, FiTrendingUp } from "react-icons/fi";
 
 const TeacherDashboard = ({ loggedInUser }) => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -100,7 +100,32 @@ const TeacherDashboard = ({ loggedInUser }) => {
           </div>
         </header>
 
-        {/* Quick Actions - Will be placed here after modifying the header */}
+        {/* Cards Section */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <DashboardCard
+            title="My Students"
+            value={dashboardData.totalStudents}
+            icon={<Users className="w-6 h-6 text-blue-600" />}
+            description="Total students assigned to you"
+            bgColor="bg-blue-50"
+          />
+          <DashboardCard
+            title="My Courses"
+            value={dashboardData.totalCourses}
+            icon={<Library className="w-6 h-6 text-green-600" />}
+            description="Courses you are currently teaching"
+            bgColor="bg-green-50"
+          />
+          <DashboardCard
+            title="Average Grade"
+            value={`${dashboardData.averageGrade}%`}
+            icon={<Award className="w-6 h-6 text-purple-600" />}
+            description="Overall average grade of your students"
+            bgColor="bg-purple-50"
+          />
+        </section>
+
+        {/* Quick Actions */}
         <section className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-xl font-semibold text-gray-900">
@@ -131,32 +156,62 @@ const TeacherDashboard = ({ loggedInUser }) => {
                     Gradebook
                   </span>
               </Link>
+              <Link
+                href="/teacher/schedule"
+                className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer"
+              >
+                <div className="p-3 bg-gray-100 group-hover:bg-gray-200 rounded-xl transition-colors">
+                  <FiCalendar className="w-6 h-6 text-gray-700" />
+                </div>
+                <span className="text-sm font-medium text-gray-800 text-center">
+                    My Schedules
+                  </span>
+              </Link>
+              <Link
+                href="/teacher/students"
+                className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer"
+              >
+                <div className="p-3 bg-gray-100 group-hover:bg-gray-200 rounded-xl transition-colors">
+                  <FiUsers className="w-6 h-6 text-gray-700" />
+                </div>
+                <span className="text-sm font-medium text-gray-800 text-center">
+                    My Students
+                  </span>
+              </Link>
+              <Link
+                href="/teacher/student-performance"
+                className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer"
+              >
+                <div className="p-3 bg-gray-100 group-hover:bg-gray-200 rounded-xl transition-colors">
+                  <FiTrendingUp className="w-6 h-6 text-gray-700" />
+                </div>
+                <span className="text-sm font-medium text-gray-800 text-center">
+                    Student Performance
+                  </span>
+              </Link>
+              <Link
+                href="/teacher/courses"
+                className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer"
+              >
+                <div className="p-3 bg-gray-100 group-hover:bg-gray-200 rounded-xl transition-colors">
+                  <Library className="w-6 h-6 text-gray-700" />
+                </div>
+                <span className="text-sm font-medium text-gray-800 text-center">
+                    My Courses
+                  </span>
+              </Link>
+              <Link
+                href="/teacher/exam"
+                className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer"
+              >
+                <div className="p-3 bg-gray-100 group-hover:bg-gray-200 rounded-xl transition-colors">
+                  <FiFileText className="w-6 h-6 text-gray-700" />
+                </div>
+                <span className="text-sm font-medium text-gray-800 text-center">
+                    Exams
+                  </span>
+              </Link>
             </div>
-        </section>
-
-        {/* Cards Section */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <DashboardCard
-            title="My Students"
-            value={dashboardData.totalStudents}
-            icon={<Users className="w-6 h-6 text-blue-600" />}
-            description="Total students assigned to you"
-            bgColor="bg-blue-50"
-          />
-          <DashboardCard
-            title="My Courses"
-            value={dashboardData.totalCourses}
-            icon={<Library className="w-6 h-6 text-green-600" />}
-            description="Courses you are currently teaching"
-            bgColor="bg-green-50"
-          />
-          <DashboardCard
-            title="Average Grade"
-            value={`${dashboardData.averageGrade}%`}
-            icon={<Award className="w-6 h-6 text-purple-600" />}
-            description="Overall average grade of your students"
-            bgColor="bg-purple-50"
-          />
         </section>
 
         {/* Charts Section */}
