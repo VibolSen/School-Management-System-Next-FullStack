@@ -1,12 +1,41 @@
-import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-
-const prisma = new PrismaClient();
+import { getLoggedInUser } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
 export async function GET() {
+  const user = await getLoggedInUser();
+
+  if (!user || !['ADMIN', 'STUDY_OFFICE', 'TEACHER'].includes(user.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   try {
+    let studentIds = [];
+
+    if (user.role === 'ADMIN' || user.role === 'STUDY_OFFICE') {
+      const allStudents = await prisma.user.findMany({
+        where: { role: 'STUDENT' },
+        select: { id: true },
+      });
+      studentIds = allStudents.map(s => s.id);
+    } else if (user.role === 'TEACHER') {
+      const courses = await prisma.course.findMany({
+        where: { leadById: user.id },
+        include: {
+          groups: {
+            include: {
+              students: {
+                select: { id: true },
+              },
+            },
+          },
+        },
+      });
+      studentIds = courses.flatMap(c => c.groups.flatMap(g => g.students.map(s => s.id)));
+    }
+
     const students = await prisma.user.findMany({
-      where: { role: 'STUDENT' },
+      where: { id: { in: studentIds } },
       include: {
         submissions: true,
         examSubmissions: true,
