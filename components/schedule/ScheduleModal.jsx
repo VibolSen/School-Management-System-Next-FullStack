@@ -221,6 +221,26 @@ export default function ScheduleModal({ isOpen, onClose, onSave, schedule, isRea
                       )}
                     </div>
 
+                    {isReadOnly && schedule && (
+                      <div className="border-t border-gray-200 pt-4 mt-4 space-y-3">
+                        <h4 className="text-base font-semibold text-gray-800">Assignment Details</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div>
+                            <p className="block text-xs font-medium text-gray-700">Teacher</p>
+                            <p className="mt-1 text-sm text-gray-900">
+                              {schedule.creator ? `${schedule.creator.firstName} ${schedule.creator.lastName}`: 'N/A'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="block text-xs font-medium text-gray-700">Group</p>
+                            <p className="mt-1 text-sm text-gray-900">
+                              {schedule.assignedToGroup ? schedule.assignedToGroup.name : 'N/A'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {!isReadOnly && (
                       <div className="border-t border-gray-200 pt-4 mt-4 space-y-3">
                         <h4 className="text-base font-semibold text-gray-800">Assignments</h4>

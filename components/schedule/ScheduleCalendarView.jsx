@@ -59,6 +59,20 @@ const CustomToolbar = ({ label, onNavigate, onView, view }) => {
 };
 
 /* -------------------------
+   Custom Agenda Event
+-------------------------- */
+const CustomAgendaEvent = ({ event }) => {
+  return (
+    <div style={{ display: 'flex', width: '100%' }}>
+      <span style={{ flex: '1 1 50%' }}>{event.title}</span>
+      <span style={{ flex: '1 1 50%' }}>
+        {event.resource?.assignedToGroup?.name || ''}
+      </span>
+    </div>
+  );
+};
+
+/* -------------------------
    Calendar View
 -------------------------- */
 export default function ScheduleCalendarView({
@@ -156,6 +170,13 @@ export default function ScheduleCalendarView({
     setView(newView);
   }, []);
 
+  const components = {
+    toolbar: CustomToolbar,
+    agenda: {
+      event: CustomAgendaEvent,
+    },
+  };
+
   return (
     <div className="h-[700px]">
       <Calendar
@@ -165,7 +186,7 @@ export default function ScheduleCalendarView({
         endAccessor="end"
         style={{ height: "100%" }}
         onSelectEvent={onSelectEvent}
-        components={{ toolbar: CustomToolbar }}
+        components={components}
         date={date}
         view={view}
         onNavigate={handleNavigate}

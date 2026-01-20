@@ -142,19 +142,9 @@ const ADMIN_NAV_ITEMS = [
     href: "/admin/student-performance",
   },
   {
-    label: "Points Management",
-    icon: <FiAward className="w-5 h-5" />,
-    href: "/admin/points-management",
-  },
-  {
     label: "Attendance",
     icon: <FiCalendar className="w-5 h-5" />,
     href: "/admin/attendance",
-  },
-  {
-    label: "Payroll",
-    icon: <FiCreditCard className="w-5 h-5" />,
-    href: "/admin/payroll",
   },
   {
     label: "Financial Management",
