@@ -29,7 +29,7 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
       try {
         // Admins see all courses, others see their own
         const url =
-          loggedInUser.role === "ADMIN" || loggedInUser.role === "FACULTY"
+          loggedInUser.role === "ADMIN"
             ? "/api/courses"
             : `/api/courses?teacherId=${loggedInUser.id}`;
         const res = await fetch(url);

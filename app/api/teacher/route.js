@@ -12,7 +12,7 @@ export async function GET() {
     }
 
     // Only ADMIN and STUDY_OFFICE roles can fetch all teachers
-    if (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE" && loggedInUser.role !== "FACULTY") {
+    if (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

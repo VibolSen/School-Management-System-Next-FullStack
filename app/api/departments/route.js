@@ -9,11 +9,7 @@ export async function GET(req) {
     const loggedInUser = await getLoggedInUser();
     let whereClause = {};
 
-    // If the user is a FACULTY and heads at least one faculty, filter departments
-    if (loggedInUser && loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
-      const facultyIds = loggedInUser.headedFaculties.map(faculty => faculty.id);
-      whereClause = { facultyId: { in: facultyIds } };
-    }
+    // No additional filtering needed for departments based on role here
 
     const departments = await prisma.department.findMany({
       where: whereClause,

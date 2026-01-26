@@ -9,7 +9,6 @@ const JWT_SECRET = new TextEncoder().encode(
 const roleProtectedPaths = {
   admin: ["/admin", "/admin/dashboard"],
   hr: ["/hr", "/hr/dashboard"],
-  faculty: ["/faculty", "/faculty/dashboard"],
   teacher: ["/teacher", "/teacher/dashboard", "/teacher/assignments"],
   student: ["/student", "/student/dashboard", "/student/invoices", "/student/invoices/[id]"],
   study_office: ["/study-office", "/study-office/dashboard", "/study-office/students", "/study-office/courses", "/study-office/courses/[id]"],
@@ -60,7 +59,7 @@ export async function middleware(request) {
     // Protect API routes
     if (path.startsWith('/api/library')) {
       if (request.method === 'POST' || request.method === 'PUT' || request.method === 'DELETE') {
-        if (userRole !== 'admin' && userRole !== 'faculty') {
+        if (userRole !== 'admin') {
           return new NextResponse(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
         }
       }
@@ -76,8 +75,8 @@ export async function middleware(request) {
 
     if (path.startsWith('/api/departments')) {
       if (request.method === 'DELETE') {
-        if (userRole === 'faculty') {
-          return new NextResponse(JSON.stringify({ error: 'Forbidden: Faculty cannot delete departments' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+        if (userRole !== 'admin' && userRole !== 'study_office') {
+          return new NextResponse(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
         }
       }
     }

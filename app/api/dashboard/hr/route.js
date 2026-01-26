@@ -7,7 +7,7 @@ export async function GET() {
     const staff = await prisma.user.findMany({
       where: {
         role: {
-          in: [Role.ADMIN, Role.FACULTY, Role.HR, Role.TEACHER],
+          in: [Role.ADMIN, Role.HR, Role.TEACHER],
         },
       },
     });
@@ -21,7 +21,7 @@ export async function GET() {
       },
       where: {
         role: {
-          in: [Role.ADMIN, Role.FACULTY, Role.HR, Role.TEACHER],
+          in: [Role.ADMIN, Role.HR, Role.TEACHER],
         },
       },
     });

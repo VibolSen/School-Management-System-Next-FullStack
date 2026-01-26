@@ -35,15 +35,9 @@ export async function GET(req) {
         select: { courseId: true },
       });
       courseIds = enrollments.map(e => e.courseId);
-    } else if (user.role === 'FACULTY' || user.role === 'ADMIN') {
+    } else if (user.role === 'ADMIN') {
       const courses = await prisma.course.findMany({
-        where: {
-          OR: [
-            { leadById: user.id },
-            // Admins can see all announcements
-            user.role === 'ADMIN' ? {} : undefined,
-          ].filter(Boolean),
-        },
+        where: {},
         select: { id: true },
       });
       courseIds = courses.map(c => c.id);

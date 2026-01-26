@@ -6,7 +6,7 @@ import StaffTable from "./StaffTable";
 import StaffModal from "./StaffModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 
-const ALL_ROLES = ["ADMIN", "HR", "FACULTY", "TEACHER", "STUDY_OFFICE"];
+const ALL_ROLES = ["ADMIN", "HR", "TEACHER", "STUDY_OFFICE"];
 
 export default function StaffManagementView() {
   const { user, loading: userLoading } = useUser();

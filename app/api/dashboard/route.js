@@ -18,7 +18,7 @@ export async function GET() {
     ] = await Promise.all([
       prisma.user.count({ where: { role: "STUDENT" } }),
       prisma.user.count({
-        where: { role: { in: ["ADMIN", "HR", "FACULTY", "TEACHER"] } },
+        where: { role: { in: ["ADMIN", "HR", "TEACHER"] } },
       }),
       prisma.department.count(),
       prisma.course.count(),

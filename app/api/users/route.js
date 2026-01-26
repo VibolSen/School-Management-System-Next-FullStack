@@ -31,7 +31,6 @@ export async function GET(request) {
 
     if (
       loggedInUser.role === "ADMIN" ||
-      loggedInUser.role === "FACULTY" ||
       loggedInUser.role === "HR" ||
       loggedInUser.role === "STUDY_OFFICE"
     ) {

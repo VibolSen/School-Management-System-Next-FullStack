@@ -32,7 +32,6 @@ export async function GET(request, { params }) {
     if (
       loggedInUser.role === "ADMIN" ||
       (loggedInUser.role === "HR" && user.role !== "STUDENT") ||
-      (loggedInUser.role === "FACULTY" && user.role !== "STUDENT") ||
       (loggedInUser.role === "STUDY_OFFICE") ||
       (loggedInUser.id === id)
     ) {

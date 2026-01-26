@@ -45,7 +45,7 @@ export async function GET(req) {
       whereClause.leadById = teacherId;
     }
 
-    if (loggedInUser && loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE" && loggedInUser.role !== "FACULTY") {
+    if (loggedInUser && loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE") {
       whereClause.leadById = loggedInUser.id;
     }
 
@@ -99,8 +99,8 @@ export async function POST(req) {
     let finalTeacherId = requestedTeacherId;
 
     // Authorization logic for POST
-    if (role !== "ADMIN" && role !== "STUDY_OFFICE" && role !== "FACULTY") {
-      // Only ADMIN, STUDY_OFFICE or FACULTY can create courses
+    if (role !== "ADMIN" && role !== "STUDY_OFFICE") {
+      // Only ADMIN or STUDY_OFFICE can create courses
       return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
     }
 
@@ -168,8 +168,8 @@ export async function PUT(req) {
     }
 
     // Authorization logic for PUT
-    if (role !== "ADMIN" && role !== "STUDY_OFFICE" && role !== "FACULTY") {
-      // Only ADMIN, STUDY_OFFICE or FACULTY can update courses
+    if (role !== "ADMIN" && role !== "STUDY_OFFICE") {
+      // Only ADMIN or STUDY_OFFICE can update courses
       return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
     }
 
@@ -177,10 +177,10 @@ export async function PUT(req) {
       name,
     };
 
-    // Handle teacherId update (only if not faculty or if faculty is updating to themselves)
-    if (requestedTeacherId && (role !== "FACULTY" || requestedTeacherId === loggedInUserId)) {
+    // Handle teacherId update
+    if (requestedTeacherId) {
       dataToUpdate.leadBy = { connect: { id: requestedTeacherId } };
-    } else if (requestedTeacherId === null && role !== "FACULTY") { // Allow admin/study_office to disconnect
+    } else if (requestedTeacherId === null) { // Allow admin/study_office to disconnect
       dataToUpdate.leadBy = { disconnect: true };
     }
 
@@ -267,8 +267,8 @@ export async function DELETE(req) {
     }
 
     // Authorization logic for DELETE
-    if (role !== "ADMIN" && role !== "STUDY_OFFICE" && role !== "FACULTY") {
-      // Only ADMIN, STUDY_OFFICE or FACULTY can delete courses
+    if (role !== "ADMIN" && role !== "STUDY_OFFICE") {
+      // Only ADMIN or STUDY_OFFICE can delete courses
       return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
     }
 

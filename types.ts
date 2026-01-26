@@ -3,7 +3,6 @@ export type ViewType = 'Dashboard' | 'Staff' | 'Students' | 'Courses' | 'E-Libra
 export enum Role {
   ADMINISTRATOR = 'Administrator',
   HR = 'HR',
-  FACULTY = 'Faculty',
   STUDENT = 'Student',
 }
 

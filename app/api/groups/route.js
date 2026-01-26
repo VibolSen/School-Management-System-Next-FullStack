@@ -22,28 +22,8 @@ export async function GET() {
       // No additional filtering needed for admin
     } else if (userRole === "TEACHER") {
       whereClause.id = { in: loggedInUser.groupIds };
-    } else if (loggedInUser && loggedInUser.role === "FACULTY" && loggedInUser.headedFaculties && loggedInUser.headedFaculties.length > 0) {
-      const headedFacultyIds = loggedInUser.headedFaculties.map(faculty => faculty.id);
-
-      const departmentsInHeadedFaculties = await prisma.department.findMany({
-        where: { facultyId: { in: headedFacultyIds } },
-        select: { id: true },
-      });
-      const departmentIds = departmentsInHeadedFaculties.map(dept => dept.id);
-
-      const coursesInDepartments = await prisma.courseDepartment.findMany({
-        where: { departmentId: { in: departmentIds } },
-        select: { courseId: true },
-      });
-      const courseIds = coursesInDepartments.map(cd => cd.courseId);
-
-      whereClause.courses = {
-        some: {
-          id: { in: courseIds },
-        },
-      };
     } else {
-      // If not admin or faculty with headed faculties, return forbidden or empty array
+      // If not admin or teacher, return forbidden or empty array
       return new NextResponse("Forbidden", { status: 403 });
     }
 

@@ -10,7 +10,6 @@ datasource db {
 enum Role {
   ADMIN
   HR
-  FACULTY
   TEACHER
   STUDENT
   STUDY_OFFICE

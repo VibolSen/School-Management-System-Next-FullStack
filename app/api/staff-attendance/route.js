@@ -18,7 +18,7 @@ export async function GET(request) {
     const staff = await prisma.user.findMany({
       where: {
         role: {
-          in: ['HR', 'ADMIN', 'FACULTY', 'TEACHER'],
+          in: ['HR', 'ADMIN', 'TEACHER'],
         },
       },
     });

@@ -25,17 +25,14 @@ export default function FacultyModal({
   useEffect(() => {
     if (isOpen) {
       setName(facultyToEdit?.name || "");
-      setHeadId(facultyToEdit?.headId || "");
     } else {
       setName("");
-      setHeadId("");
     }
   }, [isOpen, facultyToEdit]);
 
   const validateForm = () => {
     const newErrors = {};
     if (!name.trim()) newErrors.name = "Faculty name is required";
-    if (!headId) newErrors.headId = "Director is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -43,7 +40,7 @@ export default function FacultyModal({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      onSave({ name, headId });
+      onSave({ name });
     }
   };
 
@@ -104,37 +101,6 @@ export default function FacultyModal({
               />
               {errors.name && (
                 <p className="text-xs text-red-500 mt-1">{errors.name}</p>
-              )}
-            </div>
-
-            {/* Director / Head */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Director (Faculty User)
-              </label>
-              <select
-                className={`w-full px-3 py-2 border rounded-md text-sm bg-white ${
-                  errors.headId
-                    ? "border-red-500 ring-1 ring-red-500"
-                    : "border-slate-300"
-                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
-                value={headId}
-                onChange={(e) => {
-                  setHeadId(e.target.value);
-                  if (errors.headId) setErrors((prev) => ({ ...prev, headId: "" }));
-                }}
-                disabled={isLoading}
-                required={!isEditMode}
-              >
-                <option value="">Select Director</option>
-                {facultyUsers.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.firstName} {user.lastName}
-                  </option>
-                ))}
-              </select>
-              {errors.headId && (
-                <p className="text-xs text-red-500 mt-1">{errors.headId}</p>
               )}
             </div>
           </div>

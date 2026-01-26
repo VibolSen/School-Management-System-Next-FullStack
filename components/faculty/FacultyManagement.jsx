@@ -19,7 +19,7 @@ export default function FacultyManagement() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const API_ENDPOINT = '/api/faculty';
-  const FACULTY_USERS_API_ENDPOINT = '/api/users?role=FACULTY'; // API endpoint for faculty users
+  const FACULTY_USERS_API_ENDPOINT = '/api/users?role=TEACHER'; // API endpoint for teachers who can be directors
 
   const showMessage = (message, type = "success") => {
     if (type === "error") {

@@ -11,7 +11,7 @@ export async function GET(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE" && loggedInUser.role !== "FACULTY") {
+    if (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -93,9 +93,6 @@ export async function POST(req) {
 
     if (!name) {
       return NextResponse.json({ error: "Faculty name is required" }, { status: 400 });
-    }
-    if (!headId) {
-      return NextResponse.json({ error: "Faculty head is required" }, { status: 400 });
     }
 
     const newFaculty = await prisma.faculty.create({
