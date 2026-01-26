@@ -14,7 +14,7 @@ export async function GET(request) {
 
   try {
     let exams;
-    if (userRole === "ADMIN") {
+    if (userRole === "ADMIN" || userRole === "STUDY_OFFICE") {
       exams = await prisma.exam.findMany({
         include: {
           group: { select: { id: true, name: true } },

@@ -18,7 +18,8 @@ import {
   FiSend,
   FiCode,
   FiCalendar,
-  FiCheckSquare,
+  FiFileText,
+  FiClipboard,
 } from "react-icons/fi";
 import { usePathname } from "next/navigation";
 
@@ -91,6 +92,16 @@ const STUDY_OFFICE_NAV_ITEMS = [
     label: "Gradebook",
     icon: <FiBookOpen className="w-5 h-5" />,
     href: "/study-office/gradebook",
+  },
+  {
+    label: "Assignments",
+    icon: <FiClipboard className="w-5 h-5" />,
+    href: "/study-office/assignments",
+  },
+  {
+    label: "Exams",
+    icon: <FiFileText className="w-5 h-5" />,
+    href: "/study-office/exams",
   },
   {
     label: "Student Performance",

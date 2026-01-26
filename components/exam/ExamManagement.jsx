@@ -49,7 +49,7 @@ export default function ExamManagement({ loggedInUser }) {
     // The userRole is already defined and lowercased at the component level
     // No need to redefine here: const userRole = loggedInUser.role?.toLowerCase(); 
 
-    if (userRole !== "admin" && userRole !== "teacher") {
+    if (userRole !== "admin" && userRole !== "teacher" && userRole !== "study_office") {
       setIsUnauthorized(true);
       setIsLoading(false);
       return;
@@ -58,12 +58,14 @@ export default function ExamManagement({ loggedInUser }) {
     setIsLoading(true);
     try {
       let examsRes, groupsRes;
-      if (userRole === "admin") {
+      if (userRole === "admin" || userRole === "study_office") {
         [examsRes, groupsRes] = await Promise.all([
           fetch("/api/exams"),
           fetch("/api/groups"),
         ]);
-        setAllGroups(await groupsRes.json());
+        if (userRole === "admin") {
+          setAllGroups(await groupsRes.json());
+        }
       } else if (userRole === "teacher") {
         [examsRes, groupsRes] = await Promise.all([
           fetch(`/api/teacher/exams?teacherId=${teacherId}`),
@@ -207,10 +209,10 @@ export default function ExamManagement({ loggedInUser }) {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
             <h1 className="text-3xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              {userRole === "admin" ? "Exam Management" : "My Exams"}
+              {userRole === "admin" || userRole === "study_office" ? "Exam Management" : "My Exams"}
             </h1>
             <p className="text-slate-600 text-sm mt-1">
-              {userRole === "admin"
+              {userRole === "admin" || userRole === "study_office"
                 ? "Manage all exams across the school"
                 : "View and manage your assigned exams"}
             </p>
@@ -328,7 +330,7 @@ export default function ExamManagement({ loggedInUser }) {
         <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-800">
-              {userRole === "admin" ? "All Exams" : "My Exams"}
+              {userRole === "admin" || userRole === "study_office" ? "All Exams" : "My Exams"}
             </h2>
             <button
               onClick={fetchData}
@@ -377,7 +379,7 @@ export default function ExamManagement({ loggedInUser }) {
                   No Exams Yet
                 </h3>
                 <p className="text-slate-500 text-sm mb-4">
-                  {userRole === "admin"
+                  {userRole === "admin" || userRole === "study_office"
                     ? "Create your first exam to get started."
                     : "You haven't created any exams yet."}
                 </p>
@@ -399,8 +401,8 @@ export default function ExamManagement({ loggedInUser }) {
                   exam={exam}
                   onNavigate={() =>
                     router.push(
-                      userRole === "admin"
-                        ? `/admin/exam-management/${exam.id}`
+                      userRole === "admin" || userRole === "study_office"
+                        ? `/${userRole === "admin" ? "admin" : "study-office"}/exam-management/${exam.id}`
                         : `/teacher/exam/${exam.id}`
                     )
                   }

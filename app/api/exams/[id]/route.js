@@ -48,7 +48,7 @@ export async function GET(request, { params }) {
 
     // Authorization check
 
-    if (loggedInUser.role === "ADMIN" || (loggedInUser.role === "TEACHER" && exam.teacherId === loggedInUser.id)) {
+    if (loggedInUser.role === "ADMIN" || loggedInUser.role === "STUDY_OFFICE" || (loggedInUser.role === "TEACHER" && exam.teacherId === loggedInUser.id)) {
 
       return NextResponse.json(exam);
 

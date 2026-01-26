@@ -11,7 +11,7 @@ const roleProtectedPaths = {
   hr: ["/hr", "/hr/dashboard"],
   teacher: ["/teacher", "/teacher/dashboard", "/teacher/assignments"],
   student: ["/student", "/student/dashboard", "/student/invoices", "/student/invoices/[id]"],
-  study_office: ["/study-office", "/study-office/dashboard", "/study-office/students", "/study-office/courses", "/study-office/courses/[id]"],
+  study_office: ["/study-office", "/study-office/dashboard", "/study-office/students", "/study-office/courses", "/study-office/courses/[id]", "/study-office/assignments", "/study-office/exams"],
 };
 
 export async function middleware(request) {

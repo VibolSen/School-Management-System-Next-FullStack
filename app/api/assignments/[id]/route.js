@@ -9,8 +9,8 @@ export async function GET(request, { params }) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  // Only allow admins to fetch assignments by ID
-  if (loggedInUser.role !== "ADMIN") {
+  // Only allow admins and study office to fetch assignments by ID
+  if (loggedInUser.role !== "ADMIN" && loggedInUser.role !== "STUDY_OFFICE") {
     return new NextResponse("Forbidden", { status: 403 });
   }
 

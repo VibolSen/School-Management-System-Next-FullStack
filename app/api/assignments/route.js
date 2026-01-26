@@ -15,8 +15,8 @@ export async function GET(request) {
 
   try {
     let assignments;
-    if (userRole === "ADMIN") {
-      console.log("ADMIN role detected. Attempting to fetch all assignments.");
+    if (userRole === "ADMIN" || userRole === "STUDY_OFFICE") {
+      console.log("ADMIN or STUDY_OFFICE role detected. Attempting to fetch all assignments.");
       assignments = await prisma.assignment.findMany({
         include: {
           group: { select: { id: true, name: true } },
