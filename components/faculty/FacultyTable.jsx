@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
-const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAssignDirectorClick, onAddFacultyClick }) => {
+const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAddFacultyClick }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortColumn, setSortColumn] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -125,12 +125,6 @@ const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAssi
                               className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
                             >
                               Departments
-                            </th><th
-                              scope="col"
-                              className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
-                              onClick={() => handleSort('head')}
-                            >
-                              Director
                             </th><th scope="col" className="px-6 py-3 text-center">
                               Actions
                             </th>
@@ -152,9 +146,6 @@ const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAssi
                       ? (faculty.departments || [])[0].name
                       : faculty.departments.length}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {faculty.head ? `${faculty.head.firstName || ''} ${faculty.head.lastName || ''}`.trim() : 'N/A'}
-                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <button
                       onClick={() => onEditClick(faculty)}
@@ -167,12 +158,6 @@ const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAssi
                       className="text-red-600 hover:text-red-800 hover:scale-105 transition-all duration-200"
                     >
                       Delete
-                    </button>
-                    <button
-                      onClick={() => onAssignDirectorClick(faculty)}
-                      className="text-blue-600 hover:text-blue-800 hover:scale-105 transition-all duration-200"
-                    >
-                      Assign Director
                     </button>
                   </td>
                 </tr>

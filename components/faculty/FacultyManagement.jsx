@@ -8,7 +8,6 @@ import Notification from '@/components/Notification';
 
 export default function FacultyManagement() {
   const [faculties, setFaculties] = useState([]);
-  const [facultyUsers, setFacultyUsers] = useState([]); // New state for faculty users
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingFaculty, setEditingFaculty] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,21 +44,10 @@ export default function FacultyManagement() {
     }
   }, []);
 
-  const fetchFacultyUsers = useCallback(async () => {
-    try {
-      const response = await fetch(FACULTY_USERS_API_ENDPOINT);
-      if (!response.ok) throw new Error('Failed to fetch faculty users.');
-      const data = await response.json();
-      setFacultyUsers(data);
-    } catch (err) {
-      showMessage(err.message, 'error');
-    }
-  }, []);
 
   useEffect(() => {
     fetchFaculties();
-    fetchFacultyUsers(); // Fetch faculty users on mount
-  }, [fetchFaculties, fetchFacultyUsers]);
+  }, [fetchFaculties]);
 
   const handleSaveFaculty = async (formData) => {
     setIsLoading(true);
@@ -130,10 +118,6 @@ export default function FacultyManagement() {
     setIsModalOpen(true);
   };
 
-  const handleAssignDirectorClick = (faculty) => {
-    setEditingFaculty(faculty);
-    setIsModalOpen(true);
-  };
 
   const handleDeleteRequest = (faculty) => {
     setItemToDelete(faculty);
@@ -165,7 +149,6 @@ export default function FacultyManagement() {
         faculties={faculties}
         onEditClick={handleEditClick}
         onDeleteClick={handleDeleteRequest}
-        onAssignDirectorClick={handleAssignDirectorClick}
         onAddFacultyClick={handleAddClick}
         isLoading={isLoading}
       />
@@ -177,7 +160,6 @@ export default function FacultyManagement() {
           onSave={handleSaveFaculty}
           facultyToEdit={editingFaculty}
           isLoading={isLoading}
-          facultyUsers={facultyUsers} // Pass faculty users here
         />
       )}
 

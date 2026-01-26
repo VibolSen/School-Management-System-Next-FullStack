@@ -9,10 +9,8 @@ export default function FacultyModal({
   onSave,
   facultyToEdit,
   isLoading,
-  facultyUsers = [],
 }) {
   const [name, setName] = useState("");
-  const [headId, setHeadId] = useState("");
   const [mounted, setMounted] = useState(false);
   const [errors, setErrors] = useState({});
 
