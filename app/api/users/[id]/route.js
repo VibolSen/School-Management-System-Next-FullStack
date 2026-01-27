@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 
 // GET a single user by ID
 export async function GET(request, { params }) {
-  const { id } = params;
+  const { id } = await params;
   try {
     const loggedInUser = await getLoggedInUser();
     if (!loggedInUser) {
@@ -13,7 +13,7 @@ export async function GET(request, { params }) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         id: true,
         firstName: true,
@@ -47,7 +47,7 @@ export async function GET(request, { params }) {
 
 // PUT to update a user
 export async function PUT(request, { params }) {
-  const { id } = params;
+  const { id } = await params;
   try {
     const loggedInUser = await getLoggedInUser();
     if (!loggedInUser) {
@@ -55,7 +55,7 @@ export async function PUT(request, { params }) {
     }
 
     const userToUpdate = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!userToUpdate) {
@@ -74,6 +74,7 @@ export async function PUT(request, { params }) {
     const formData = await request.formData();
     const firstName = formData.get("firstName");
     const lastName = formData.get("lastName");
+    const password = formData.get("password");
 
     const data = {};
     if (firstName) data.firstName = firstName;
@@ -92,7 +93,7 @@ export async function PUT(request, { params }) {
     }
 
     const updatedUser = await prisma.user.update({
-      where: { id: params.id },
+      where: { id },
       data,
       select: {
         id: true,
@@ -113,7 +114,7 @@ export async function PUT(request, { params }) {
 
 // DELETE a user
 export async function DELETE(request, { params }) {
-  const { id } = params;
+  const { id } = await params;
   try {
     const loggedInUser = await getLoggedInUser();
     if (!loggedInUser) {
@@ -121,7 +122,7 @@ export async function DELETE(request, { params }) {
     }
 
     const userToDelete = await prisma.user.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!userToDelete) {
@@ -147,7 +148,7 @@ export async function DELETE(request, { params }) {
     }
 
     await prisma.user.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'User deleted successfully' });

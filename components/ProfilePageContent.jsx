@@ -270,7 +270,7 @@ export default function ProfilePageContent({
                   </div>
                   <div className="flex items-center justify-center gap-1.5 text-sm text-gray-600">
                     <Shield className="w-4 h-4" />
-                    <span className="capitalize">{user.role?.name}</span>
+                    <span className="capitalize">{user.role}</span>
                   </div>
                 </div>
 

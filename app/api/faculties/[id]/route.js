@@ -3,10 +3,9 @@ import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function GET(req, context) {
+export async function GET(req, { params }) {
   try {
-    const params = await context.params; // ✅ IMPORTANT
-    const { id } = params;
+    const { id } = await params;
 
     const faculty = await prisma.faculty.findUnique({
       where: { id },

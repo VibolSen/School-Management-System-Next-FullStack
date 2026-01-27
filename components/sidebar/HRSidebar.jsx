@@ -65,7 +65,6 @@ const HR_NAV_ITEMS = [
     icon: <FiClipboard className="w-5 h-5" />,
     href: "/hr/job-postings",
   },
-  { label: "Leave", icon: <FiSend className="w-5 h-5" />, href: "/hr/leave" },
   {
     label: "Attendance",
     icon: <FiCalendar className="w-5 h-5" />,
@@ -75,11 +74,6 @@ const HR_NAV_ITEMS = [
     label: "Manage Attendance",
     icon: <FiUsers className="w-5 h-5" />,
     href: "/hr/manage-attendance",
-  },
-  {
-    label: "Payroll",
-    icon: <FiCreditCard className="w-5 h-5" />,
-    href: "/hr/payroll",
   },
   {
     label: "Reports & Analytics",

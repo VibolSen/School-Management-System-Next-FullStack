@@ -124,22 +124,6 @@ const STUDY_OFFICE_NAV_ITEMS = [
     href: "/study-office/e-library",
   },
   {
-    label: "Admin Dashboard",
-    icon: <FiGrid className="w-5 h-5" />,
-    href: "/admin/dashboard",
-  },
-  {
-    label: "Job Postings (Admin)",
-    icon: <FiBriefcase className="w-5 h-5" />,
-    href: "/admin/job-postings",
-  },
-  {
-    label: "Finance (Admin)",
-    icon: <FiSend className="w-5 h-5" />,
-    href: "/admin/finance",
-  },
-
-  {
     label: "My Attendance",
     icon: <FiCalendar className="w-5 h-5" />,
     href: "/study-office/my-attendance",

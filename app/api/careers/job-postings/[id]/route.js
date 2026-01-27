@@ -3,9 +3,8 @@ import prisma from "@/lib/prisma";
 
 // GET a single open job posting by ID for public view
 export async function GET(request, { params }) {
+  const { id } = await params;
   try {
-    const { id } = params;
-
     if (!id || !/^[0-9a-fA-F]{24}$/.test(id)) {
       return NextResponse.json(
         { message: "Invalid Job ID format" },

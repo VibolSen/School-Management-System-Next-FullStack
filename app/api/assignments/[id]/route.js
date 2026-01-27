@@ -14,7 +14,7 @@ export async function GET(request, { params }) {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   try {
     const assignment = await prisma.assignment.findUnique({
@@ -48,7 +48,7 @@ export async function PUT(request, { params }) {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   try {
     const body = await request.json();
@@ -88,7 +88,7 @@ export async function DELETE(request, { params }) {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   try {
     await prisma.assignment.delete({

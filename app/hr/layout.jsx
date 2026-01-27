@@ -3,7 +3,7 @@ import { useState } from "react";
 import Header from "../../components/nav/Header";
 import HRSidebar from "../../components/sidebar/HRSidebar";
 
-export default function AdminLayout({ children }) {
+export default function HRLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);

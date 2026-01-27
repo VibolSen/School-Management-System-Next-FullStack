@@ -125,7 +125,7 @@ export default function UserTable({
                 </option>
               ))}
           </select>
-          {currentUserRole === "ADMIN" && (
+          {(currentUserRole === "ADMIN" || currentUserRole === "HR") && (
             <button
               onClick={onAddUserClick}
               disabled={isLoading}
@@ -227,7 +227,7 @@ export default function UserTable({
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium space-x-2 text-center">
-                    {currentUserRole === "ADMIN" && (
+                    {(currentUserRole === "ADMIN" || currentUserRole === "HR") && (
                       <button
                         onClick={() => onEditClick(user)}
                         className="text-indigo-600 hover:text-indigo-900 hover:scale-105 transition-all duration-200"
@@ -246,7 +246,7 @@ export default function UserTable({
                         </button>
                       </Link>
                     )}
-                    {currentUserRole === "ADMIN" && (
+                    {(currentUserRole === "ADMIN" || currentUserRole === "HR") && (
                       <button
                         onClick={() => onDeleteClick(user.id)}
                         className="text-red-600 hover:text-red-800 hover:scale-105 transition-all duration-200"

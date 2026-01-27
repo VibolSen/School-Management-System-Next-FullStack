@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 // GET /api/admin/staff/[id] - Get a single staff member by ID
-export async function GET(req, { params }) {
-  const { id } = params;
+export async function GET(request, { params }) {
+  const { id } = await params;
   try {
     const staffMember = await prisma.user.findUnique({
       where: { id },

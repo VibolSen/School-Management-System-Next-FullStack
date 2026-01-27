@@ -133,14 +133,14 @@ const HRDashboard = () => {
             value={totalDepartments.toString()}
             icon={<Building2 className="w-6 h-6 text-orange-500" />}
             description="All departments"
-            href="/admin/departments"
+            href="/hr/reports"
           />
           <DashboardCard
             title="Total Teachers"
             value={dashboardData.totalTeachers?.toString() || "N/A"}
             icon={<Users className="w-6 h-6 text-blue-500" />}
             description="Total teaching staff"
-            href="/admin/teachers"
+            href="/hr/staff"
           />
         </section>
 
@@ -154,46 +154,12 @@ const HRDashboard = () => {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
             {[
-              {
-                label: "Manage Staff",
-                icon: Users,
-                href: "/hr/staff",
-              },
-              {
-                label: "Attendance",
-                icon: CalendarCheck,
-                href: "/hr/attendance",
-              },
-              {
-                label: "Reports",
-                icon: BarChart3,
-                href: "/hr/reports",
-              },
-              {
-                label: "Settings",
-                icon: Settings,
-                href: "/hr/settings",
-              },
-              {
-                label: "Job Postings",
-                icon: ClipboardList,
-                href: "/hr/job-postings",
-              },
-              {
-                label: "Leave",
-                icon: Send,
-                href: "/hr/leave",
-              },
-              {
-                label: "Manage Attendance",
-                icon: UserPlus,
-                href: "/hr/manage-attendance",
-              },
-              {
-                label: "Payroll",
-                icon: DollarSign,
-                href: "/hr/payroll",
-              },
+              { label: "Manage Staff", icon: Users, href: "/hr/staff" },
+              { label: "Attendance", icon: CalendarCheck, href: "/hr/attendance" },
+              { label: "Reports", icon: BarChart3, href: "/hr/reports" },
+              { label: "Settings", icon: Settings, href: "/hr/settings" },
+              { label: "Job Postings", icon: ClipboardList, href: "/hr/job-postings" },
+              { label: "Manage Attendance", icon: UserPlus, href: "/hr/manage-attendance" },
             ].map((action, i) => (
               <Link
                 href={action.href}

@@ -82,11 +82,6 @@ const ADMIN_NAV_ITEMS = [
     href: "/admin/staff",
   },
   {
-    label: "Job Postings",
-    icon: <FiBriefcase className="w-5 h-5" />,
-    href: "/admin/job-postings",
-  },
-  {
     label: "Teachers",
     icon: <FiUsers className="w-5 h-5" />,
     href: "/admin/teachers",
@@ -97,19 +92,24 @@ const ADMIN_NAV_ITEMS = [
     href: "/admin/students",
   },
   {
-    label: "Departments",
-    icon: <FiGrid className="w-5 h-5" />,
-    href: "/admin/departments",
-  },
-  {
     label: "Faculty",
     icon: <FiBook className="w-5 h-5" />,
     href: "/admin/faculty",
   },
   {
+    label: "Departments",
+    icon: <FiGrid className="w-5 h-5" />,
+    href: "/admin/departments",
+  },
+  {
     label: "Courses",
     icon: <FiBook className="w-5 h-5" />,
     href: "/admin/courses",
+  },
+  {
+    label: "Groups",
+    icon: <FiHash className="w-5 h-5" />,
+    href: "/admin/groups",
   },
   {
     label: "Assignment Management",
@@ -125,11 +125,6 @@ const ADMIN_NAV_ITEMS = [
     label: "Course Analytics",
     icon: <FiBarChart2 className="w-5 h-5" />,
     href: "/admin/course-analytics",
-  },
-  {
-    label: "Groups",
-    icon: <FiHash className="w-5 h-5" />,
-    href: "/admin/groups",
   },
   {
     label: "E-Library",
@@ -165,6 +160,11 @@ const ADMIN_NAV_ITEMS = [
     label: "Certificate Management",
     icon: <FiBookOpen className="w-5 h-5" />,
     href: "/admin/certificate-management",
+  },
+  {
+    label: "Job Postings",
+    icon: <FiBriefcase className="w-5 h-5" />,
+    href: "/admin/job-postings",
   },
   {
     label: "Settings",
