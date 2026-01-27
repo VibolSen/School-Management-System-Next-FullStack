@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { X, ClipboardList, Calendar, Target, Users, BookOpen } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function AssignmentModal({
   isOpen,
@@ -96,127 +98,70 @@ export default function AssignmentModal({
   if (!isOpen || !mounted) return null;
 
   const modalContent = (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-2 ${
-        isClosing ? "animate-fadeOut" : "animate-fadeIn"
-      }`}
-    >
-      {/* Backdrop with blur effect */}
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={handleClose}
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={handleClose}
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+          />
 
-      {/* Modal Container */}
-      <div
-        className={`relative w-full max-w-xl transform ${
-          isClosing ? "animate-scaleOut" : "animate-scaleIn"
-        }`}
-      >
-        {/* Gradient Border Effect */}
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur opacity-25"></div>
-
-        <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden">
-          {/* Header with Gradient */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <div className="p-1.5 bg-white/20 rounded-lg">
-                  <svg
-                    className="w-5 h-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-full overflow-hidden flex flex-col border border-white/20"
+          >
+            <div className="p-5 border-b bg-gradient-to-r from-slate-50 to-white">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <ClipboardList className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-800">
+                      {isEditMode ? "Edit Assignment" : "New Assignment"}
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                      {isEditMode ? "Update assignment details and requirements" : "Create a new learning task for your students"}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-lg font-bold text-white">
-                    {isEditMode ? "Edit Assignment" : "Create New Assignment"}
-                  </h2>
-                  <p className="text-blue-100 text-xs mt-0.5">
-                    {isEditMode
-                      ? "Update the details for your assignment"
-                      : "Fill in the details for your new assignment"}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={handleClose}
-                disabled={isLoading}
-                className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-md transition-all duration-200 disabled:opacity-50"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                <button
+                  onClick={handleClose}
+                  className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all duration-200"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
-          </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="p-4 max-h-[60vh] overflow-y-auto">
-              <div className="space-y-4">
-                {/* Title Input */}
-                <div className="group">
-                  <label className="flex items-center text-xs font-semibold text-slate-700 mb-2">
-                    <svg
-                      className="w-3 h-3 mr-1 text-blue-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
-                    Assignment Title *
+            <form onSubmit={handleSubmit} noValidate className="flex flex-col overflow-hidden">
+              <div className="p-6 space-y-5 overflow-y-auto max-h-[70vh]">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-700 ml-1">
+                    Assignment Title
                   </label>
                   <input
                     type="text"
                     name="title"
                     value={formData.title}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200 placeholder-slate-400 text-sm"
-                    placeholder="e.g., Chapter 5 Review Quiz"
+                    className={`w-full px-4 py-2.5 bg-slate-50 border rounded-xl text-sm transition-all duration-200 ${
+                      error && !formData.title.trim()
+                        ? "border-red-500 ring-4 ring-red-500/10"
+                        : "border-slate-200 hover:border-blue-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:bg-white"
+                    }`}
+                    placeholder="e.g., Quantum Mechanics Problem Set #1"
                     disabled={isLoading}
                   />
                 </div>
 
-                {/* Description Input */}
-                <div className="group">
-                  <label className="flex items-center text-xs font-semibold text-slate-700 mb-2">
-                    <svg
-                      className="w-3 h-3 mr-1 text-blue-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 6h16M4 12h16M4 18h16"
-                      />
-                    </svg>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-700 ml-1">
                     Description
                   </label>
                   <textarea
@@ -224,31 +169,16 @@ export default function AssignmentModal({
                     value={formData.description}
                     onChange={handleChange}
                     rows={3}
-                    className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200 placeholder-slate-400 resize-none text-sm"
-                    placeholder="Provide detailed instructions for your students..."
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm transition-all duration-200 placeholder-slate-400 resize-none hover:border-blue-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:bg-white"
+                    placeholder="Outline the objectives and requirements..."
                     disabled={isLoading}
-                  ></textarea>
+                  />
                 </div>
 
-                {/* Details Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {/* Due Date */}
-                  <div className="group">
-                    <label className="flex items-center text-xs font-semibold text-slate-700 mb-2">
-                      <svg
-                        className="w-3 h-3 mr-1 text-blue-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      Due Date
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 ml-1 flex items-center">
+                      <Calendar className="w-3 h-3 mr-1 text-slate-400" /> Due Date
                     </label>
                     <input
                       type="date"
@@ -256,28 +186,14 @@ export default function AssignmentModal({
                       value={formData.dueDate}
                       onChange={handleChange}
                       min={new Date().toISOString().split("T")[0]}
-                      className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200 text-sm"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm transition-all duration-200 hover:border-blue-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:bg-white"
                       disabled={isLoading}
                     />
                   </div>
 
-                  {/* Points */}
-                  <div className="group">
-                    <label className="flex items-center text-xs font-semibold text-slate-700 mb-2">
-                      <svg
-                        className="w-3 h-3 mr-1 text-blue-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                        />
-                      </svg>
-                      Points
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 ml-1 flex items-center">
+                      <Target className="w-3 h-3 mr-1 text-slate-400" /> Max Points
                     </label>
                     <input
                       type="number"
@@ -285,189 +201,89 @@ export default function AssignmentModal({
                       value={formData.points}
                       onChange={handleChange}
                       min="0"
-                      max="1000"
-                      className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200 text-sm"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm transition-all duration-200 hover:border-blue-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:bg-white"
                       placeholder="100"
                       disabled={isLoading}
                     />
                   </div>
 
-                  {/* Group Selection */}
-                  <div className="group">
-                    <label className="flex items-center text-xs font-semibold text-slate-700 mb-2">
-                      <svg
-                        className="w-3 h-3 mr-1 text-blue-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                        />
-                      </svg>
-                      Assign to Group *
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 ml-1 flex items-center">
+                      <Users className="w-3 h-3 mr-1 text-slate-400" /> Target Group
                     </label>
-                    <select
-                      name="groupId"
-                      value={formData.groupId}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-all duration-200 bg-white appearance-none text-sm"
-                      disabled={isEditMode || teacherGroups.length === 0 || isLoading}
-                    >
-                      {teacherGroups.length === 0 ? (
-                        <option value="">
-                          You have no groups to assign to
-                        </option>
-                      ) : (
-                        teacherGroups.map((group) => (
-                          <option key={group.id} value={group.id}>
-                            {group.name}
-                          </option>
-                        ))
-                      )}
-                    </select>
+                    <div className="relative group">
+                      <select
+                        name="groupId"
+                        value={formData.groupId}
+                        onChange={handleChange}
+                        className="w-full pl-3 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm transition-all duration-200 appearance-none hover:border-blue-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:bg-white"
+                        disabled={isEditMode || teacherGroups.length === 0 || isLoading}
+                      >
+                        {teacherGroups.length === 0 ? (
+                          <option value="">No Groups</option>
+                        ) : (
+                          teacherGroups.map((group) => (
+                            <option key={group.id} value={group.id}>
+                              {group.name}
+                            </option>
+                          ))
+                        )}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Error Message */}
                 {error && (
-                  <div className="flex items-center p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <svg
-                      className="w-4 h-4 text-red-500 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <span className="text-red-600 font-normal text-sm">{error}</span>
-                  </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 bg-red-50 border border-red-100 rounded-xl flex items-center gap-2"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    <span className="text-xs text-red-600 font-medium">{error}</span>
+                  </motion.div>
                 )}
               </div>
-            </div>
 
-            {/* Footer Actions */}
-            <div className="p-4 bg-slate-50 border-t flex flex-col sm:flex-row justify-between items-center gap-3">
-              <div className="text-xs text-slate-500">
-                Fields marked with * are required
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  disabled={isLoading}
-                  className="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg font-normal hover:bg-slate-50 transition-all duration-200 disabled:opacity-50 flex items-center space-x-1"
-                >
-                  <svg
-                    className="w-3 h-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+              <div className="p-5 bg-slate-50 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                  * All required fields must be complete
+                </span>
+                <div className="flex gap-3 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={handleClose}
+                    disabled={isLoading}
+                    className="flex-1 sm:flex-none px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all duration-200"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                  <span>Cancel</span>
-                </button>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-normal shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:transform-none flex items-center space-x-1"
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
-                      <span>{isEditMode ? "Saving..." : "Creating..."}</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        className="w-3 h-3"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      <span>{isEditMode ? "Save Changes" : "Create Assignment"}</span>
-                    </>
-                  )}
-                </button>
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="flex-1 sm:flex-none px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 transition-all duration-200 active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
+                  >
+                    {isLoading ? (
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      isEditMode ? "Save Changes" : "Create Task"
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
-          </form>
+            </form>
+          </motion.div>
         </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        @keyframes fadeOut {
-          from {
-            opacity: 1;
-          }
-          to {
-            opacity: 0;
-          }
-        }
-        @keyframes scaleIn {
-          from {
-            transform: scale(0.9);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-        @keyframes scaleOut {
-          from {
-            transform: scale(1);
-            opacity: 1;
-          }
-          to {
-            transform: scale(0.9);
-            opacity: 0;
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-        .animate-fadeOut {
-          animation: fadeOut 0.3s ease-out;
-        }
-        .animate-scaleIn {
-          animation: scaleIn 0.3s ease-out;
-        }
-        .animate-scaleOut {
-          animation: scaleOut 0.3s ease-out;
-        }
-      `}</style>
-    </div>
+      )}
+    </AnimatePresence>
   );
 
   return createPortal(modalContent, document.body);
 }
+
+// Remove the old style tag that was here before

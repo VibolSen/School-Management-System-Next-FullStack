@@ -143,7 +143,7 @@ export default function AssignmentManagement() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-4">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-4">
         <Notification
           {...notification}
           onClose={() => setNotification({ ...notification, show: false })}
@@ -152,16 +152,16 @@ export default function AssignmentManagement() {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               {user?.role === "TEACHER" ? "Assignments" : "Assignment Management"}
             </h1>
-            <p className="text-slate-600 mt-1">
+            <p className="text-slate-600 text-xs mt-0.5">
               {user?.role === "TEACHER" ? "View and manage your assigned tasks" : "Manage all assignments across the school"}
             </p>
           </div>
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-2 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow hover:shadow-md transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             disabled={userLoading || (!user || (user.role !== "ADMIN" && user.role !== "TEACHER"))}
           >
             <span className="flex items-center gap-1">
@@ -268,7 +268,7 @@ export default function AssignmentManagement() {
         </div>
 
         {/* Assignments Grid */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white p-4">
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white p-3">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-800">
               All Assignments

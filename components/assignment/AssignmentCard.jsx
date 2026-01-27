@@ -2,7 +2,7 @@
 
 "use client";
 
-import React from "react";
+import { Edit, Trash2 } from "lucide-react";
 
 const AssignmentCard = ({
   assignment,
@@ -160,16 +160,16 @@ const AssignmentCard = ({
 
       {/* Main Card */}
       <div
-        className={`relative bg-white rounded-xl shadow-sm hover:shadow-md border border-slate-100 overflow-hidden transition-all duration-300 transform hover:scale-[1.02] group-hover:border-blue-200`}
+        className={`relative bg-white rounded-xl shadow-sm hover:shadow-md border border-slate-100 overflow-hidden transition-all duration-300 transform hover:scale-[1.01] group-hover:border-blue-200`}
       >
         {/* Status Gradient Bar */}
         <div className={`h-1 bg-gradient-to-r from-blue-400 to-purple-400`} />
 
-        <div className="p-4">
+        <div className="p-3">
           {/* Header Section */}
-          <div className="flex justify-between items-start mb-3">
+          <div className="flex justify-between items-start mb-2.5">
             {/* Group Badge */}
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
               <svg
                 className="w-2.5 h-2.5 mr-1"
                 fill="none"
@@ -188,7 +188,7 @@ const AssignmentCard = ({
 
             {/* Status Badge */}
             <span
-              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold border ${styles.badge}`}
+              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${styles.badge}`}
             >
               {statusIcon}
               <span className="ml-1">{status || "No Status"}</span>
@@ -196,24 +196,24 @@ const AssignmentCard = ({
           </div>
 
           {/* Assignment Title */}
-          <div onClick={onNavigate} className="cursor-pointer mb-3 group/title">
-            <h3 className="text-base font-bold text-slate-800 leading-tight line-clamp-2 group-hover/title:text-blue-600 transition-colors duration-200">
+          <div onClick={onNavigate} className="cursor-pointer mb-2 group/title">
+            <h3 className="text-sm font-bold text-slate-800 leading-tight line-clamp-2 group-hover/title:text-blue-600 transition-colors duration-200">
               {assignment.title || "Untitled Assignment"}
             </h3>
           </div>
 
           {/* Description Preview */}
           {assignment.description && (
-            <p className="text-slate-600 text-xs mb-3 line-clamp-2 leading-relaxed">
+            <p className="text-slate-600 text-[11px] mb-2.5 line-clamp-2 leading-relaxed">
               {assignment.description}
             </p>
           )}
 
           {/* Due Date & Info Section */}
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center space-x-3">
               {/* Due Date */}
-              <div className="flex items-center text-xs">
+              <div className="flex items-center text-[10px]">
                 <svg
                   className={`w-3 h-3 mr-1 ${
                     isOverdue ? "text-red-500" : styles.icon
@@ -246,7 +246,7 @@ const AssignmentCard = ({
 
               {/* Points */}
               {assignment.points && (
-                <div className="flex items-center text-xs text-slate-500">
+                <div className="flex items-center text-[10px] text-slate-500">
                   <svg
                     className="w-3 h-3 mr-1"
                     fill="none"
@@ -268,8 +268,8 @@ const AssignmentCard = ({
 
           {/* Submission Count (if available) */}
           {assignment.submissionCount !== undefined && (
-            <div className="mb-3">
-              <div className="flex justify-between text-xs text-slate-500 mb-1">
+            <div className="mb-2.5">
+              <div className="flex justify-between text-[10px] text-slate-500 mb-1">
                 <span>Submissions: {assignment.submissionCount}</span>
                 <span>
                   {assignment.totalStudents
@@ -281,9 +281,9 @@ const AssignmentCard = ({
                     : ""}
                 </span>
               </div>
-              <div className="w-full bg-slate-200 rounded-full h-1.5">
+              <div className="w-full bg-slate-200 rounded-full h-1">
                 <div
-                  className="bg-green-500 h-1.5 rounded-full transition-all duration-500"
+                  className="bg-green-500 h-1 rounded-full transition-all duration-500"
                   style={{
                     width: `${
                       assignment.totalStudents
@@ -300,44 +300,20 @@ const AssignmentCard = ({
 
           {/* Action Buttons */}
           {showActions && (userRole === "ADMIN" || userRole === "TEACHER") && (
-            <div className="flex justify-end space-x-2 pt-3 border-t border-slate-100">
+            <div className="flex justify-end space-x-3 pt-2.5 border-t border-slate-100">
               <button
                 onClick={onEdit}
-                className="flex items-center px-2 py-1.5 text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all duration-200 group/edit"
+                className="text-indigo-600 hover:text-indigo-900 transition-all duration-200"
+                title="Edit Assignment"
               >
-                <svg
-                  className="w-3 h-3 mr-1 group-hover/edit:scale-110 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                Edit
+                <Edit className="w-4 h-4" />
               </button>
               <button
                 onClick={onDelete}
-                className="flex items-center px-2 py-1.5 text-xs font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-all duration-200 group/delete"
+                className="text-red-600 hover:text-red-800 transition-all duration-200"
+                title="Delete Assignment"
               >
-                <svg
-                  className="w-3 h-3 mr-1 group-hover/delete:scale-110 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-                Delete
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           )}

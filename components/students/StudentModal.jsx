@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Eye, EyeOff } from "lucide-react"; // Used for password visibility toggle
+import { Eye, EyeOff, X, User, Mail, Lock } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const initialFormState = {
   firstName: "",
@@ -79,161 +80,172 @@ export default function StudentModal({
   if (!isOpen || !mounted) return null; // Use mounted state for createPortal
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-full overflow-y-auto animate-fade-in-scale">
-        <div className="p-6 border-b">
-          <div className="flex justify-between items-center">
-            <h2 id="add-student-modal-title" className="text-xl font-bold text-slate-800">
-              {isEditMode ? "Edit Student" : "Add New Student"}
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-slate-500 hover:text-slate-800"
-              aria-label="Close modal"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+          />
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-full overflow-hidden flex flex-col border border-white/20"
+          >
+            <div className="p-5 border-b bg-gradient-to-r from-slate-50 to-white">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-indigo-100 rounded-lg">
+                    <User className="w-5 h-5 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h2 id="add-student-modal-title" className="text-lg font-bold text-slate-800">
+                      {isEditMode ? "Edit Student Profile" : "Register New Student"}
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                      {isEditMode ? "Modify student academic account" : "Enroll a new student into the system"}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all duration-200"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} noValidate className="flex flex-col overflow-hidden">
+              <div className="p-6 space-y-5 overflow-y-auto max-h-[70vh]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 ml-1">First Name</label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      className={`w-full px-3 py-2.5 bg-slate-50 border rounded-xl text-sm transition-all duration-200 ${
+                        errors.firstName
+                          ? "border-red-500 ring-4 ring-red-500/10"
+                          : "border-slate-200 hover:border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white"
+                      }`}
+                    />
+                    {errors.firstName && (
+                      <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-[10px] text-red-500 ml-1">
+                        {errors.firstName}
+                      </motion.p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 ml-1">Last Name</label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      className={`w-full px-3 py-2.5 bg-slate-50 border rounded-xl text-sm transition-all duration-200 ${
+                        errors.lastName
+                          ? "border-red-500 ring-4 ring-red-500/10"
+                          : "border-slate-200 hover:border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white"
+                      }`}
+                    />
+                    {errors.lastName && (
+                      <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-[10px] text-red-500 ml-1">
+                        {errors.lastName}
+                      </motion.p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-700 ml-1">Email Address</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                    </div>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className={`w-full pl-10 pr-3 py-2.5 bg-slate-50 border rounded-xl text-sm transition-all duration-200 ${
+                        errors.email
+                          ? "border-red-500 ring-4 ring-red-500/10"
+                          : "border-slate-200 hover:border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white"
+                      }`}
+                    />
+                  </div>
+                  {errors.email && (
+                    <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-[10px] text-red-500 ml-1">
+                      {errors.email}
+                    </motion.p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-700 ml-1">
+                    Password {isEditMode ? "(Optional)" : ""}
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                    </div>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder={isEditMode ? "Leave blank to keep current" : "Minimum 6 characters"}
+                      value={formData.password}
+                      onChange={handleChange}
+                      className={`w-full pl-10 pr-10 py-2.5 bg-slate-50 border rounded-xl text-sm transition-all duration-200 ${
+                        errors.password
+                          ? "border-red-500 ring-4 ring-red-500/10"
+                          : "border-slate-200 hover:border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white"
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-indigo-600 transition-colors"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-[10px] text-red-500 ml-1">
+                      {errors.password}
+                    </motion.p>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-5 bg-slate-50 border-t flex justify-end items-center gap-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-200 hover:shadow-xl hover:shadow-indigo-300 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
+                >
+                  {isLoading ? "Saving..." : isEditMode ? "Update Profile" : "Enroll Student"}
+                </button>
+              </div>
+            </form>
+          </motion.div>
         </div>
-
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* First Name */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                First Name
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md text-sm ${
-                  errors.firstName
-                    ? "border-red-500 ring-1 ring-red-500"
-                    : "border-slate-300"
-                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
-              />
-              {errors.firstName && (
-                <p className="text-xs text-red-500 mt-1">{errors.firstName}</p>
-              )}
-            </div>
-
-            {/* Last Name */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Last Name
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md text-sm ${
-                  errors.lastName
-                    ? "border-red-500 ring-1 ring-red-500"
-                    : "border-slate-300"
-                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
-              />
-              {errors.lastName && (
-                <p className="text-xs text-red-500 mt-1">{errors.lastName}</p>
-              )}
-            </div>
-
-            {/* Email */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Email Address
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md text-sm ${
-                  errors.email
-                    ? "border-red-500 ring-1 ring-red-500"
-                    : "border-slate-300"
-                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
-              />
-              {errors.email && (
-                <p className="text-xs text-red-500 mt-1">{errors.email}</p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div className="md:col-span-2 relative">
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Password {isEditMode ? "(Optional)" : ""}
-              </label>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder={
-                  isEditMode
-                    ? "Leave blank to keep current password"
-                    : "Minimum 6 characters"
-                }
-                value={formData.password}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md text-sm ${
-                  errors.password
-                    ? "border-red-500 ring-1 ring-red-500"
-                    : "border-slate-300"
-                } focus:outline-none focus:ring-1 focus:ring-blue-500`}
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
-              {errors.password && (
-                <p className="text-xs text-red-500 mt-1">{errors.password}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="p-6 bg-slate-50 border-t rounded-b-xl flex justify-end items-center gap-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              {isLoading
-                ? "Saving..."
-                : isEditMode
-                ? "Save Changes"
-                : "Save Student"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 
   return createPortal(modalContent, document.body);

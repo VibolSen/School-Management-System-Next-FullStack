@@ -94,23 +94,23 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-md shadow-sm">
-      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="container mx-auto px-4 py-2 flex items-center justify-between">
         {/* Logo Section */}
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-md ring-2 ring-primary/30">
+        <div className="flex items-center space-x-2">
+          <div className="w-8 h-8 rounded-lg overflow-hidden shadow-sm ring-1 ring-primary/30">
             <img
               src="/logo/STEP.jpg"
               alt="STEP Logo"
               className="w-full h-full object-cover"
             />
           </div>
-          <span className="font-black text-3xl tracking-tight bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-md">
+          <span className="font-black text-2xl tracking-tight bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-sm">
             STEP
           </span>
         </div>
 
         {/* Navigation Links */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center space-x-6 text-sm">
           <Link href="/" className="hover:text-foreground transition-colors">
             Home
           </Link>
@@ -130,7 +130,7 @@ export default function Navbar() {
             </button>
 
             {facultiesOpen && faculties.length > 0 && (
-              <div className="absolute top-full left-0 mt-8 min-w-48 max-w-md bg-gray-200 shadow-lg rounded-2xl py-2 animate-fade-in-scale">
+              <div className="absolute top-full left-0 mt-4 min-w-48 max-w-md bg-gray-200 shadow-md rounded-xl py-1 animate-fade-in-scale">
                 {faculties.map((faculty) => (
                   <Link
                     key={faculty.id}
@@ -160,7 +160,7 @@ export default function Navbar() {
             </button>
 
             {open && courses.length > 0 && (
-              <div className="absolute top-full left-0 mt-8 min-w-48 max-w-md bg-gray-200 shadow-lg rounded-2xl py-2 animate-fade-in-scale">
+              <div className="absolute top-full left-0 mt-4 min-w-48 max-w-md bg-gray-200 shadow-md rounded-xl py-1 animate-fade-in-scale">
                 {courses.map((course) => (
                   <Link
                     key={course.id}
@@ -195,7 +195,7 @@ export default function Navbar() {
                 <div className="relative" onMouseEnter={handleProfileEnter} onMouseLeave={handleProfileLeave}>
                   <button
                     onClick={() => setProfileDropdownOpen((prev) => !prev)}
-                    className="flex items-center gap-2 hover:text-foreground transition-colors"
+                    className="flex items-center gap-1.5 hover:text-foreground transition-colors text-sm"
                   >
                     <span>
                       Welcome, {user.firstName}
@@ -208,7 +208,7 @@ export default function Navbar() {
                   </button>
 
                   {profileDropdownOpen && (
-                    <div className="absolute top-full right-0 mt-8 w-48 bg-white shadow-lg rounded-2xl py-2">
+                    <div className="absolute top-full right-0 mt-4 w-48 bg-white shadow-md rounded-xl py-1">
                       <Link
                         href={`/${user.role.toLowerCase()}/profile`}
                         className="block px-4 py-2 hover:bg-gray-100 text-black transition-colors"
@@ -229,7 +229,7 @@ export default function Navbar() {
                         ) : (
               <Link
                 href="/login"
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+                className="px-4 py-1.5 rounded-lg bg-gradient-to-r from-green-500 to-green-600 text-white font-medium text-sm shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105"
               >
                 Login
               </Link>

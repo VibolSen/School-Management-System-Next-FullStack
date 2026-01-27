@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import InvoiceModal from "./InvoiceModal"; // This will be created next
-import Link from "next/link"; // For viewing invoice details
+import InvoiceModal from "./InvoiceModal";
+import Link from "next/link";
+import { Plus, Eye, Edit, Trash2 } from "lucide-react";
 
 export default function InvoicesManagement() {
   const [invoices, setInvoices] = useState([]);
@@ -76,80 +77,91 @@ export default function InvoicesManagement() {
   };
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Invoices Management</h1>
+    <div className="max-w-7xl mx-auto space-y-4">
+      <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          Invoices Management
+        </h1>
         <button
           onClick={handleAddInvoice}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
         >
-          Create Invoice
+          <Plus className="w-4 h-4" />
+          <span>Create Invoice</span>
         </button>
       </div>
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Invoice ID
+                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  # ID
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Student
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Total Amount
+                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Amount
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Issue Date
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Due Date
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {invoices.map((invoice) => (
-                <tr key={invoice.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Link href={`/admin/finance/invoices/${invoice.id}`} className="text-blue-500 hover:underline">
-                      {invoice.id.substring(invoice.id.length - 8)}
-                    </Link>
+                <tr key={invoice.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="px-4 py-3 whitespace-nowrap text-xs font-bold text-slate-400">
+                    {invoice.id.substring(invoice.id.length - 8)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-700">
                     {invoice.student?.firstName} {invoice.student?.lastName}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">${invoice.totalAmount.toFixed(2)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={getStatusColor(invoice.status)}>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${invoice.totalAmount.toFixed(2)}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                      invoice.status === 'PAID' ? 'bg-green-50 text-green-700 border-green-200' : 
+                      invoice.status === 'OVERDUE' ? 'bg-red-50 text-red-700 border-red-200' : 
+                      invoice.status === 'SENT' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
+                      'bg-slate-50 text-slate-600 border-slate-200'
+                    }`}>
                       {invoice.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {new Date(invoice.issueDate).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">
                     {new Date(invoice.dueDate).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <button
-                      onClick={() => handleEditInvoice(invoice)}
-                      className="text-blue-500 hover:text-blue-600 font-medium mr-4"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteInvoice(invoice.id)}
-                      className="text-red-500 hover:text-red-600 font-medium"
-                    >
-                      Delete
-                    </button>
+                  <td className="px-4 py-3 whitespace-nowrap text-right">
+                    <div className="flex justify-end gap-2">
+                      <Link
+                        href={`/admin/finance/invoices/${invoice.id}`}
+                        className="p-1 px-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all duration-200"
+                        title="View Invoice"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Link>
+                      <button
+                        onClick={() => handleEditInvoice(invoice)}
+                        className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                        title="Edit Invoice"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteInvoice(invoice.id)}
+                        className="p-1 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                        title="Delete Invoice"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -157,13 +169,12 @@ export default function InvoicesManagement() {
           </table>
         </div>
       </div>
-      {isModalOpen && (
-        <InvoiceModal
-          invoice={selectedInvoice}
-          onClose={closeModal}
-          onInvoiceSaved={onInvoiceSaved}
-        />
-      )}
+      <InvoiceModal
+        isOpen={isModalOpen}
+        invoice={selectedInvoice}
+        onClose={closeModal}
+        onInvoiceSaved={onInvoiceSaved}
+      />
     </div>
   );
 }

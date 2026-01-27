@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import { Edit, Eye, Trash2 } from "lucide-react";
 
 export default function TeacherTable({
   teachers = [],
@@ -26,20 +27,20 @@ export default function TeacherTable({
   }, [teachers, searchTerm]);
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-xl border border-slate-200 transition-all duration-300 ease-in-out">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <h2 className="text-xl font-semibold text-blue-700 transition-colors duration-300">Teacher Roster</h2>
+    <div className="bg-white p-4 rounded-xl shadow-md border border-slate-200 transition-all duration-300 ease-in-out">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-3 gap-3">
+        <h2 className="text-lg font-semibold text-blue-700 transition-colors duration-300">Teacher Roster</h2>
         <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
           <input
             type="text"
-            placeholder="Search by name or email..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-64 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
+            className="w-full md:w-44 px-2.5 py-1.5 border border-slate-300 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           />
           <button
             onClick={onAddTeacherClick}
-            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
+            className="w-full md:w-auto bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-blue-700 focus:ring-1 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
           >
             Add Teacher
           </button>
@@ -49,10 +50,10 @@ export default function TeacherTable({
         <table className="w-full text-sm text-left text-slate-500">
           <thead className="text-xs text-slate-700 uppercase bg-slate-100">
             <tr>
-              <th className="px-6 py-3">Name</th>
-              <th className="px-6 py-3">Email</th>
-              <th className="px-6 py-3 text-center">Assigned Courses</th>
-              {canManageTeachers && <th className="px-6 py-3 text-center">Actions</th>}
+              <th className="px-4 py-2.5">Name</th>
+              <th className="px-4 py-2.5">Email</th>
+              <th className="px-4 py-2.5 text-center">Assigned Courses</th>
+              {canManageTeachers && <th className="px-4 py-2.5 text-center">Actions</th>}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -71,38 +72,54 @@ export default function TeacherTable({
             ) : (
               filteredTeachers.map((teacher) => (
                 <tr key={teacher.id} className="hover:bg-blue-50 transition-all duration-200 ease-in-out transform hover:scale-[1.005]">
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-2.5">
                     <div className="flex items-center">
-                      <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600 text-xs mr-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600 text-[10px] mr-3">
                         {teacher.firstName.charAt(0)}
                         {teacher.lastName.charAt(0)}
                       </div>
                       <div>
-                        <div className="font-medium text-slate-800">
+                        <div className="font-medium text-slate-800 text-xs">
                           {`${teacher.firstName} ${teacher.lastName}`}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-slate-600">{teacher.email}</td>
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-4 py-2.5 text-slate-600">{teacher.email}</td>
+                  <td className="px-4 py-2.5 text-center">
                     <span className="px-2 py-1 text-xs font-semibold text-sky-800 bg-sky-100 rounded-full">
                       {teacher._count?.ledCourses ?? 0}
                     </span>
                   </td>
                   {canManageTeachers && (
-                    <td className="px-6 py-4 text-sm font-medium space-x-2 text-center">
+                    <td className="px-4 py-2.5 text-sm font-medium space-x-3 text-center">
                       <button
                         onClick={() => onEditClick(teacher)}
-                        className="text-indigo-600 hover:text-indigo-900 hover:scale-105 transition-all duration-200"
+                        className="text-indigo-600 hover:text-indigo-900 transition-all duration-200"
+                        title="Edit Teacher"
                       >
-                        Edit
+                        <Edit className="w-4 h-4" />
                       </button>
+                      {currentUserRole && (
+                        <Link 
+                          href={`/${currentUserRole.toLowerCase()}/users/${teacher.id}`}
+                          className="inline-block"
+                          title="View Profile"
+                        >
+                          <button
+                            className="text-blue-600 hover:text-blue-800 transition-all duration-200"
+                            disabled={isLoading}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        </Link>
+                      )}
                       <button
                         onClick={() => onDeleteClick(teacher)}
-                        className="text-red-600 hover:text-red-900 hover:scale-105 transition-all duration-200"
+                        className="text-red-600 hover:text-red-900 transition-all duration-200"
+                        title="Delete Teacher"
                       >
-                        Delete
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </td>
                   )}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import FeeModal from "./FeeModal";
+import { Plus, Edit, Trash2 } from "lucide-react";
 
 export default function FeesManagement() {
   const [fees, setFees] = useState([]);
@@ -60,54 +61,61 @@ export default function FeesManagement() {
   }
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Fees Management</h1>
+    <div className="max-w-7xl mx-auto space-y-4">
+      <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          Fees Management
+        </h1>
         <button
           onClick={handleAddFee}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
         >
-          Add Fee
+          <Plus className="w-4 h-4" />
+          <span>Add Fee</span>
         </button>
       </div>
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Name
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Description
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Amount
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {fees.map((fee) => (
-                <tr key={fee.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">{fee.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{fee.description}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">${fee.amount.toFixed(2)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <button
-                      onClick={() => handleEditFee(fee)}
-                      className="text-blue-500 hover:text-blue-600 font-medium mr-4"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteFee(fee.id)}
-                      className="text-red-500 hover:text-red-600 font-medium"
-                    >
-                      Delete
-                    </button>
+                <tr key={fee.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-700">{fee.name}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">{fee.description}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${fee.amount.toFixed(2)}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-right">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => handleEditFee(fee)}
+                        className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                        title="Edit Fee"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteFee(fee.id)}
+                        className="p-1 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                        title="Delete Fee"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -115,13 +123,12 @@ export default function FeesManagement() {
           </table>
         </div>
       </div>
-      {isModalOpen && (
-        <FeeModal
-          fee={selectedFee}
-          onClose={closeModal}
-          onFeeSaved={onFeeSaved}
-        />
-      )}
+      <FeeModal
+        isOpen={isModalOpen}
+        fee={selectedFee}
+        onClose={closeModal}
+        onFeeSaved={onFeeSaved}
+      />
     </div>
   );
 }

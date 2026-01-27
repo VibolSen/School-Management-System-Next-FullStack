@@ -29,11 +29,11 @@ const NavLink = ({ icon, label, href, isCollapsed, isActive }) => (
   <li>
     <Link
       href={href}
-      className={`group flex items-center gap-3 my-1 p-3 rounded-xl transition-all duration-300 relative
+      className={`group flex items-center gap-2.5 my-0.5 p-2 rounded-lg transition-all duration-300 relative
         ${
           isActive
-            ? "bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-md scale-[1.02]"
-            : "text-slate-300 hover:text-white hover:bg-blue-800/60 hover:shadow-lg hover:scale-[1.05]"
+            ? "bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-sm scale-[1.01]"
+            : "text-slate-300 hover:text-white hover:bg-blue-800/60 "
         }
       `}
       title={isCollapsed ? label : ""}
@@ -209,7 +209,7 @@ export default function AdminSidebar({ initialOpen = true }) {
       >
         {/* Header */}
         <div
-          className={`flex items-center p-4 border-b border-blue-800 h-16 transition-all duration-300 ${
+          className={`flex items-center p-3 border-b border-blue-800 h-14 transition-all duration-300 ${
             isCollapsed ? "justify-center" : "justify-between"
           }`}
         >
@@ -228,7 +228,7 @@ export default function AdminSidebar({ initialOpen = true }) {
                   d="M12 6.253v11.494m-5.22-8.242l10.44 4.99m-10.44-4.99l10.44 4.99M3 10.519l9-4.266 9 4.266"
                 />
               </svg>
-              <h1 className="text-xl font-bold text-white tracking-wide">
+              <h1 className="text-lg font-bold text-white tracking-wide">
                 Admin Portal
               </h1>
             </div>

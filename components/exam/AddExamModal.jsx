@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react"; // Import the X icon
+import { X, FileText, Calendar, Users, Info } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function AddExamModal({
   isOpen,
@@ -57,109 +58,166 @@ export default function AddExamModal({
   if (!isOpen || !mounted) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg transform transition-all scale-100 opacity-100">
-        <div className="p-6 border-b border-slate-200 flex justify-between items-center">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Create New Exam
-          </h2>
-          <button
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={onClose}
-            disabled={isLoading}
-            className="text-slate-500 hover:text-slate-700 transition-colors duration-200"
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+          />
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-full overflow-hidden flex flex-col border border-white/20"
           >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <div className="p-6 space-y-5">
-            <div>
-              <label className="block text-sm font-semibold text-slate-800 mb-1">
-                Title *
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm h-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out"
-                placeholder="e.g., Midterm Exam"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-800 mb-1">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows={3} // Reduced rows for compactness
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out"
-                placeholder="Instructions for the students..."
-              ></textarea>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-1">
-                  Exam Date
-                </label>
-                <input
-                  type="date"
-                  name="examDate"
-                  value={formData.examDate}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm h-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-1">
-                  Assign to Group *
-                </label>
-                <select
-                  name="groupId"
-                  value={formData.groupId}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm h-10 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out"
-                  disabled={teacherGroups.length === 0}
+            <div className="p-5 border-b bg-gradient-to-r from-slate-50 to-white">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <FileText className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-800">New Examination</h2>
+                    <p className="text-xs text-slate-500">Configure a new assessment for your students</p>
+                  </div>
+                </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all duration-200"
                 >
-                  {teacherGroups.length === 0 ? (
-                    <option value="">You have no groups to assign to</option>
-                  ) : (
-                    <>
-                      <option value="">Select a group</option> {/* Added placeholder */}
-                      {teacherGroups.map((group) => (
-                        <option key={group.id} value={group.id}>
-                          {group.name}
-                        </option>
-                      ))}
-                    </>
-                  )}
-                </select>
+                  <X className="w-5 h-5" />
+                </button>
               </div>
             </div>
-            {error && <p className="text-sm font-medium text-red-600 mt-2">{error}</p>}
-          </div>
-          <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 rounded-b-2xl">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isLoading}
-              className="px-5 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-100 transition-colors duration-200 shadow-sm"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-5 py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg"
-            >
-              {isLoading ? "Creating..." : "Create Exam"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+
+            <form onSubmit={handleSubmit} noValidate className="flex flex-col overflow-hidden">
+              <div className="p-6 space-y-5 overflow-y-auto max-h-[70vh]">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-700 ml-1">Exam Title</label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2.5 bg-slate-50 border rounded-xl text-sm transition-all duration-200 ${
+                      error && !formData.title.trim()
+                        ? "border-red-500 ring-4 ring-red-500/10"
+                        : "border-slate-200 hover:border-purple-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 focus:bg-white"
+                    }`}
+                    placeholder="e.g., Spring Midterm 2024"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-700 ml-1">Instructions / Description</label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm transition-all duration-200 placeholder-slate-400 resize-none hover:border-purple-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 focus:bg-white"
+                    placeholder="Provide exam details, duration, etc..."
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 ml-1 flex items-center">
+                      <Calendar className="w-3 h-3 mr-1 text-slate-400" /> Exam Date
+                    </label>
+                    <input
+                      type="date"
+                      name="examDate"
+                      value={formData.examDate}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm transition-all duration-200 hover:border-purple-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-700 ml-1 flex items-center">
+                      <Users className="w-3 h-3 mr-1 text-slate-400" /> Target Group
+                    </label>
+                    <div className="relative group">
+                      <select
+                        name="groupId"
+                        value={formData.groupId}
+                        onChange={handleChange}
+                        className={`w-full pl-3 pr-8 py-2 bg-slate-50 border rounded-xl text-sm transition-all duration-200 appearance-none hover:border-purple-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/10 focus:bg-white ${
+                          error && !formData.groupId ? "border-red-500" : "border-slate-200"
+                        }`}
+                        disabled={teacherGroups.length === 0}
+                      >
+                        {teacherGroups.length === 0 ? (
+                          <option value="">No Groups</option>
+                        ) : (
+                          <>
+                            <option value="">Select Category</option>
+                            {teacherGroups.map((group) => (
+                              <option key={group.id} value={group.id}>
+                                {group.name}
+                              </option>
+                            ))}
+                          </>
+                        )}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-purple-500 transition-colors">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 bg-red-50 border border-red-100 rounded-xl flex items-center gap-2"
+                  >
+                    <Info className="w-4 h-4 text-red-500" />
+                    <span className="text-xs text-red-600 font-medium">{error}</span>
+                  </motion.div>
+                )}
+              </div>
+
+              <div className="p-5 bg-slate-50 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                  Students will see this in their agenda
+                </span>
+                <div className="flex gap-3 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    disabled={isLoading}
+                    className="flex-1 sm:flex-none px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="flex-1 sm:flex-none px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300 transition-all duration-200 active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
+                  >
+                    {isLoading ? (
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      "Schedule Exam"
+                    )}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 
   return createPortal(modalContent, document.body);

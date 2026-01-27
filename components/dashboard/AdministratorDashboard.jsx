@@ -103,13 +103,13 @@ export default function AdministratorDashboard() {
 
   return (
     <div className="min-h-screen ">
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
+      <div className="max-w-7xl mx-auto p-4 space-y-6">
         {/* Header */}
         <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">
-              Welcome back, <span className="font-medium">{welcomeName}</span>
+            <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-sm text-gray-600">
+              Welcome back, <span className="font-medium text-gray-800">{welcomeName}</span>
             </p>
           </div>
 
@@ -122,61 +122,61 @@ export default function AdministratorDashboard() {
         </header>
 
         {/* Cards Section */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <DashboardCard
             title="Students"
             value={dashboardData.studentCount}
-            icon={<Users className="w-6 h-6 text-blue-500" />}
+            icon={<Users className="w-5 h-5 text-blue-500" />}
             description="Active enrolled students"
             href="/admin/students"
           />
           <DashboardCard
             title="Teachers"
             value={dashboardData.teacherCount}
-            icon={<UserCheck className="w-6 h-6 text-green-500" />}
+            icon={<UserCheck className="w-5 h-5 text-green-500" />}
             description="Teaching staff"
             href="/admin/teachers"
           />
           <DashboardCard
             title="Staff"
             value={dashboardData.staffCount}
-            icon={<Briefcase className="w-6 h-6 text-purple-500" />}
+            icon={<Briefcase className="w-5 h-5 text-purple-500" />}
             description="Administrative staff"
             href="/admin/staff"
           />
           <DashboardCard
             title="Departments"
             value={dashboardData.departmentCount}
-            icon={<Building2 className="w-6 h-6 text-orange-500" />}
+            icon={<Building2 className="w-5 h-5 text-orange-500" />}
             description="Academic departments"
             href="/admin/departments"
           />
           <DashboardCard
             title="Courses"
             value={dashboardData.courseCount}
-            icon={<Library className="w-6 h-6 text-indigo-500" />}
+            icon={<Library className="w-5 h-5 text-indigo-500" />}
             description="Available courses"
             href="/admin/courses"
           />
           <DashboardCard
             title="Groups"
             value={dashboardData.groupCount}
-            icon={<Group className="w-6 h-6 text-pink-500" />}
+            icon={<Group className="w-5 h-5 text-pink-500" />}
             description="Student groups"
             href="/admin/groups"
           />
         </section>
 
         {/* Quick Actions */}
-        <section className="bg-white rounded-lg border p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
+        <section className="bg-white rounded-lg border p-4 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-base font-semibold text-gray-900">
               Quick Actions
             </h3>
-            <TrendingUp className="w-5 h-5 text-gray-400" />
+            <TrendingUp className="w-4 h-4 text-gray-400" />
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
             {[
               {
                 label: "Manage Users",
@@ -232,7 +232,7 @@ export default function AdministratorDashboard() {
               <Link
                 href={action.href}
                 key={i}
-                className="flex flex-col items-center gap-2 p-4 rounded-lg border hover:bg-gray-50 transition"
+                className="flex flex-col items-center gap-1.5 p-3 rounded-lg border hover:bg-gray-50 transition"
               >
                 <div className="p-2 bg-gray-100 rounded-md">
                   <action.icon className="w-5 h-5 text-gray-600" />
@@ -244,8 +244,8 @@ export default function AdministratorDashboard() {
         </section>
 
         {/* Analytics Chart */}
-        <section className="bg-white rounded-lg border p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <section className="bg-white rounded-lg border p-4 shadow-sm">
+          <h3 className="text-base font-semibold text-gray-900 mb-3">
             School Overview
           </h3>
           <AnalyticsChart data={chartData} />

@@ -148,9 +148,9 @@ export default function DepartmentManagementView() {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn duration-700">
+    <div className="space-y-4 animate-fadeIn duration-700">
       <div className="flex justify-between items-center">
-        <h1 className="text-4xl font-extrabold text-blue-700 animate-scale-in">
+        <h1 className="text-xl font-bold text-blue-700 animate-scale-in">
           Department Management
         </h1>
       </div>

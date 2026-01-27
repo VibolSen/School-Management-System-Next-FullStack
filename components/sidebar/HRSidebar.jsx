@@ -28,9 +28,9 @@ const NavLink = ({
   <li>
     <Link
       href={href}
-      className={`flex items-center p-3 my-1 rounded-lg transition-colors duration-200 w-full text-left group relative ${
+      className={`flex items-center p-2 my-0.5 rounded-lg transition-colors duration-200 w-full text-left group relative ${
         isActive
-          ? "bg-blue-600 text-white shadow-md"
+          ? "bg-blue-600 text-white shadow-sm"
           : "text-slate-200 hover:bg-blue-800 hover:text-white"
       }`}
       title={isCollapsed ? label : ""}
@@ -100,7 +100,7 @@ const HRSidebar = ({ isOpen, setIsOpen }) => {
           isOpen ? "min-w-max" : "w-16"
         } overflow-hidden`}
       >
-        <div className="flex items-center p-4 border-b border-blue-800 h-16 relative">
+        <div className="flex items-center p-3 border-b border-blue-800 h-14 relative">
           {!isCollapsed ? (
             <div className="flex items-center">
               <svg
@@ -116,7 +116,7 @@ const HRSidebar = ({ isOpen, setIsOpen }) => {
                   d="M12 6.253v11.494m-5.22-8.242l10.44 4.99m-10.44-4.99l10.44 4.99M3 10.519l9-4.266 9 4.266"
                 />
               </svg>
-              <h1 className="ml-2 text-xl font-bold">HR Portal</h1>
+              <h1 className="ml-2 text-lg font-bold">HR Portal</h1>
             </div>
           ) : (
             <div className="w-8 h-8"></div>

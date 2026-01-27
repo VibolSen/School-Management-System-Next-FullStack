@@ -14,7 +14,7 @@ import {
 
 export default function AnalyticsChart({ data }) {
   return (
-    <div style={{ width: "100%", height: 300 }}>
+    <div style={{ width: "100%", height: 250 }}>
       <ResponsiveContainer>
         <BarChart
           data={data}

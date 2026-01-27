@@ -42,7 +42,7 @@ export default function Header({ toggleSidebar }) {
 
   if (loading) {
     return (
-      <header className="bg-white shadow-sm p-4 flex justify-between items-center z-10">
+      <header className="bg-white shadow-sm p-3 flex justify-between items-center z-10">
         <div className="flex items-center">
           <div className="h-9 w-9 rounded-full bg-slate-200 animate-pulse"></div>
           <div className="hidden md:block ml-2">
@@ -55,7 +55,7 @@ export default function Header({ toggleSidebar }) {
   }
 
   return (
-    <header className="bg-white shadow-sm p-4 flex justify-between items-center z-10">
+    <header className="bg-white shadow-sm p-3 flex justify-between items-center z-10">
       <div className="flex items-center">
         <button
           onClick={toggleSidebar}
@@ -90,7 +90,7 @@ export default function Header({ toggleSidebar }) {
             className="flex items-center space-x-2"
           >
             <img
-              className="h-9 w-9 rounded-full object-cover border border-slate-300"
+              className="h-8 w-8 rounded-full object-cover border border-slate-300"
               src={user?.profile?.avatar || "/default-cover.jpg"}
               alt={user?.name || "Guest"}
               onError={(e) => (e.currentTarget.src = "/default-cover.jpg")}

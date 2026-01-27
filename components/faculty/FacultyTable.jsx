@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown, Edit, Trash2 } from 'lucide-react';
 
 const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAddFacultyClick }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,23 +71,23 @@ const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAddF
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-xl border border-slate-200 transition-all duration-300 ease-in-out">
+    <div className="bg-white p-4 rounded-xl shadow-md border border-slate-200 transition-all duration-300 ease-in-out">
       <div className="flex flex-col md:flex-row justify-between items-center mb-3 gap-2">
-        <h2 className="text-xl font-semibold text-blue-700 transition-colors duration-300">
+        <h2 className="text-lg font-semibold text-blue-700 transition-colors duration-300">
           Faculty Directory
         </h2>
         <div className="flex gap-2">
           <input
             type="text"
-            placeholder="Search faculty..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
+            className="w-full md:w-44 px-2.5 py-1.5 border border-slate-300 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           />
           <select
             value={filterDepartments}
             onChange={(e) => setFilterDepartments(e.target.value)}
-            className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
+            className="w-full md:w-auto px-2.5 py-1.5 border border-slate-300 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           >
             <option value="all">All Departments</option>
             <option value="none">No Departments</option>
@@ -97,7 +97,7 @@ const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAddF
           </select>
           <button
             onClick={onAddFacultyClick}
-            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
+            className="w-full md:w-auto bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-blue-700 focus:ring-1 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
           >
             Add New Faculty
           </button>
@@ -114,7 +114,7 @@ const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAddF
                           <tr>
                             <th
                               scope="col"
-                              className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                              className="px-4 py-2.5 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
                               onClick={() => handleSort('name')}
                             >
                               <div className="flex items-center gap-1.5">
@@ -122,10 +122,10 @@ const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAddF
                               </div>
                             </th><th
                               scope="col"
-                              className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                              className="px-4 py-2.5 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
                             >
                               Departments
-                            </th><th scope="col" className="px-6 py-3 text-center">
+                            </th><th scope="col" className="px-4 py-2.5 text-center">
                               Actions
                             </th>
                           </tr>
@@ -136,28 +136,30 @@ const FacultyTable = ({ faculties, onEditClick, onDeleteClick, isLoading, onAddF
                   key={faculty.id}
                   className="hover:bg-blue-50 transition-all duration-200 ease-in-out transform hover:scale-[1.005]"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-4 py-2.5 whitespace-nowrap text-sm font-medium text-gray-900">
                     {faculty.name}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-4 py-2.5 whitespace-nowrap text-sm text-gray-900">
                     {(faculty.departments || []).length === 0
                       ? 'None'
                       : (faculty.departments || []).length === 1
                       ? (faculty.departments || [])[0].name
                       : faculty.departments.length}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-4 py-2.5 whitespace-nowrap text-sm text-gray-500 space-x-3 text-center">
                     <button
                       onClick={() => onEditClick(faculty)}
-                      className="text-indigo-600 hover:text-indigo-900 hover:scale-105 transition-all duration-200"
+                      className="text-indigo-600 hover:text-indigo-900 transition-all duration-200"
+                      title="Edit Faculty"
                     >
-                      Edit
+                      <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => onDeleteClick(faculty)}
-                      className="text-red-600 hover:text-red-800 hover:scale-105 transition-all duration-200"
+                      className="text-red-600 hover:text-red-800 transition-all duration-200"
+                      title="Delete Faculty"
                     >
-                      Delete
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>

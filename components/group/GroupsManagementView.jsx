@@ -173,8 +173,8 @@ export default function GroupManagementView({ role }) {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn duration-700">
-        <h1 className="text-4xl font-extrabold text-blue-700 animate-scale-in">
+    <div className="space-y-4 animate-fadeIn duration-700">
+        <h1 className="text-xl font-bold text-blue-700 animate-scale-in">
           Group Directory
         </h1>
       <GroupsTable

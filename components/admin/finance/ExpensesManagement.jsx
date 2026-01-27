@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ExpenseModal from "./ExpenseModal"; // This will be created next
+import ExpenseModal from "./ExpenseModal";
+import { Plus, Edit, Trash2 } from "lucide-react";
 
 export default function ExpensesManagement() {
   const [expenses, setExpenses] = useState([]);
@@ -60,60 +61,71 @@ export default function ExpensesManagement() {
   };
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Expenses Management</h1>
+    <div className="max-w-7xl mx-auto space-y-4">
+      <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          Expenses Management
+        </h1>
         <button
           onClick={handleAddExpense}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
         >
-          Add Expense
+          <Plus className="w-4 h-4" />
+          <span>Add Expense</span>
         </button>
       </div>
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Category
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Description
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Amount
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Date
                 </th>
-                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {expenses.map((expense) => (
-                <tr key={expense.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">{expense.category}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{expense.description}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">${expense.amount.toFixed(2)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                <tr key={expense.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200 uppercase">
+                      {expense.category}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">{expense.description}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${expense.amount.toFixed(2)}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">
                     {new Date(expense.date).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <button
-                      onClick={() => handleEditExpense(expense)}
-                      className="text-blue-500 hover:text-blue-600 font-medium mr-4"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteExpense(expense.id)}
-                      className="text-red-500 hover:text-red-600 font-medium"
-                    >
-                      Delete
-                    </button>
+                  <td className="px-4 py-3 whitespace-nowrap text-right">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => handleEditExpense(expense)}
+                        className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                        title="Edit Expense"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteExpense(expense.id)}
+                        className="p-1 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                        title="Delete Expense"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -121,13 +133,12 @@ export default function ExpensesManagement() {
           </table>
         </div>
       </div>
-      {isModalOpen && (
-        <ExpenseModal
-          expense={selectedExpense}
-          onClose={closeModal}
-          onExpenseSaved={onExpenseSaved}
-        />
-      )}
+      <ExpenseModal
+        isOpen={isModalOpen}
+        expense={selectedExpense}
+        onClose={closeModal}
+        onExpenseSaved={onExpenseSaved}
+      />
     </div>
   );
 }

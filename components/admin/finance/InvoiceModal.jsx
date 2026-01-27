@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Select from "react-select"; // Assuming you have react-select installed or a similar component
+import { createPortal } from "react-dom";
+import Select from "react-select";
+import { X, FileText, User, Calendar, Plus, Trash2, DollarSign, List, Info } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-export default function InvoiceModal({ invoice, onClose, onInvoiceSaved }) {
+export default function InvoiceModal({ isOpen, invoice, onClose, onInvoiceSaved }) {
   const [formData, setFormData] = useState({
     studentId: "",
     issueDate: "",
@@ -156,166 +159,261 @@ export default function InvoiceModal({ invoice, onClose, onInvoiceSaved }) {
 
   const totalAmount = formData.items.reduce((acc, item) => acc + item.amount, 0);
 
-  return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            {invoice ? "Edit Invoice" : "Create New Invoice"}
-          </h2>
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label htmlFor="studentId" className="block text-sm font-medium text-gray-700">
-                  Student
-                </label>
-                <Select
-                  id="studentId"
-                  name="studentId"
-                  options={students.map((s) => ({
-                    value: s.id,
-                    label: `${s.firstName} ${s.lastName} (${s.email})`,
-                  }))}
-                  value={selectedStudent}
-                  onChange={handleStudentSelectChange}
-                  isClearable
-                  placeholder="Select student"
-                  className="mt-1"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="issueDate" className="block text-sm font-medium text-gray-700">
-                  Issue Date
-                </label>
-                <input
-                  type="date"
-                  id="issueDate"
-                  name="issueDate"
-                  value={formData.issueDate}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700">
-                  Due Date
-                </label>
-                <input
-                  type="date"
-                  id="dueDate"
-                  name="dueDate"
-                  value={formData.dueDate}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  required
-                />
-              </div>
-            </div>
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-            {/* Invoice Items Section */}
-            <h3 className="text-xl font-bold text-gray-800 mb-2 mt-6">Invoice Items</h3>
-            <div className="mb-4 border p-4 rounded-md">
-              {formData.items.length > 0 ? (
-                <div className="space-y-2 mb-4">
-                  {formData.items.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center bg-gray-50 p-2 rounded-md">
-                      <span>{item.description} - ${item.amount.toFixed(2)}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveItem(index)}
-                        className="text-red-500 hover:text-red-700 text-sm"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 text-center mb-4">No items added yet.</p>
-              )}
+  if (!mounted) return null;
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
-                <div>
-                  <label htmlFor="itemFee" className="block text-sm font-medium text-gray-700">
-                    Fee Type
-                  </label>
-                  <Select
-                    id="itemFee"
-                    name="feeId"
-                    options={fees.map((f) => ({ value: f.id, label: f.name }))}
-                    value={fees.find(f => f.id === currentInvoiceItem.feeId) ? {value: currentInvoiceItem.feeId, label: fees.find(f => f.id === currentInvoiceItem.feeId).name} : null}
-                    onChange={handleItemFeeSelect}
-                    isClearable
-                    placeholder="Select fee"
-                    className="mt-1"
-                  />
+  const selectStyles = {
+    control: (base, state) => ({
+      ...base,
+      backgroundColor: 'rgb(248, 250, 252)',
+      borderColor: state.isFocused ? '#6366f1' : 'rgb(226, 232, 240)',
+      borderRadius: '0.75rem',
+      padding: '1px',
+      fontSize: '0.875rem',
+      boxShadow: state.isFocused ? '0 0 0 4px rgba(99, 102, 241, 0.1)' : 'none',
+      '&:hover': {
+        borderColor: state.isFocused ? '#6366f1' : '#c7d2fe',
+      }
+    }),
+    placeholder: (base) => ({ ...base, color: '#94a3b8' }),
+    menu: (base) => ({
+      ...base,
+      backgroundColor: 'white',
+      borderRadius: '0.75rem',
+      overflow: 'hidden',
+      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+      border: '1px solid #f1f5f9',
+      zIndex: 100
+    }),
+    option: (base, state) => ({
+      ...base,
+      backgroundColor: state.isFocused ? '#eef2ff' : 'transparent',
+      color: state.isFocused ? '#4f46e5' : '#475569',
+      cursor: 'pointer',
+      fontSize: '0.875rem'
+    })
+  };
+
+  const modalContent = (
+    <AnimatePresence>
+      {(isOpen || invoice) && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center p-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+        />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col border border-white/20"
+        >
+          {/* Header */}
+          <div className="p-6 border-b bg-gradient-to-r from-indigo-50 via-white to-slate-50">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-200">
+                  <FileText className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <label htmlFor="itemDescription" className="block text-sm font-medium text-gray-700">
-                    Description
-                  </label>
-                  <input
-                    type="text"
-                    id="itemDescription"
-                    name="description"
-                    value={currentInvoiceItem.description}
-                    onChange={handleItemInputChange}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="itemAmount" className="block text-sm font-medium text-gray-700">
-                    Amount
-                  </label>
-                  <input
-                    type="number"
-                    id="itemAmount"
-                    name="amount"
-                    value={currentInvoiceItem.amount}
-                    onChange={handleItemInputChange}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
-                    step="0.01"
-                  />
-                </div>
-                <div className="md:col-span-3 text-right">
-                  <button
-                    type="button"
-                    onClick={handleAddItem}
-                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded text-sm"
-                  >
-                    Add Item
-                  </button>
+                  <h2 className="text-xl font-bold text-slate-900">{invoice ? "Edit Invoice" : "Create New Invoice"}</h2>
+                  <p className="text-xs text-slate-500 font-medium tracking-wide">Financial billing system</p>
                 </div>
               </div>
-            </div>
-
-            <div className="flex justify-between items-center text-lg font-bold text-gray-800 mt-4">
-                <span>Total:</span>
-                <span>${totalAmount.toFixed(2)}</span>
-            </div>
-
-            <div className="flex justify-end gap-4 mt-6">
               <button
-                type="button"
                 onClick={onClose}
-                disabled={isLoading}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all duration-200"
               >
-                Cancel
+                <X className="w-5 h-5" />
               </button>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                {isLoading ? "Saving..." : invoice ? "Update Invoice" : "Create Invoice"}
-              </button>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} noValidate className="flex flex-col overflow-hidden">
+            <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
+              {/* Basic Info Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Student</label>
+                  <Select
+                    options={students.map((s) => ({
+                      value: s.id,
+                      label: `${s.firstName} ${s.lastName} (${s.email})`,
+                    }))}
+                    value={selectedStudent}
+                    onChange={handleStudentSelectChange}
+                    styles={selectStyles}
+                    placeholder="Search for a student..."
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Issue Date</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                      <Calendar className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="date"
+                      name="issueDate"
+                      value={formData.issueDate}
+                      onChange={handleInputChange}
+                      className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm transition-all duration-200 hover:border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Due Date</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                      <Calendar className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="date"
+                      name="dueDate"
+                      value={formData.dueDate}
+                      onChange={handleInputChange}
+                      className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm transition-all duration-200 hover:border-indigo-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Items Section */}
+              <div className="pt-4 space-y-4">
+                <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+                  <List className="w-4 h-4 text-indigo-600" />
+                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Invoice Items</h3>
+                </div>
+
+                {/* Items List */}
+                <div className="space-y-2 max-h-[30vh] overflow-y-auto pr-1">
+                  <AnimatePresence mode="popLayout">
+                    {formData.items.length > 0 ? (
+                      formData.items.map((item, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 10 }}
+                          className="group flex justify-between items-center bg-slate-50 hover:bg-white border border-slate-100 hover:border-indigo-200 p-3 rounded-2xl transition-all duration-200 hover:shadow-sm"
+                        >
+                          <div>
+                            <p className="text-sm font-semibold text-slate-800">{item.description}</p>
+                            <p className="text-[10px] text-indigo-500 font-bold tracking-tight">AMOUNT: ${item.amount.toFixed(2)}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem(index)}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all duration-200"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </motion.div>
+                      ))
+                    ) : (
+                      <div className="p-10 border-2 border-dashed border-slate-100 rounded-3xl text-center">
+                        <Info className="w-8 h-8 text-slate-200 mx-auto mb-2" />
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">No items added yet</p>
+                      </div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Add New Item Compact Grid */}
+                <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 space-y-4 shadow-inner">
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                    <div className="md:col-span-4 space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500 ml-1">FEE TYPE</label>
+                      <Select
+                        options={fees.map((f) => ({ value: f.id, label: f.name }))}
+                        value={fees.find(f => f.id === currentInvoiceItem.feeId) ? {value: currentInvoiceItem.feeId, label: fees.find(f => f.id === currentInvoiceItem.feeId).name} : null}
+                        onChange={handleItemFeeSelect}
+                        styles={selectStyles}
+                        placeholder="Select Fee"
+                      />
+                    </div>
+                    <div className="md:col-span-5 space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500 ml-1">DESCRIPTION</label>
+                      <input
+                        type="text"
+                        name="description"
+                        value={currentInvoiceItem.description}
+                        onChange={handleItemInputChange}
+                        className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm transition-all duration-200 focus:border-indigo-500"
+                        placeholder="Detail..."
+                      />
+                    </div>
+                    <div className="md:col-span-3 space-y-1">
+                      <label className="text-[10px] font-bold text-slate-500 ml-1">AMOUNT</label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                          <span className="text-xs font-bold">$</span>
+                        </div>
+                        <input
+                          type="number"
+                          name="amount"
+                          value={currentInvoiceItem.amount}
+                          onChange={handleItemInputChange}
+                          className="w-full pl-7 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm transition-all duration-200 focus:border-indigo-500 font-semibold"
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleAddItem}
+                      className="flex items-center gap-2 px-4 py-2 bg-white text-indigo-600 border border-indigo-100 rounded-xl text-xs font-bold shadow-sm hover:shadow hover:bg-indigo-600 hover:text-white transition-all duration-200"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Add to List
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 bg-slate-900 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="flex items-baseline gap-3">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">Total Amount Due</span>
+                <span className="text-2xl font-black text-white leading-none tracking-tight">${totalAmount.toFixed(2)}</span>
+              </div>
+              <div className="flex gap-3 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 sm:flex-none px-6 py-2.5 text-xs font-bold text-slate-400 hover:text-white transition-colors"
+                >
+                  CANCEL
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="flex-1 sm:flex-none px-8 py-2.5 bg-gradient-to-r from-indigo-500 to-blue-600 text-white rounded-xl text-xs font-black tracking-widest shadow-xl shadow-indigo-900/40 hover:shadow-indigo-500/20 active:scale-95 transition-all duration-200 disabled:opacity-50"
+                >
+                  {isLoading ? "PROCESSING..." : invoice ? "UPDATE INVOICE" : "CONFIRM INVOICE"}
+                </button>
+              </div>
             </div>
           </form>
-        </div>
+        </motion.div>
       </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
+
+  return createPortal(modalContent, document.body);
 }

@@ -200,7 +200,7 @@ export default function ExamManagement({ loggedInUser }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-4">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-4">
         <Notification
           {...notification}
           onClose={() => setNotification({ ...notification, show: false })}
@@ -208,7 +208,7 @@ export default function ExamManagement({ loggedInUser }) {
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h1 className="text-3xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               {userRole === "admin" || userRole === "study_office" ? "Exam Management" : "My Exams"}
             </h1>
             <p className="text-slate-600 text-sm mt-1">
@@ -220,7 +220,7 @@ export default function ExamManagement({ loggedInUser }) {
           {showAddExamButton && (
             <button
               onClick={() => setIsAddModalOpen(true)}
-              className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2.5 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+              className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow hover:shadow-md transform hover:scale-105 transition-all duration-200"
               disabled={userRole === "teacher" && teacherGroups.length === 0}
               title={addExamButtonTitle}
             >
@@ -245,7 +245,7 @@ export default function ExamManagement({ loggedInUser }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-white">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-white">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-100 rounded-lg">
                 <svg
@@ -271,7 +271,7 @@ export default function ExamManagement({ loggedInUser }) {
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-white">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-white">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-100 rounded-lg">
                 <svg
@@ -297,7 +297,7 @@ export default function ExamManagement({ loggedInUser }) {
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-white">
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-white">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-purple-100 rounded-lg">
                 <svg
@@ -327,7 +327,7 @@ export default function ExamManagement({ loggedInUser }) {
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white p-4">
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white p-3">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-800">
               {userRole === "admin" || userRole === "study_office" ? "All Exams" : "My Exams"}

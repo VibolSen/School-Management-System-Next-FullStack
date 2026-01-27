@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { Edit, Trash2 } from "lucide-react";
 
 const SortIndicator = ({ direction }) => {
   if (!direction) return null;
@@ -106,23 +107,23 @@ export default function CoursesTable({
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-xl border border-slate-200 transition-all duration-300 ease-in-out">
+    <div className="bg-white p-4 rounded-xl shadow-md border border-slate-200 transition-all duration-300 ease-in-out">
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <h2 className="text-xl font-semibold text-blue-700 transition-colors duration-300">
+        <h2 className="text-lg font-semibold text-blue-700 transition-colors duration-300">
           Course Directory
         </h2>
         <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
           <input
             type="text"
-            placeholder="Search courses..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
+            className="w-full md:w-44 px-2.5 py-1.5 border border-slate-300 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           />
           <select
             value={departmentFilter}
             onChange={(e) => setDepartmentFilter(e.target.value)}
-            className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
+            className="w-full md:w-auto px-2.5 py-1.5 border border-slate-300 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           >
             <option value="All">All Departments</option>
             {departments.map((dept) => (
@@ -134,7 +135,7 @@ export default function CoursesTable({
           <select
             value={teacherFilter}
             onChange={(e) => setTeacherFilter(e.target.value)}
-            className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
+            className="w-full md:w-auto px-2.5 py-1.5 border border-slate-300 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
           >
             <option value="All">All Teachers</option>
             {teachers.map((teacher) => (
@@ -145,7 +146,7 @@ export default function CoursesTable({
           </select>
           <button
             onClick={onAddCourseClick}
-            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
+            className="w-full md:w-auto bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-blue-700 focus:ring-1 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
           >
             Add Course
           </button>
@@ -157,7 +158,7 @@ export default function CoursesTable({
           <thead className="text-xs text-slate-700 uppercase bg-slate-100">
             <tr>
               <th
-                className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                className="px-4 py-2.5 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
                 onClick={() => handleSort("name")}
               >
                 <div className="flex items-center gap-1.5">
@@ -170,7 +171,7 @@ export default function CoursesTable({
                 </div>
               </th>
               <th
-                className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                className="px-4 py-2.5 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
                 onClick={() => handleSort("department.name")}
               >
                 <div className="flex items-center gap-1.5">
@@ -185,7 +186,7 @@ export default function CoursesTable({
                 </div>
               </th>
               <th
-                className="px-6 py-3 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                className="px-4 py-2.5 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
                 onClick={() => handleSort("leadBy.firstName")}
               >
                 <div className="flex items-center gap-1.5">
@@ -199,8 +200,8 @@ export default function CoursesTable({
                   />
                 </div>
               </th>
-              <th className="px-6 py-3 text-center hover:bg-slate-200 transition-colors duration-200">Groups</th>
-              <th className="px-6 py-3 text-center hover:bg-slate-200 transition-colors duration-200">Actions</th>
+              <th className="px-4 py-2.5 text-center hover:bg-slate-200 transition-colors duration-200">Groups</th>
+              <th className="px-4 py-2.5 text-center hover:bg-slate-200 transition-colors duration-200">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -219,38 +220,40 @@ export default function CoursesTable({
             ) : (
               sortedCourses.map((course) => (
                 <tr key={course.id} className="hover:bg-blue-50 transition-all duration-200 ease-in-out transform hover:scale-[1.005]">
-                  <td className="px-6 py-4 font-medium text-slate-900">
+                  <td className="px-4 py-2.5 font-medium text-slate-900">
                     {course.name}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-2.5">
                     {course.courseDepartments && course.courseDepartments.length > 0
                       ? course.courseDepartments.map(cd => cd.department.name).join(", ")
                       : "N/A"}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-2.5">
                     {course.leadBy ? (
                       `${course.leadBy.firstName} ${course.leadBy.lastName}`
                     ) : (
                       <span className="italic text-slate-400">Unassigned</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-center">
-                    <span className="px-2 py-1 text-xs font-semibold text-purple-800 bg-purple-100 rounded-full">
+                  <td className="px-4 py-2.5 text-center">
+                    <span className="px-2 py-0.5 text-[10px] font-semibold text-purple-800 bg-purple-100 rounded-full">
                       {course._count?.groups ?? 0}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium space-x-2 text-center">
+                  <td className="px-4 py-2.5 text-sm font-medium space-x-3 text-center">
                     <button
                       onClick={() => onEdit(course)}
-                      className="text-indigo-600 hover:text-indigo-900 hover:scale-105 transition-all duration-200"
+                      className="text-indigo-600 hover:text-indigo-900 transition-all duration-200"
+                      title="Edit Course"
                     >
-                      Edit
+                      <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => onDelete(course)}
-                      className="text-red-600 hover:text-red-800 hover:scale-105 transition-all duration-200"
+                      className="text-red-600 hover:text-red-800 transition-all duration-200"
+                      title="Delete Course"
                     >
-                      Delete
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>
