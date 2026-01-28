@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-import { createNotification } from "@/lib/notification"; // New import
+import { createNotificationForUsers } from "@/lib/notification"; // Updated import
 
 const prisma = new PrismaClient();
 const JWT_SECRET = new TextEncoder().encode(
@@ -22,7 +22,7 @@ async function getUser(req) {
 
 // GET announcements for a course
 export async function GET(req, { params }) {
-  const { courseId } = params;
+  const { courseId } = await params;
 
   try {
     const announcements = await prisma.announcement.findMany({
@@ -51,7 +51,7 @@ export async function POST(req, { params }) {
     return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 });
   }
 
-  const { courseId } = params;
+  const { courseId } = await params;
 
   try {
     const { title, content } = await req.json();
@@ -76,13 +76,15 @@ export async function POST(req, { params }) {
       },
     });
 
-    // Create notifications for all students enrolled in the course
+    // Create notifications for students enrolled in this specific course
     if (newAnnouncement.course && newAnnouncement.course.enrollments.length > 0) {
-      await createNotification(
-        ["STUDENT"], // Target only students
+      const enrolledStudentIds = newAnnouncement.course.enrollments.map(e => e.studentId);
+      await createNotificationForUsers(
+        enrolledStudentIds, // Only notify students enrolled in this course
         "NEW_ANNOUNCEMENT",
         `New announcement in "${newAnnouncement.course.name}": "${newAnnouncement.title}" `,
-        `/student/courses/${courseId}` // Link to course details page
+        `/student/courses/${courseId}`,
+        ["STUDENT"] // Store role for filtering
       );
     }
 

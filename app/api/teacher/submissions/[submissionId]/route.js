@@ -1,12 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { createNotification } from "@/lib/notification"; // New import
+import { createNotificationForUsers } from "@/lib/notification"; // Updated import
 
 const prisma = new PrismaClient();
 
 export async function GET(req, { params }) {
   try {
-    const { submissionId } = params;
+    const { submissionId } = await params;
 
     const submission = await prisma.submission.findUnique({
       where: { id: submissionId },
@@ -45,7 +45,7 @@ export async function GET(req, { params }) {
 
 export async function PUT(req, { params }) {
   try {
-    const { submissionId } = params;
+    const { submissionId } = await params;
     const { grade, feedback } = await req.json();
 
     if (grade === undefined || grade === null || grade === "") {
@@ -73,13 +73,14 @@ export async function PUT(req, { params }) {
       },
     });
 
-    // Create notification for the student
+    // Create notification for the specific student who submitted
     if (updatedSubmission.student && updatedSubmission.assignment) {
-      await createNotification(
-        ["STUDENT"], // Target only students
+      await createNotificationForUsers(
+        [updatedSubmission.student.id], // Only notify the student who submitted
         "SCORE_UPDATED",
         `Your assignment "${updatedSubmission.assignment.title}" has been graded. Score: ${updatedSubmission.grade}/${updatedSubmission.assignment.points}.`,
-        `/student/assignments/${updatedSubmission.assignment.id}` // Link to assignment details page
+        `/student/assignments/${updatedSubmission.assignment.id}`,
+        ["STUDENT"] // Store role for filtering
       );
     }
 

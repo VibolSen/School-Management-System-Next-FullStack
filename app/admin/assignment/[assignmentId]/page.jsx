@@ -7,7 +7,7 @@ import Link from "next/link";
 // ✅ FIX #1: The function now accepts the whole `params` object
 async function getAssignmentData(params) {
   // Destructuring happens safely inside the function
-  const assignmentId = params.assignmentId;
+  const { assignmentId } = await params;
 
   return await prisma.assignment.findUnique({
     where: { id: assignmentId },
@@ -24,8 +24,9 @@ async function getAssignmentData(params) {
 }
 
 export default async function GradingPage({ params }) {
-  // ✅ FIX #2: Call the async data fetching function first, passing `params` directly.
-  const assignment = await getAssignmentData(params);
+  // ✅ FIX #2: Await params before passing to data fetching function.
+  const resolvedParams = await params;
+  const assignment = await getAssignmentData(resolvedParams);
 
   if (!assignment) {
     return (

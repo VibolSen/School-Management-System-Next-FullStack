@@ -26,7 +26,7 @@ export async function PUT(req, { params }) {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
-  const { announcementId } = params;
+  const { announcementId } = await params;
   
   try {
     const { title, content } = await req.json();
@@ -72,7 +72,7 @@ export async function DELETE(req, { params }) {
         return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     }
 
-    const { announcementId } = params;
+    const { announcementId } = await params;
 
     try {
         const announcement = await prisma.announcement.findUnique({

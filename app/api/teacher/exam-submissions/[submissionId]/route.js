@@ -13,7 +13,7 @@ export async function PUT(req, { params }) {
   }
 
   try {
-    const { submissionId } = params;
+    const { submissionId } = await params;
     const { grade, feedback, status } = await req.json(); // Also allow status update
 
     if (grade === undefined || grade === null || grade === "") {

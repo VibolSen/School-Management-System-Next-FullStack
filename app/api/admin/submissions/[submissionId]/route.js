@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 
 export async function PUT(request, { params }) {
   try {
-    const { submissionId } = params;
+    const { submissionId } = await params;
     const { grade, feedback } = await request.json();
 
     if (!submissionId) {

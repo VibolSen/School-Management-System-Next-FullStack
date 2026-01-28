@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 
 export async function PUT(req, { params }) {
-  const { assignmentId } = params;
+  const { assignmentId } = await params;
   const { title, description, dueDate } = await req.json();
 
   try {
@@ -27,7 +27,7 @@ export async function PUT(req, { params }) {
 }
 
 export async function DELETE(req, { params }) {
-  const { assignmentId } = params;
+  const { assignmentId } = await params;
 
   try {
     await prisma.assignment.delete({

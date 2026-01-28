@@ -41,7 +41,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const { firstName, lastName, email } = await request.json();
 
     const updatedTeacher = await prisma.user.update({
@@ -75,7 +75,7 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     await prisma.user.delete({
       where: { id, role: 'TEACHER' },
     });

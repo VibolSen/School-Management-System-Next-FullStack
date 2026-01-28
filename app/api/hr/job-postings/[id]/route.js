@@ -44,7 +44,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const {
       title,
       description,
@@ -89,7 +89,7 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     await prisma.jobPosting.delete({
       where: { id },
     });

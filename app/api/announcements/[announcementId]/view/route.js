@@ -26,7 +26,7 @@ export async function POST(req, { params }) {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
   }
 
-  const { announcementId } = params;
+  const { announcementId } = await params;
 
   try {
     const existingView = await prisma.announcementView.findFirst({

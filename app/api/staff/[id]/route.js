@@ -51,7 +51,7 @@ export async function GET(request, { params }) {
 
 // PUT or PATCH /api/admin/staff/[id] - Update a staff member by ID
 export async function PUT(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
   try {
     const {
       name,
@@ -125,7 +125,7 @@ export async function PUT(req, { params }) {
 
 // DELETE /api/admin/staff/[id] - Delete a staff member by ID
 export async function DELETE(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
   try {
     await prisma.user.delete({
       where: { id },

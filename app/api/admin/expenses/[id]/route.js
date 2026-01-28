@@ -10,7 +10,7 @@ export async function GET(request, { params }) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const expense = await prisma.expense.findUnique({
       where: { id },
     });
@@ -34,7 +34,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const { category, description, amount, date } = await request.json();
 
     const updatedExpense = await prisma.expense.update({
@@ -65,7 +65,7 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     await prisma.expense.delete({
       where: { id },
     });

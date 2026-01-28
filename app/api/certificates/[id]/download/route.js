@@ -32,7 +32,7 @@ const generateCertificateHTML = (certificate, courseName) => {
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const certificate = await prisma.certificate.findUnique({
       where: { id },
       include: { course: true },

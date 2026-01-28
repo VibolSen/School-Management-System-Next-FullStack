@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 // GET function is already correct
 export async function GET(req, { params }) {
   try {
-    const { examSubmissionId } = params;
+    const { examSubmissionId } = await params;
     const examSubmission = await prisma.examSubmission.findUnique({
       where: { id: examSubmissionId },
       include: {
@@ -38,7 +38,7 @@ export async function PUT(req, { params }) {
   try {
     // ✅ FIX: Await the request body *before* accessing params.
     const { content } = await req.json();
-    const { examSubmissionId } = params;
+    const { examSubmissionId } = await params;
 
     if (!content) {
       return NextResponse.json(

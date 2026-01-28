@@ -1,13 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { createNotification } from "@/lib/notification"; // New import
+import { createNotificationForUsers } from "@/lib/notification"; // Updated import
 
 const prisma = new PrismaClient();
 
 // GET a single submission's details
 export async function GET(req, { params }) {
   try {
-    const { submissionId } = params;
+    const { submissionId } = await params;
     const submission = await prisma.submission.findUnique({
       where: { id: submissionId },
       include: {
@@ -39,7 +39,7 @@ export async function GET(req, { params }) {
 // UPDATE a submission with the student's work
 export async function PUT(req, { params }) {
   try {
-    const { submissionId } = params;
+    const { submissionId } = await params;
     const { content } = await req.json();
 
     if (!content) {
@@ -66,13 +66,14 @@ export async function PUT(req, { params }) {
       },
     });
 
-    // Create notification for the teacher
+    // Create notification for the specific teacher who created the assignment
     if (updatedSubmission.assignment?.teacher && updatedSubmission.student) {
-      await createNotification(
-        ["TEACHER"], // Target only teachers
+      await createNotificationForUsers(
+        [updatedSubmission.assignment.teacher.id], // Only notify the assignment's teacher
         "ASSIGNMENT_SUBMITTED",
         `Student ${updatedSubmission.student.firstName} ${updatedSubmission.student.lastName} has submitted assignment "${updatedSubmission.assignment.title}".`,
-        `/teacher/submissions/${updatedSubmission.id}` // Link to the submission details page for the teacher
+        `/teacher/assignment/${updatedSubmission.assignmentId}`,
+        ["TEACHER"] // Store role for filtering
       );
     }
 

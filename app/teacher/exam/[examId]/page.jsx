@@ -6,7 +6,7 @@ import Link from "next/link";
 const prisma = new PrismaClient();
 
 async function getExamData(params) {
-  const { examId } = params;
+  const { examId } = await params;
 
   return await prisma.exam.findUnique({
     where: { id: examId },
@@ -23,7 +23,8 @@ async function getExamData(params) {
 }
 
 export default async function ExamDetailPage({ params }) {
-  const exam = await getExamData(params);
+  const resolvedParams = await params;
+  const exam = await getExamData(resolvedParams);
 
   if (!exam) {
     return (

@@ -123,11 +123,11 @@ export default function ExamDetailView({ initialExam }) {
         onClose={() => setNotification({ ...notification, show: false })}
       />
       <div>
-        <Link
-          href="/teacher/exam"
-          className="text-blue-600 hover:underline text-sm"
-        >
-          &larr; Back to All Exams
+        <Link href="/teacher/exam">
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition-colors mb-4 inline-flex items-center gap-2">
+            <span>&larr;</span>
+            <span>Back to All Exams</span>
+          </button>
         </Link>
         <h1 className="text-3xl font-bold text-slate-800 mt-2">
           {exam.title}
