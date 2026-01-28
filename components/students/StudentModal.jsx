@@ -54,9 +54,21 @@ export default function StudentModal({
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.firstName.trim())
+    
+    // Validate first name
+    if (!formData.firstName.trim()) {
       newErrors.firstName = "First name is required";
-    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+    } else if (!/^[a-zA-Z\s'-]+$/.test(formData.firstName)) {
+      newErrors.firstName = "First name must contain only letters";
+    }
+    
+    // Validate last name
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = "Last name is required";
+    } else if (!/^[a-zA-Z\s'-]+$/.test(formData.lastName)) {
+      newErrors.lastName = "Last name must contain only letters";
+    }
+    
     if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email))
       newErrors.email = "A valid email is required";
     if (!isEditMode && (!formData.password || formData.password.length < 6)) {
