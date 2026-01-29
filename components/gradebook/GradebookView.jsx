@@ -4,7 +4,8 @@
 import React, { useState, useEffect } from 'react';
 import GradebookToolbar from './GradebookToolbar';
 import GradebookTable from './GradebookTable';
-import { FiLoader, FiAlertTriangle } from 'react-icons/fi';
+import { FiAlertTriangle } from 'react-icons/fi';
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const GradebookView = () => {
   const [gradebookData, setGradebookData] = useState(null);
@@ -33,7 +34,7 @@ const GradebookView = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <FiLoader className="animate-spin text-blue-500 h-8 w-8" />
+        <LoadingSpinner size="lg" color="blue" />
         <span className="ml-3 text-gray-600">Loading gradebook...</span>
       </div>
     );

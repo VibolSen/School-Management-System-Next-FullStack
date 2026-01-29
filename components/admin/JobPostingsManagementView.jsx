@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useUser } from "@/context/UserContext";
-import { Loader2 } from "lucide-react";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import JobPostingForm from "@/components/admin/JobPostingForm";
 import JobPostingTable from "@/components/admin/JobPostingTable";
 
@@ -120,9 +120,9 @@ export default function JobPostingsManagementView() {
 
   if (isLoading && jobPostings.length === 0) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
-        <p className="ml-2 text-gray-600">Loading job postings...</p>
+      <div className="flex flex-col justify-center items-center h-screen">
+        <LoadingSpinner size="lg" color="blue" className="mb-3" />
+        <p className="text-gray-600">Loading job postings...</p>
       </div>
     );
   }

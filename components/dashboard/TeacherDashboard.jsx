@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import Link from "next/link";
 import {
   BarChart,
@@ -50,7 +51,7 @@ const TeacherDashboard = ({ loggedInUser }) => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center space-y-3">
-          <div className="animate-spin w-10 h-10 border-4 border-gray-300 border-t-blue-500 rounded-full mx-auto" />
+          <LoadingSpinner size="md" color="blue" className="mx-auto" />
           <p className="text-gray-600 font-medium">Loading dashboard...</p>
         </div>
       </div>

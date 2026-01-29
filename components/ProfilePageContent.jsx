@@ -12,6 +12,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 import { useUser } from "../context/UserContext";
 
@@ -144,7 +145,7 @@ export default function ProfilePageContent({
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
         <div className="bg-white/80 backdrop-blur-sm border border-white/60 rounded-xl shadow-lg p-8 max-w-md w-full text-center">
-          <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <LoadingSpinner size="md" color="blue" className="mx-auto mb-4" />
           <p className="text-gray-600">Loading your profile...</p>
         </div>
       </div>

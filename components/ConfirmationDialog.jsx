@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
+import { X, AlertTriangle, CheckCircle } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function ConfirmationDialog({
   isOpen,
@@ -137,7 +138,7 @@ export default function ConfirmationDialog({
                       {/* Loading spinner or text */}
                       {isLoading ? (
                         <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          <LoadingSpinner size="xs" color="white" className="mr-2" />
                           Processing...
                         </>
                       ) : (

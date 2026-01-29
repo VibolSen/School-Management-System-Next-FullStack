@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import AddExamModal from "./AddExamModal";
 import EditExamModal from "./EditExamModal";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import Notification from "@/components/Notification";
 import ExamCard from "./ExamCard";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
@@ -355,7 +356,7 @@ export default function ExamManagement({ loggedInUser }) {
 
           {isLoading ? (
             <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+              <LoadingSpinner size="lg" color="blue" />
             </div>
           ) : exams.length === 0 ? (
             <div className="text-center py-12">

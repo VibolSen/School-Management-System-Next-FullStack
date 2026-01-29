@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const ReportsView = () => {
   const [departments, setDepartments] = useState([]);
@@ -60,7 +61,11 @@ const ReportsView = () => {
         </select>
       </div>
 
-      {loading && <div>Loading...</div>}
+      {loading && (
+        <div className="flex justify-center py-12">
+          <LoadingSpinner size="lg" color="indigo" />
+        </div>
+      )}
       {error && <div className="text-red-500">Error: {error}</div>}
 
       {reportsData && (

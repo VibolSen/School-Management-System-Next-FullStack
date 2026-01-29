@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function NotificationsDropdown() {
   const [notifications, setNotifications] = useState([]);
@@ -81,7 +82,9 @@ export default function NotificationsDropdown() {
         <div className="absolute right-0 z-20 w-72 mt-2 overflow-hidden bg-gray-100 text-black rounded-lg shadow-xl border border-gray-200">
           <div className="py-2 max-h-80 overflow-y-auto">
             {isLoading && (
-              <div className="px-4 py-2 text-sm text-gray-600">Loading...</div>
+              <div className="px-4 py-8 flex items-center justify-center">
+                <LoadingSpinner size="sm" />
+              </div>
             )}
             {error && (
               <div className="px-4 py-2 text-sm text-red-600">{error}</div>

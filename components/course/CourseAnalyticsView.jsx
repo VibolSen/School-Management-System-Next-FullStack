@@ -14,6 +14,7 @@ import {
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import { Users, BarChart3 } from "lucide-react";
 import AnnouncementsView from "@/components/announcements/AnnouncementsView";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const CourseAnalyticsView = ({ loggedInUser }) => {
   const [selectedCourseId, setSelectedCourseId] = useState(null);
@@ -151,8 +152,9 @@ const CourseAnalyticsView = ({ loggedInUser }) => {
       </div>
 
       {loading && (
-        <div className="flex justify-center items-center h-64">
-          <div className="text-slate-600">Loading...</div>
+        <div className="flex flex-col justify-center items-center h-64 gap-3">
+          <LoadingSpinner size="lg" color="blue" />
+          <span className="text-slate-500 font-medium animate-pulse">Gathering insights...</span>
         </div>
       )}
 

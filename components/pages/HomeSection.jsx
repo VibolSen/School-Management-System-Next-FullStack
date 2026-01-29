@@ -13,6 +13,7 @@ import {
   Shield,
   Megaphone,
 } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function HomeSection() {
   return (
@@ -25,7 +26,7 @@ export default function HomeSection() {
 
         <div className="container mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-full border border-blue-200/50 mb-6 shadow-lg backdrop-blur-sm">
-            <Sparkles className="w-4 h-4 text-blue-600 animate-spin" />
+            <LoadingSpinner size="xs" color="blue" />
             <span className="text-xs font-semibold text-blue-700 tracking-wide">
               Empowering Global Education
             </span>

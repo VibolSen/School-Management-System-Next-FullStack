@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { Eye, EyeOff } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -255,7 +256,7 @@ export default function RegisterPage() {
               >
                 {loading ? (
                   <>
-                    <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    <LoadingSpinner size="xs" color="white" className="mr-2" />
                     Creating Account...
                   </>
                 ) : success ? (

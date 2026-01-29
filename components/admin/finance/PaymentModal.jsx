@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Select from "react-select";
 import { X, CreditCard, Hash, Calendar, DollarSign, FileText, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function PaymentModal({ isOpen, payment, onClose, onPaymentSaved }) {
   const [formData, setFormData] = useState({
@@ -297,7 +298,7 @@ export default function PaymentModal({ isOpen, payment, onClose, onPaymentSaved 
                 className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300 transition-all duration-200 active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
               >
                 {isLoading ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <LoadingSpinner size="xs" color="white" />
                 ) : (
                   payment ? "Update Payment" : "Record Payment"
                 )}

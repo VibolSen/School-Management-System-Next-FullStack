@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Loader2 } from "lucide-react";
+import { X } from "lucide-react";
 import StatusMessage from "@/components/StatusMessage";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function JobPostingForm({
   isOpen,
@@ -297,7 +298,7 @@ export default function JobPostingForm({
               }`}
             >
               {isLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
+                <LoadingSpinner size="xs" color="white" />
               ) : initialData ? (
                 "Update Job Posting"
               ) : (

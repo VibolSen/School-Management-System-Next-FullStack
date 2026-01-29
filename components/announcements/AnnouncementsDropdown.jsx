@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function AnnouncementsDropdown() {
     const [announcements, setAnnouncements] = useState([]);
@@ -42,7 +43,12 @@ export default function AnnouncementsDropdown() {
             {isOpen && (
                 <div className="absolute right-0 z-20 w-64 mt-2 overflow-hidden bg-white rounded-lg shadow-xl dark:bg-gray-800">
                     <div className="py-2">
-                        {isLoading && <div className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">Loading...</div>}
+                        {isLoading && (
+                            <div className="px-4 py-6 flex flex-col items-center justify-center gap-2">
+                                <LoadingSpinner size="sm" />
+                                <span className="text-xs text-gray-400 font-medium">Fetching news...</span>
+                            </div>
+                        )}
                         {error && <div className="px-4 py-2 text-sm text-red-600 dark:text-red-400">{error}</div>}
                         {!isLoading && !error && announcements.length === 0 && (
                             <div className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">No recent announcements.</div>

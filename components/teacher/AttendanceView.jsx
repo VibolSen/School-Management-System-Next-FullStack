@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import StatusMessage from "@/components/StatusMessage";
 import AttendanceControls from "./attendance/AttendanceControls";
 import StudentList from "./attendance/StudentList";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function AttendanceView() {
   const [groups, setGroups] = useState([]);
@@ -162,7 +163,7 @@ export default function AttendanceView() {
         {isLoading ? (
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
             <div className="flex justify-center mb-4">
-              <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+              <LoadingSpinner size="lg" color="blue" />
             </div>
             <p className="text-gray-600 text-lg font-medium">
               Loading students...

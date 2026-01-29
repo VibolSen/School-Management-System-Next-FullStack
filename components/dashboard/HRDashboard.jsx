@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import DashboardCard from "@/components/dashboard/DashboardCard";
+import FullPageLoading from "@/components/ui/FullPageLoading";
 import {
   Briefcase,
   Building2,
@@ -78,7 +79,7 @@ const HRDashboard = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <FullPageLoading message="Synchronizing dashboard data..." />;
   }
 
   if (error) {

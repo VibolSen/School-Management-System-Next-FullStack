@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Eye, EyeOff, X, User, Mail, Lock, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const initialFormState = {
   firstName: "",
@@ -308,7 +309,7 @@ export default function StaffModal({
                 >
                   {isLoading ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <LoadingSpinner size="xs" color="white" />
                       <span>Saving...</span>
                     </div>
                   ) : (

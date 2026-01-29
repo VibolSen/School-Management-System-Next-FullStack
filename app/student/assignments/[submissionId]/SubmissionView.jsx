@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Notification from "@/components/Notification";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -142,7 +143,9 @@ export default function SubmissionView({ initialSubmission }) {
                 disabled={isLoading}
                 className="bg-blue-600 text-white font-normal px-4 py-1.5 rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
-                {isLoading ? "Submitting..." : "Submit Assignment"}
+                {isLoading ? (
+                  <LoadingSpinner size="xs" color="white" />
+                ) : "Submit Assignment"}
               </button>
             </div>
           </form>

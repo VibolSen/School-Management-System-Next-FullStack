@@ -1,5 +1,7 @@
 "use client";
 
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+
 export default function AttendanceControls({
   groups,
   selectedGroup,
@@ -61,10 +63,7 @@ export default function AttendanceControls({
             disabled={isSaving || !selectedGroup || students.length === 0}
           >
             {isSaving ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Saving...</span>
-              </>
+              <LoadingSpinner size="xs" color="white" />
             ) : (
               <>
                 <svg

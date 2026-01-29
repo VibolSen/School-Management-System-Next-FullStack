@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import AssignmentModal from "../AssignmentModal";
 import Notification from "@/components/Notification";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import AssignmentCard from "./AssignmentCard";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import { useUser } from "@/context/UserContext";
@@ -296,7 +297,7 @@ export default function AssignmentManagement() {
 
           {isLoading ? (
             <div className="flex justify-center items-center py-10">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+              <LoadingSpinner size="lg" color="blue" />
             </div>
           ) : assignments.length === 0 ? (
             <div className="text-center py-10">

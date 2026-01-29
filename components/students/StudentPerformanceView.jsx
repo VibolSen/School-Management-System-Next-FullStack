@@ -11,6 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const StudentPerformanceView = () => {
   const [students, setStudents] = useState([]);
@@ -90,7 +91,17 @@ const StudentPerformanceView = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-[70vh] gap-6">
+        <div className="relative">
+          <div className="absolute inset-0 bg-blue-400/20 blur-2xl rounded-full scale-150 animate-pulse" />
+          <LoadingSpinner size="xl" color="blue" />
+        </div>
+        <p className="text-slate-600 font-bold text-lg animate-pulse tracking-tight">
+          Analyzing Student Performance Data...
+        </p>
+      </div>
+    );
   }
 
   if (error) {

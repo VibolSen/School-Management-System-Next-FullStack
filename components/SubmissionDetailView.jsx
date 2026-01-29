@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 
 import { SubmissionStatus } from "../types";
+import LoadingSpinner from "./ui/LoadingSpinner";
 
 const getStatusBadge = (status, grade) => {
   switch (status) {
@@ -153,7 +154,14 @@ const SubmissionDetailView = ({ assignment, course, onBack, onEdit }) => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+        <LoadingSpinner size="xl" />
+        <p className="text-slate-500 font-semibold animate-pulse tracking-wide">
+          Retrieving Submission Details...
+        </p>
+      </div>
+    );
   }
 
   if (error) {

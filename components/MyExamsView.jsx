@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Notification from "@/components/Notification";
 import ExamCard from "@/components/exam/ExamCard";
-import { Loader2, FileText } from "lucide-react"; // Import icons
+import { FileText } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function MyExamsView({ loggedInUser }) {
   const [submissions, setSubmissions] = useState([]);
@@ -72,8 +73,8 @@ export default function MyExamsView({ loggedInUser }) {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {isLoading ? (
-              <div className="col-span-full flex justify-center items-center py-8">
-                <Loader2 className="h-10 w-10 animate-spin text-blue-600 mr-3" />
+              <div className="col-span-full flex flex-col justify-center items-center py-8">
+                <LoadingSpinner size="lg" color="blue" className="mb-3" />
                 <p className="text-lg font-medium text-slate-700">Loading your exams...</p>
               </div>
             ) : submissions.length === 0 ? (

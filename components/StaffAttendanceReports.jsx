@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const StaffAttendanceReports = () => {
   const [attendanceData, setAttendanceData] = useState([]);
@@ -56,7 +57,11 @@ const StaffAttendanceReports = () => {
           Filter
         </button>
       </div>
-      {loading && <div>Loading...</div>}
+      {loading && (
+        <div className="flex justify-center py-10">
+          <LoadingSpinner size="lg" />
+        </div>
+      )}
       {error && <div className="text-red-500">Error: {error}</div>}
       {attendanceData.length > 0 && (
         <div className="bg-white p-6 rounded-lg shadow-md">

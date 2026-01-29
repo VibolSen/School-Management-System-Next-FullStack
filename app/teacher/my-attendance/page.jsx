@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import Notification from "@/components/Notification";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function TeacherAttendancePage() {
   const { user } = useUser();
@@ -116,7 +117,9 @@ export default function TeacherAttendancePage() {
                   : "bg-green-600 hover:bg-green-700"
               }`}
             >
-              {isLoading ? "Checking In..." : "Check In"}
+              {isLoading ? (
+                <LoadingSpinner size="xs" color="white" />
+              ) : "Check In"}
             </button>
             {!canCheckIn && !attendanceRecord?.checkInTime && (
               <p className="text-sm text-red-500 mt-2">Check-in is not available after 5:00 PM.</p>
@@ -132,7 +135,9 @@ export default function TeacherAttendancePage() {
                   : "bg-red-600 hover:bg-red-700"
               }`}
             >
-              {isLoading ? "Checking Out..." : "Check Out"}
+              {isLoading ? (
+                <LoadingSpinner size="xs" color="white" />
+              ) : "Check Out"}
             </button>
           )}
         </div>

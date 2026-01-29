@@ -1,8 +1,7 @@
-"use client";
-
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { Edit, Eye, Trash2 } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function TeacherTable({
   teachers = [],
@@ -59,8 +58,13 @@ export default function TeacherTable({
           <tbody className="bg-white divide-y divide-gray-200">
             {isLoading && teachers.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-8 text-gray-500">
-                  Loading...
+                <td colSpan={canManageTeachers ? 4 : 3} className="py-12">
+                  <div className="flex flex-col items-center justify-center gap-3">
+                    <LoadingSpinner size="md" color="blue" />
+                    <span className="text-sm font-medium text-slate-500 animate-pulse">
+                      Retrieving teacher records...
+                    </span>
+                  </div>
                 </td>
               </tr>
             ) : filteredTeachers.length === 0 ? (

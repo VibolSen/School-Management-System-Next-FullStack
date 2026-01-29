@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import AnnouncementModal from "./AnnouncementModal";
 import AnnouncementCard from "./AnnouncementCard";
 import Notification from "@/components/Notification";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function AnnouncementsView({ courseId, loggedInUser }) {
   console.log("AnnouncementsView - loggedInUser:", loggedInUser);
@@ -119,7 +120,10 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
       </div>
 
       {isLoading ? (
-        <p>Loading...</p>
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <LoadingSpinner size="lg" />
+          <p className="text-slate-500 font-medium animate-pulse">Loading announcements...</p>
+        </div>
       ) : announcements.length === 0 ? (
         <p>No announcements yet.</p>
       ) : (

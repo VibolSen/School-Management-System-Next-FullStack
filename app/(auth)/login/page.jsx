@@ -6,6 +6,7 @@ import { LogIn, Mail, Lock } from "lucide-react";
 import Cookies from "js-cookie"; // You may need to install this: npm install js-cookie
 
 import { Eye, EyeOff } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -180,7 +181,7 @@ const handleSubmit = async (e) => {
               >
                 {isLoading ? (
                   <>
-                    <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    <LoadingSpinner size="xs" color="white" className="mr-2" />
                     Logging in...
                   </>
                 ) : (

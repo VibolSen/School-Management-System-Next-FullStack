@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import AssignmentModal from "./AssignmentModal";
 import Notification from "@/components/Notification";
 import AssignmentCard from "./assignment/AssignmentCard";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function AssignmentsView({ loggedInUser }) {
   // STATE MANAGEMENT
@@ -308,7 +309,7 @@ export default function AssignmentsView({ loggedInUser }) {
 
           {isLoading ? (
             <div className="flex justify-center items-center py-10">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+              <LoadingSpinner size="lg" color="blue" />
             </div>
           ) : assignments.length === 0 ? (
             <div className="text-center py-10">
@@ -426,7 +427,7 @@ export default function AssignmentsView({ loggedInUser }) {
               >
                 {isLoading ? (
                   <>
-                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                    <LoadingSpinner size="xs" color="white" />
                     Deleting...
                   </>
                 ) : (

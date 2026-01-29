@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PlusCircle, Edit, Trash2, Loader2 } from "lucide-react";
+import { PlusCircle, Edit, Trash2 } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { format } from "date-fns";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import StatusMessage from "@/components/StatusMessage";
@@ -92,9 +93,9 @@ export default function JobPostingsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
-        <p className="ml-2 text-gray-600">Loading job postings...</p>
+      <div className="flex flex-col justify-center items-center h-screen">
+        <LoadingSpinner size="lg" color="blue" className="mb-4" />
+        <p className="text-gray-600">Loading job postings...</p>
       </div>
     );
   }

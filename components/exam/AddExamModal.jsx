@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, FileText, Calendar, Users, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function AddExamModal({
   isOpen,
@@ -206,7 +207,7 @@ export default function AddExamModal({
                     className="flex-1 sm:flex-none px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-purple-200 hover:shadow-xl hover:shadow-purple-300 transition-all duration-200 active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2"
                   >
                     {isLoading ? (
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <LoadingSpinner size="xs" color="white" />
                     ) : (
                       "Schedule Exam"
                     )}
