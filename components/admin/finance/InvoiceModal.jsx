@@ -6,7 +6,7 @@ import Select from "react-select";
 import { X, FileText, User, Calendar, Plus, Trash2, DollarSign, List, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function InvoiceModal({ isOpen, invoice, onClose, onInvoiceSaved }) {
+export default function InvoiceModal({ isOpen, invoice, onClose, onInvoiceSaved, showMessage }) {
   const [formData, setFormData] = useState({
     studentId: "",
     issueDate: "",
@@ -143,15 +143,14 @@ export default function InvoiceModal({ isOpen, invoice, onClose, onInvoiceSaved 
       });
 
       if (response.ok) {
+        showMessage(`Invoice ${invoice ? "updated" : "created"} successfully!`, "success");
         onInvoiceSaved();
       } else {
         const errorData = await response.json();
-        console.error("Failed to save invoice:", errorData.message);
-        alert(`Error: ${errorData.message}`);
+        showMessage(errorData.message || "Failed to save invoice", "error");
       }
     } catch (error) {
-      console.error("Error saving invoice:", error);
-      alert("An unexpected error occurred.");
+       showMessage(error.message, "error");
     } finally {
       setIsLoading(false);
     }

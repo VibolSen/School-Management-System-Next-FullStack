@@ -3,7 +3,7 @@
 
 import React, { useState, useCallback } from "react";
 import Link from "next/link";
-import Notification from "@/components/Notification";
+
 
 // Helper component for status badges
 const StatusBadge = ({ status }) => {
@@ -77,19 +77,9 @@ const SubmissionRow = ({ submission, onGrade }) => {
 // The main view component for the entire page
 export default function ExamDetailView({ initialExam }) {
   const [exam, setExam] = useState(initialExam);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
 
-  const showMessage = useCallback((message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  }, []);
+
+
 
   const handleGradeSubmission = async (submissionId, grade, feedback) => {
     try {
@@ -110,18 +100,15 @@ export default function ExamDetailView({ initialExam }) {
           sub.id === submissionId ? { ...sub, ...updatedSubmission } : sub
         ),
       }));
-      showMessage("Grade saved successfully!");
+      console.log("Grade saved successfully!");
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     }
   };
 
   return (
     <div className="space-y-6">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
+
       <div>
         <Link href="/teacher/exam">
           <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition-colors mb-4 inline-flex items-center gap-2">

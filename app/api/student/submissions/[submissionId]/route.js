@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { createNotificationForUsers } from "@/lib/notification"; // Updated import
 
 const prisma = new PrismaClient();
 
@@ -59,23 +58,13 @@ export async function PUT(req, { params }) {
       include: {
         assignment: {
           include: {
-            teacher: { select: { id: true, firstName: true, lastName: true } }, // Include teacher ID for notification
+            teacher: { select: { id: true, firstName: true, lastName: true } }, 
           },
         },
-        student: { select: { firstName: true, lastName: true } }, // Include student name for notification message
+        student: { select: { firstName: true, lastName: true } }, 
       },
     });
 
-    // Create notification for the specific teacher who created the assignment
-    if (updatedSubmission.assignment?.teacher && updatedSubmission.student) {
-      await createNotificationForUsers(
-        [updatedSubmission.assignment.teacher.id], // Only notify the assignment's teacher
-        "ASSIGNMENT_SUBMITTED",
-        `Student ${updatedSubmission.student.firstName} ${updatedSubmission.student.lastName} has submitted assignment "${updatedSubmission.assignment.title}".`,
-        `/teacher/assignment/${updatedSubmission.assignmentId}`,
-        ["TEACHER"] // Store role for filtering
-      );
-    }
 
     return NextResponse.json(updatedSubmission);
   } catch (error) {

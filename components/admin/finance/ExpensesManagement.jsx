@@ -3,11 +3,40 @@
 import { useState, useEffect } from "react";
 import ExpenseModal from "./ExpenseModal";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 export default function ExpensesManagement() {
   const [expenses, setExpenses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
+
+  // New states for ConfirmationDialog
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showMessage = (message, type = "success") => {
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
 
   useEffect(() => {
     fetchExpenses();
@@ -19,6 +48,8 @@ export default function ExpensesManagement() {
       if (response.ok) {
         const data = await response.json();
         setExpenses(data);
+      } else {
+        console.error("Failed to fetch expenses");
       }
     } catch (error) {
       console.error("Error fetching expenses:", error);
@@ -35,18 +66,29 @@ export default function ExpensesManagement() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteExpense = async (expenseId) => {
-    if (confirm("Are you sure you want to delete this expense?")) {
-      try {
-        const response = await fetch(`/api/admin/expenses/${expenseId}`, {
-          method: "DELETE",
-        });
-        if (response.ok) {
-          fetchExpenses();
-        }
-      } catch (error) {
-        console.error("Error deleting expense:", error);
+  const handleDeleteExpense = (expenseId) => {
+    setDeleteId(expenseId);
+    setShowDeleteConfirmation(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    try {
+      const response = await fetch(`/api/admin/expenses/${deleteId}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        showMessage("Expense deleted successfully!", "success");
+        fetchExpenses();
+      } else {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete expense");
       }
+    } catch (error) {
+       showMessage(error.message, "error");
+    } finally {
+        setShowDeleteConfirmation(false);
+        setDeleteId(null);
     }
   };
 
@@ -138,6 +180,35 @@ export default function ExpensesManagement() {
         expense={selectedExpense}
         onClose={closeModal}
         onExpenseSaved={onExpenseSaved}
+        showMessage={showMessage}
+      />
+
+       <ConfirmationDialog
+        isOpen={showDeleteConfirmation}
+        onClose={() => setShowDeleteConfirmation(false)}
+        onConfirm={confirmDelete}
+        title="Delete Expense"
+        message="Are you sure you want to delete this expense? This action cannot be undone."
+      />
+
+       <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        confirmText="OK"
+        type="success"
+      />
+
+       <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        confirmText="OK"
+        type="danger"
       />
     </div>
   );

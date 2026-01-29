@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Notification from "@/components/Notification";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 export default function EditExamView({ exam, loggedInUser }) {
   const router = useRouter();
@@ -13,18 +13,36 @@ export default function EditExamView({ exam, loggedInUser }) {
     examDate: exam.examDate ? new Date(exam.examDate).toISOString().split('T')[0] : "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
-  const [error, setError] = useState("");
+
+  // Consolidated error state for field validation (inline) and modal for API errors
+  const [fieldError, setFieldError] = useState("");
+
+  // Confirmation States
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(() => {
-      setNotification({ show: false, message: "", type: "" });
-    }, 3000);
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+    // Navigate after success modal is closed
+    router.push("/teacher/exam");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
   };
 
   const handleChange = (e) => {
@@ -35,9 +53,10 @@ export default function EditExamView({ exam, loggedInUser }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title.trim()) {
-      setError("Exam title is required.");
+      setFieldError("Exam title is required.");
       return;
     }
+    setFieldError(""); // Clear field error
 
     setIsLoading(true);
     try {
@@ -52,8 +71,8 @@ export default function EditExamView({ exam, loggedInUser }) {
         throw new Error(errData.error || "Failed to update exam");
       }
 
-      showMessage("Exam updated successfully!");
-      router.push("/teacher/exam");
+      showMessage("Exam updated successfully!", "success");
+      // Navigation happens in handleCloseSuccessModal
     } catch (err) {
       showMessage(err.message, "error");
     } finally {
@@ -63,10 +82,7 @@ export default function EditExamView({ exam, loggedInUser }) {
 
   return (
     <div className="space-y-6">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
+
       <h1 className="text-3xl font-bold text-slate-800">Edit Exam</h1>
       <div className="bg-white rounded-xl shadow-2xl w-full">
         <form onSubmit={handleSubmit}>
@@ -109,7 +125,7 @@ export default function EditExamView({ exam, loggedInUser }) {
                 className="w-full px-3 py-2 border rounded-md"
               />
             </div>
-            {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+            {fieldError && <p className="text-xs text-red-500 mt-1">{fieldError}</p>}
           </div>
           <div className="p-6 bg-slate-50 border-t flex justify-end gap-4">
             <button
@@ -130,6 +146,28 @@ export default function EditExamView({ exam, loggedInUser }) {
           </div>
         </form>
       </div>
+
+      <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="success"
+      />
+
+      <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="danger"
+      />
     </div>
   );
 }

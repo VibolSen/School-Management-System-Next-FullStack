@@ -7,7 +7,7 @@ import { X, CreditCard, Hash, Calendar, DollarSign, FileText, Info } from "lucid
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-export default function PaymentModal({ isOpen, payment, onClose, onPaymentSaved }) {
+export default function PaymentModal({ isOpen, payment, onClose, onPaymentSaved, showMessage }) {
   const [formData, setFormData] = useState({
     invoiceId: "",
     amount: "",
@@ -95,15 +95,14 @@ export default function PaymentModal({ isOpen, payment, onClose, onPaymentSaved 
       });
 
       if (response.ok) {
+        showMessage(`Payment ${payment ? "updated" : "recorded"} successfully!`, "success");
         onPaymentSaved();
       } else {
         const errorData = await response.json();
-        console.error("Failed to save payment:", errorData.message);
-        alert(`Error: ${errorData.message}`);
+        showMessage(errorData.message || "Failed to save payment", "error");
       }
     } catch (error) {
-      console.error("Error saving payment:", error);
-      alert("An unexpected error occurred.");
+       showMessage(error.message, "error");
     } finally {
       setIsLoading(false);
     }

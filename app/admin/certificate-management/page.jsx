@@ -4,7 +4,7 @@ import Link from 'next/link';
 import CertificateModal from '@/components/certificate-management/CertificateModal';
 import CertificateTable from '@/components/certificate-management/CertificateTable';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
-import Notification from '@/components/Notification';
+
 import {
   Dialog,
   DialogContent,
@@ -21,11 +21,6 @@ const CertificateManagementPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [certificateToDelete, setCertificateToDelete] = useState(null);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "info",
-  });
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);

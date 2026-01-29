@@ -5,7 +5,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import AssignmentsTable from "./AssignmentsTable";
 import StudentAssignmentModal from "./StudentAssignmentModal";
-import Notification from "@/components/Notification"; // Assuming a notification component
+
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 export default function StudentAssignmentView() {
@@ -14,19 +14,7 @@ export default function StudentAssignmentView() {
   const [editingAssignment, setEditingAssignment] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
 
-  const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  };
 
   const fetchAssignments = useCallback(async () => {
     setIsLoading(true);
@@ -36,7 +24,7 @@ export default function StudentAssignmentView() {
       const data = await res.json();
       setAssignments(Array.isArray(data) ? data : []);
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
       setAssignments([]);
     } finally {
       setIsLoading(false);
@@ -72,11 +60,11 @@ export default function StudentAssignmentView() {
         const errData = await res.json().catch(() => ({})); // Handle empty error responses
         throw new Error(errData.error || "Failed to delete assignment");
       }
-      showMessage("Assignment deleted for all students successfully!");
+      console.log("Assignment deleted for all students successfully!");
       fetchAssignments(); // Refresh the list
       setItemToDelete(null);
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     }
   };
 
@@ -107,14 +95,14 @@ export default function StudentAssignmentView() {
         throw new Error(errorData.error || "Failed to save assignment");
       }
 
-      showMessage(
+      console.log(
         `Assignment ${
           editingAssignment ? "details updated" : "created"
         } successfully!`
       );
       fetchAssignments();
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       handleCloseModal();
     }
@@ -122,11 +110,6 @@ export default function StudentAssignmentView() {
 
   return (
     <div className="space-y-6 p-6 max-w-7xl mx-auto">
-      <Notification
-        show={notification.show}
-        message={notification.message}
-        type={notification.type}
-      />
       <div>
         <h1 className="text-3xl font-bold text-slate-800">Assignments</h1>
         <p className="text-slate-500 mt-1">

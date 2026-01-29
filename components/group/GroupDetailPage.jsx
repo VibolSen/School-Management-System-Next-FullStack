@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import ManageGroupMembersModal from "./ManageGroupMembersModal";
 import GroupModal from "./GroupModal";
-import Notification from "../Notification";
+
 
 export default function GroupDetailPage({ initialGroup, allStudents, role }) {
   const [group, setGroup] = useState(initialGroup);
@@ -12,16 +12,6 @@ export default function GroupDetailPage({ initialGroup, allStudents, role }) {
     useState(false);
   const [isEditGroupModalOpen, setIsEditGroupModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
-
-  const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(() => setNotification({ ...notification, show: false }), 3000);
-  };
 
   const handleSaveMembers = async (studentIds) => {
     setIsLoading(true);
@@ -39,10 +29,10 @@ export default function GroupDetailPage({ initialGroup, allStudents, role }) {
 
       const updatedGroup = await res.json();
       setGroup(updatedGroup);
-      showMessage("Group members updated successfully!");
+      console.log("Group members updated successfully!");
       handleCloseManageMembersModal();
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     }
     finally {
       setIsLoading(false);
@@ -65,10 +55,10 @@ export default function GroupDetailPage({ initialGroup, allStudents, role }) {
 
       const updatedGroup = await res.json();
       setGroup(updatedGroup);
-      showMessage("Group details updated successfully!");
+      console.log("Group details updated successfully!");
       handleCloseEditGroupModal();
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     }
     finally {
       setIsLoading(false);
@@ -81,10 +71,6 @@ export default function GroupDetailPage({ initialGroup, allStudents, role }) {
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
 
       {/* Back Button */}
       <div className="mb-6">

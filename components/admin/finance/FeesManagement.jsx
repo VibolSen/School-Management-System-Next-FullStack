@@ -3,11 +3,40 @@
 import { useState, useEffect } from "react";
 import FeeModal from "./FeeModal";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 export default function FeesManagement() {
   const [fees, setFees] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFee, setSelectedFee] = useState(null);
+
+  // New states for ConfirmationDialog
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showMessage = (message, type = "success") => {
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
 
   useEffect(() => {
     fetchFees();
@@ -19,6 +48,10 @@ export default function FeesManagement() {
       if (response.ok) {
         const data = await response.json();
         setFees(data);
+      } else {
+         // Silently fail or log for now regarding fetch list? Or show error?
+         // Usually list fetch error is less critical to modal, but good to know.
+         console.error("Failed to fetch fees");
       }
     } catch (error) {
       console.error("Error fetching fees:", error);
@@ -35,18 +68,29 @@ export default function FeesManagement() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteFee = async (feeId) => {
-    if (confirm("Are you sure you want to delete this fee?")) {
-      try {
-        const response = await fetch(`/api/admin/fees/${feeId}`, {
-          method: "DELETE",
-        });
-        if (response.ok) {
-          fetchFees();
-        }
-      } catch (error) {
-        console.error("Error deleting fee:", error);
+  const handleDeleteFee = (feeId) => {
+    setDeleteId(feeId);
+    setShowDeleteConfirmation(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    try {
+      const response = await fetch(`/api/admin/fees/${deleteId}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        showMessage("Fee deleted successfully!", "success");
+        fetchFees();
+      } else {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete fee");
       }
+    } catch (error) {
+      showMessage(error.message, "error");
+    } finally {
+        setShowDeleteConfirmation(false);
+        setDeleteId(null);
     }
   };
 
@@ -62,6 +106,7 @@ export default function FeesManagement() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-4">
+      {/* ... Header ... */}
       <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
         <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
           Fees Management
@@ -74,6 +119,7 @@ export default function FeesManagement() {
           <span>Add Fee</span>
         </button>
       </div>
+
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -101,7 +147,7 @@ export default function FeesManagement() {
                   <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${fee.amount.toFixed(2)}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-right">
                     <div className="flex justify-end gap-2">
-                      <button
+                       <button
                         onClick={() => handleEditFee(fee)}
                         className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
                         title="Edit Fee"
@@ -123,11 +169,41 @@ export default function FeesManagement() {
           </table>
         </div>
       </div>
+
       <FeeModal
         isOpen={isModalOpen}
         fee={selectedFee}
         onClose={closeModal}
         onFeeSaved={onFeeSaved}
+        showMessage={showMessage}
+      />
+
+      <ConfirmationDialog
+        isOpen={showDeleteConfirmation}
+        onClose={() => setShowDeleteConfirmation(false)}
+        onConfirm={confirmDelete}
+        title="Delete Fee"
+        message="Are you sure you want to delete this fee? This action cannot be undone."
+      />
+
+       <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        confirmText="OK"
+        type="success"
+      />
+
+       <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        confirmText="OK"
+        type="danger"
       />
     </div>
   );

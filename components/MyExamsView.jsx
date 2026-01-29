@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Notification from "@/components/Notification";
+
 import ExamCard from "@/components/exam/ExamCard";
 import { FileText } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
@@ -11,22 +11,12 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 export default function MyExamsView({ loggedInUser }) {
   const [submissions, setSubmissions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
+
   const router = useRouter();
 
   const studentId = loggedInUser?.id;
 
-  const showMessage = useCallback((message, type = "error") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  }, []);
+
 
   const fetchExams = useCallback(async () => {
     if (!studentId) return;
@@ -39,11 +29,11 @@ export default function MyExamsView({ loggedInUser }) {
       const data = await res.json();
       setSubmissions(data);
     } catch (err) {
-      showMessage(err.message);
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
-  }, [studentId, showMessage]);
+  }, [studentId]);
 
   useEffect(() => {
     fetchExams();
@@ -52,10 +42,7 @@ export default function MyExamsView({ loggedInUser }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
-        <Notification
-          {...notification}
-          onClose={() => setNotification({ ...notification, show: false })}
-        />
+
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import AnnouncementModal from "./AnnouncementModal";
 import AnnouncementCard from "./AnnouncementCard";
-import Notification from "@/components/Notification";
+
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function AnnouncementsView({ courseId, loggedInUser }) {
@@ -15,12 +15,7 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
   const [announcementToEdit, setAnnouncementToEdit] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [announcementToDelete, setAnnouncementToDelete] = useState(null);
-  const [notification, setNotification] = useState({ show: false, message: "", type: "" });
 
-  const showMessage = useCallback((message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(() => setNotification({ show: false, message: "", type: "" }), 3000);
-  }, []);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -29,11 +24,11 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
       if (!res.ok) throw new Error("Failed to fetch announcements");
       setAnnouncements(await res.json());
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
-  }, [courseId, showMessage]);
+  }, [courseId]);
 
   useEffect(() => {
     fetchData();
@@ -59,12 +54,12 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
         const errData = await res.json();
         throw new Error(errData.error || `Failed to save announcement`);
       }
-      showMessage(`Announcement ${announcementToEdit ? "updated" : "created"} successfully!`);
+      console.log(`Announcement ${announcementToEdit ? "updated" : "created"} successfully!`);
       setIsModalOpen(false);
       setAnnouncementToEdit(null);
       await fetchData();
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -94,10 +89,10 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to delete announcement");
       }
-      showMessage("Announcement deleted successfully!");
+      console.log("Announcement deleted successfully!");
       await fetchData();
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
       setShowConfirmation(false);
@@ -109,7 +104,6 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
 
   return (
     <div className="p-6">
-      <Notification {...notification} onClose={() => setNotification({ ...notification, show: false })} />
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">{courseId ? "Course Announcements" : "Announcements Management"}</h1>
         {canCreate && (

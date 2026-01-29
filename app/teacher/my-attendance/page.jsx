@@ -2,18 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
-import Notification from "@/components/Notification";
+
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function TeacherAttendancePage() {
   const { user } = useUser();
   const [attendanceRecord, setAttendanceRecord] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
+
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -21,13 +17,7 @@ export default function TeacherAttendancePage() {
     return () => clearInterval(timer);
   }, []);
 
-  const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  };
+
 
   const fetchAttendanceStatus = async () => {
     if (!user) return;
@@ -41,7 +31,7 @@ export default function TeacherAttendancePage() {
       setAttendanceRecord(data);
     } catch (error) {
       console.error("Error fetching attendance status:", error);
-      showMessage(error.message, "error");
+      console.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +43,7 @@ export default function TeacherAttendancePage() {
 
   const handleAction = async (actionType) => {
     if (!user) {
-      showMessage("User not logged in.", "error");
+      console.error("User not logged in.");
       return;
     }
     setIsLoading(true);
@@ -71,10 +61,10 @@ export default function TeacherAttendancePage() {
 
       const updatedRecord = await response.json();
       setAttendanceRecord(updatedRecord);
-      showMessage(`Successfully ${actionType.replace("_", " ").toLowerCase()}!`);
+      console.log(`Successfully ${actionType.replace("_", " ").toLowerCase()}!`);
     } catch (error) {
       console.error(`Error during ${actionType}:`, error);
-      showMessage(error.message, "error");
+      console.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -85,12 +75,7 @@ export default function TeacherAttendancePage() {
 
   return (
     <div className="space-y-6">
-      <Notification
-        show={notification.show}
-        message={notification.message}
-        type={notification.type}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
+
       <h1 className="text-3xl font-bold text-slate-800">Staff Attendance</h1>
 
       <div className="bg-white p-6 rounded-lg shadow-md">

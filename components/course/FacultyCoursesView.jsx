@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import CourseModal from "./CourseModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
-import Notification from "@/components/Notification";
+
 
 export default function FacultyCoursesView({ loggedInUser }) {
   const [courses, setCourses] = useState([]);
@@ -13,22 +13,10 @@ export default function FacultyCoursesView({ loggedInUser }) {
   const [editingCourse, setEditingCourse] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [itemToDelete, setItemToDelete] = useState(null);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
   const [searchTerm, setSearchTerm] = useState("");
 
   const teacherId = loggedInUser?.id;
 
-  const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  };
 
   const fetchData = useCallback(async () => {
     if (!teacherId) {
@@ -49,7 +37,7 @@ export default function FacultyCoursesView({ loggedInUser }) {
       setDepartments(await deptsRes.json());
       setTeachers([loggedInUser]); // Only the logged-in user is available as a teacher
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -81,11 +69,11 @@ export default function FacultyCoursesView({ loggedInUser }) {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to save course.");
       }
-      showMessage(`Course ${isEditing ? "updated" : "created"} successfully!`);
+      console.log(`Course ${isEditing ? "updated" : "created"} successfully!`);
       await fetchData();
       handleCloseModal();
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -102,10 +90,10 @@ export default function FacultyCoursesView({ loggedInUser }) {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to delete the course.");
       }
-      showMessage("Course deleted successfully!");
+      console.log("Course deleted successfully!");
       setCourses((prev) => prev.filter((c) => c.id !== itemToDelete.id));
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
       setItemToDelete(null);
@@ -141,10 +129,6 @@ export default function FacultyCoursesView({ loggedInUser }) {
 
   return (
     <div className="space-y-6">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
 
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-slate-800">My Courses</h1>

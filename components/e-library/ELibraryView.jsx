@@ -5,7 +5,7 @@ import ELibraryGrid from "./ELibraryGrid";
 import AddResourceModal from "./AddResourceModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import ResourceDetailModal from "./ResourceDetailModal";
-import Notification from "@/components/Notification";
+
 
 const ELibraryView = ({ loggedInUser }) => {
   const [resources, setResources] = useState([]);
@@ -16,18 +16,7 @@ const ELibraryView = ({ loggedInUser }) => {
   const [editingResource, setEditingResource] = useState(null);
   const [resourceToDelete, setResourceToDelete] = useState(null);
 
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "info",
-  });
 
-  const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(() => {
-      setNotification((prev) => ({ ...prev, show: false }));
-    }, 3000);
-  };
 
   const fetchResources = async () => {
     if (!loggedInUser?.departmentId) return;
@@ -43,7 +32,7 @@ const ELibraryView = ({ loggedInUser }) => {
     } catch (e) {
       console.error("Failed to fetch resources:", e);
       setResources([]);
-      showMessage("Failed to fetch resources", "error");
+      console.error("Failed to fetch resources");
     }
   };
 
@@ -70,16 +59,16 @@ const ELibraryView = ({ loggedInUser }) => {
 
       setResources(resources.filter((r) => r.id !== resource.id));
       setResourceToDelete(null);
-      showMessage("Resource deleted successfully!");
+      console.log("Resource deleted successfully!");
     } catch (e) {
       console.error(e);
-      showMessage(e.message, "error");
+      console.error(e.message);
     }
   };
 
   const handleSaveResource = async (resourceData) => {
     if (!loggedInUser) {
-      showMessage("You must be logged in to save a resource.", "error");
+      console.error("You must be logged in to save a resource.");
       return;
     }
 
@@ -108,10 +97,10 @@ const ELibraryView = ({ loggedInUser }) => {
       fetchResources();
       setIsEditModalOpen(false);
       setEditingResource(null);
-      showMessage(`Resource ${editingResource ? "updated" : "added"} successfully!`);
+      console.log(`Resource ${editingResource ? "updated" : "added"} successfully!`);
     } catch (err) {
       console.error("Failed to save resource", err);
-      showMessage(err.message, "error");
+      console.error(err.message);
     }
   };
 
@@ -125,12 +114,6 @@ const ELibraryView = ({ loggedInUser }) => {
 
   return (
     <div className="space-y-6">
-      <Notification
-        show={notification.show}
-        message={notification.message}
-        type={notification.type}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">E-Library</h1>
         <button

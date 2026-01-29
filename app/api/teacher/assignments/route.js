@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { createNotificationForUsers } from "@/lib/notification"; // Updated import
 
 const prisma = new PrismaClient();
 
@@ -76,7 +75,7 @@ export async function POST(req) {
 
     const group = await prisma.group.findUnique({
       where: { id: groupId },
-      select: { studentIds: true, name: true }, // Include group name for notification message
+      select: { studentIds: true, name: true },
     });
     console.log("Found group:", group);
 
@@ -109,16 +108,6 @@ export async function POST(req) {
       });
       console.log(`Created ${submissionsData.length} pending submissions.`);
 
-      // Create notifications for students in the specific group
-      if (group.studentIds.length > 0) {
-        await createNotificationForUsers(
-          group.studentIds, // Only notify students in this group
-          "ASSIGNMENT_CREATED",
-          `New assignment "${newAssignment.title}" posted for your group "${group.name}".`,
-          `/student/assignments/${newAssignment.id}`,
-          ["STUDENT"] // Store role for filtering
-        );
-      }
     }
 
     return NextResponse.json(newAssignment, { status: 201 });

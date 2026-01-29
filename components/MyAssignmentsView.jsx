@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AssignmentCard from "@/components/assignment/AssignmentCard";
-import Notification from "@/components/Notification"; // Assuming you have this component
+
 
 // Helper component to display a status badge
 const StatusBadge = ({ status }) => {
@@ -27,22 +27,12 @@ const StatusBadge = ({ status }) => {
 export default function MyAssignmentsView({ loggedInUser }) {
   const [submissions, setSubmissions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
+
   const router = useRouter();
 
   const studentId = loggedInUser?.id;
 
-  const showMessage = useCallback((message, type = "error") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  }, []);
+
 
   const fetchAssignments = useCallback(async () => {
     if (!studentId) return;
@@ -55,11 +45,11 @@ export default function MyAssignmentsView({ loggedInUser }) {
       const data = await res.json();
       setSubmissions(data);
     } catch (err) {
-      showMessage(err.message);
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
-  }, [studentId, showMessage]);
+  }, [studentId]);
 
   useEffect(() => {
     fetchAssignments();
@@ -67,10 +57,7 @@ export default function MyAssignmentsView({ loggedInUser }) {
 
   return (
     <div className="space-y-4">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
+
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-slate-800">My Assignments</h1>
       </div>

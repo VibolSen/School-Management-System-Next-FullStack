@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import FacultyTable from './FacultyTable';
 import FacultyModal from './FacultyModal';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
-import Notification from '@/components/Notification';
+
 
 export default function FacultyManagement() {
   const [faculties, setFaculties] = useState([]);

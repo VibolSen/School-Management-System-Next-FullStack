@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import Notification from "@/components/Notification";
+
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const StatusBadge = ({ status }) => {
@@ -24,24 +24,12 @@ export default function ExamSubmissionView({ initialSubmission }) {
   const [submission, setSubmission] = useState(initialSubmission);
   const [content, setContent] = useState(initialSubmission.content || "");
   const [isLoading, setIsLoading] = useState(false);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
 
-  const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!content.trim() && submission.status === "PENDING") {
-      showMessage("You cannot submit an empty exam.", "error");
+      console.error("You cannot submit an empty exam.");
       return;
     }
     setIsLoading(true);
@@ -57,9 +45,9 @@ export default function ExamSubmissionView({ initialSubmission }) {
       }
       const updatedSubmissionData = await res.json();
       setSubmission(updatedSubmissionData);
-      showMessage("Exam submitted successfully!");
+      console.log("Exam submitted successfully!");
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -70,10 +58,6 @@ export default function ExamSubmissionView({ initialSubmission }) {
   return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-4">
           <div className="max-w-4xl mx-auto space-y-6">
-            <Notification
-              {...notification}
-              onClose={() => setNotification({ ...notification, show: false })}
-            />
     
             <div className="flex items-center justify-between mb-5">
               <Link href="/student/exams" className="flex items-center bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg px-4 py-2 font-medium shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200">

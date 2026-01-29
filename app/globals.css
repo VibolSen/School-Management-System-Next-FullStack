@@ -112,54 +112,6 @@
   animation: gradient-text 6s ease infinite;
 }
 
-/* Notification */
-@keyframes slide-in {
-  0% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-.animate-slide-in {
-  animation: slide-in 0.3s ease-out;
-}
-
-
-/* Notification */
-@keyframes fancy-slide-in {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Animation for the progress bar decreasing in width */
-@keyframes progress-bar {
-  from {
-    width: 100%;
-  }
-
-  to {
-    width: 0%;
-  }
-}
-
-/* Attaching the animations to utility classes */
-.animate-fancy-slide-in {
-  animation: fancy-slide-in 0.3s ease-out forwards;
-}
-
-.animate-progress-bar {
-  animation: progress-bar linear forwards;
-}
 
 
 

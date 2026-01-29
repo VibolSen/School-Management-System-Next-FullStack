@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { PlusCircle, Edit, Trash2, X } from "lucide-react";
-import Notification from "@/components/Notification";
+
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 const StudentFormModal = ({ isOpen, onClose, onSave, studentToEdit, isLoading }) => {
@@ -147,19 +147,33 @@ const StudyOfficeStudentManagementView = () => {
   const [editingStudent, setEditingStudent] = useState(null);
   const [studentToDelete, setStudentToDelete] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
+
+  // Confirmation States
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
   };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
+
 
   const fetchStudents = useCallback(async () => {
     setIsLoading(true);
@@ -169,7 +183,7 @@ const StudyOfficeStudentManagementView = () => {
       const data = await response.json();
       setStudents(data);
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -211,7 +225,7 @@ const StudyOfficeStudentManagementView = () => {
         );
       }
 
-      showMessage(`Student ${isEditing ? "updated" : "created"} successfully!`);
+      showMessage(`Student ${isEditing ? "updated" : "created"} successfully!`, "success");
       await fetchStudents();
       setIsModalOpen(false);
     } catch (err) {
@@ -237,7 +251,7 @@ const StudyOfficeStudentManagementView = () => {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to delete student.");
       }
-      showMessage("Student deleted successfully!");
+      showMessage("Student deleted successfully!", "success");
       await fetchStudents();
     } catch (err) {
       showMessage(err.message, "error");
@@ -255,12 +269,7 @@ const StudyOfficeStudentManagementView = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <Notification
-        show={notification.show}
-        message={notification.message}
-        type={notification.type}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
+
 
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Student Management</h1>
 
@@ -333,6 +342,28 @@ const StudyOfficeStudentManagementView = () => {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         isLoading={isLoading}
+      />
+
+      <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="success"
+      />
+
+      <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="danger"
       />
     </div>
   );

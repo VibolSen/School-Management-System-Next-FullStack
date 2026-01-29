@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import UserTable from "./UserTable";
 import UserModal from "./UserModal";
 import ConfirmationDialog from "../ConfirmationDialog";
-import Notification from "@/components/Notification";
+
 
 // ✅ MODIFIED: Roles are now a static list based on your Prisma Enum
 import { useUser } from "@/context/UserContext";
@@ -17,11 +17,7 @@ export default function UserManagementView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
+
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -38,6 +34,8 @@ export default function UserManagementView() {
       setIsSuccessModalOpen(true);
     }
   };
+
+
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);

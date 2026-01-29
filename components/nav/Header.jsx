@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useUser } from "@/context/UserContext";
-import NotificationsDropdown from "@/components/notifications/NotificationsDropdown"; // Changed import
 
 export default function Header({ toggleSidebar }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -82,7 +81,6 @@ export default function Header({ toggleSidebar }) {
           {currentDate}
         </div>
 
-        <NotificationsDropdown /> {/* Replaced component */}
 
         <div className="relative">
           <button

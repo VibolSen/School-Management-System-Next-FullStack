@@ -14,7 +14,6 @@ import {
   Shield,
 } from "lucide-react";
 import Link from "next/link";
-import NotificationsView from "@/components/notifications/NotificationsView";
 
 const StudentDashboard = ({ loggedInUser }) => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -201,7 +200,6 @@ const StudentDashboard = ({ loggedInUser }) => {
               ))}
             </ul>
           </div>
-          <NotificationsView loggedInUser={loggedInUser} />
         </div>
       </div>
     </div>

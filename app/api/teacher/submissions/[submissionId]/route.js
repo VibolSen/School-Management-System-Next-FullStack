@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { createNotificationForUsers } from "@/lib/notification"; // Updated import
 
 const prisma = new PrismaClient();
 
@@ -73,16 +72,6 @@ export async function PUT(req, { params }) {
       },
     });
 
-    // Create notification for the specific student who submitted
-    if (updatedSubmission.student && updatedSubmission.assignment) {
-      await createNotificationForUsers(
-        [updatedSubmission.student.id], // Only notify the student who submitted
-        "SCORE_UPDATED",
-        `Your assignment "${updatedSubmission.assignment.title}" has been graded. Score: ${updatedSubmission.grade}/${updatedSubmission.assignment.points}.`,
-        `/student/assignments/${updatedSubmission.assignment.id}`,
-        ["STUDENT"] // Store role for filtering
-      );
-    }
 
     // Trigger progress update
     if (updatedSubmission.student && updatedSubmission.assignment.group.courses.length > 0) {

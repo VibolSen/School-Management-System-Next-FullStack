@@ -4,11 +4,40 @@ import { useState, useEffect } from "react";
 import PaymentModal from "./PaymentModal";
 import Link from "next/link";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 export default function PaymentsManagement() {
   const [payments, setPayments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
+
+  // New states for ConfirmationDialog
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showMessage = (message, type = "success") => {
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
 
   useEffect(() => {
     fetchPayments();
@@ -20,9 +49,11 @@ export default function PaymentsManagement() {
       if (response.ok) {
         const data = await response.json();
         setPayments(data);
+      } else {
+        console.error("Failed to fetch payments");
       }
     } catch (error) {
-      console.error("Error fetching payments:", error);
+       console.error("Error fetching payments:", error);
     }
   };
 
@@ -36,18 +67,29 @@ export default function PaymentsManagement() {
     setIsModalOpen(true);
   };
 
-  const handleDeletePayment = async (paymentId) => {
-    if (confirm("Are you sure you want to delete this payment?")) {
-      try {
-        const response = await fetch(`/api/admin/payments/${paymentId}`, {
-          method: "DELETE",
-        });
-        if (response.ok) {
-          fetchPayments();
-        }
-      } catch (error) {
-        console.error("Error deleting payment:", error);
+  const handleDeletePayment = (paymentId) => {
+    setDeleteId(paymentId);
+    setShowDeleteConfirmation(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    try {
+      const response = await fetch(`/api/admin/payments/${deleteId}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        showMessage("Payment deleted successfully!", "success");
+        fetchPayments();
+      } else {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete payment");
       }
+    } catch (error) {
+       showMessage(error.message, "error");
+    } finally {
+        setShowDeleteConfirmation(false);
+        setDeleteId(null);
     }
   };
 
@@ -122,7 +164,7 @@ export default function PaymentsManagement() {
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-right">
                     <div className="flex justify-end gap-2">
-                      <button
+                       <button
                         onClick={() => handleEditPayment(payment)}
                         className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
                         title="Edit Payment"
@@ -149,6 +191,35 @@ export default function PaymentsManagement() {
         payment={selectedPayment}
         onClose={closeModal}
         onPaymentSaved={onPaymentSaved}
+        showMessage={showMessage}
+      />
+
+       <ConfirmationDialog
+        isOpen={showDeleteConfirmation}
+        onClose={() => setShowDeleteConfirmation(false)}
+        onConfirm={confirmDelete}
+        title="Delete Payment"
+        message="Are you sure you want to delete this payment? This action cannot be undone."
+      />
+
+       <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        confirmText="OK"
+        type="success"
+      />
+
+       <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        confirmText="OK"
+        type="danger"
       />
     </div>
   );

@@ -5,7 +5,7 @@ import GroupsTable from "./GroupTable";
 import GroupModal from "./GroupModal";
 import ManageGroupMembersModal from "./ManageGroupMembersModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
-import Notification from "@/components/Notification";
+
 
 export default function GroupManagementView({ role }) {
   const [groups, setGroups] = useState([]);

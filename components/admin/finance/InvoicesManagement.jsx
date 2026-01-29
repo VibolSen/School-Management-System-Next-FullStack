@@ -4,11 +4,40 @@ import { useState, useEffect } from "react";
 import InvoiceModal from "./InvoiceModal";
 import Link from "next/link";
 import { Plus, Eye, Edit, Trash2 } from "lucide-react";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 export default function InvoicesManagement() {
   const [invoices, setInvoices] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+
+  // New states for ConfirmationDialog
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showMessage = (message, type = "success") => {
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
 
   useEffect(() => {
     fetchInvoices();
@@ -20,6 +49,8 @@ export default function InvoicesManagement() {
       if (response.ok) {
         const data = await response.json();
         setInvoices(data);
+      } else {
+        console.error("Failed to fetch invoices");
       }
     } catch (error) {
       console.error("Error fetching invoices:", error);
@@ -36,18 +67,29 @@ export default function InvoicesManagement() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteInvoice = async (invoiceId) => {
-    if (confirm("Are you sure you want to delete this invoice?")) {
-      try {
-        const response = await fetch(`/api/admin/invoices/${invoiceId}`, {
-          method: "DELETE",
-        });
-        if (response.ok) {
-          fetchInvoices();
-        }
-      } catch (error) {
-        console.error("Error deleting invoice:", error);
+  const handleDeleteInvoice = (invoiceId) => {
+    setDeleteId(invoiceId);
+    setShowDeleteConfirmation(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    try {
+      const response = await fetch(`/api/admin/invoices/${deleteId}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        showMessage("Invoice deleted successfully!", "success");
+        fetchInvoices();
+      } else {
+         const data = await response.json();
+        throw new Error(data.error || "Failed to delete invoice");
       }
+    } catch (error) {
+      showMessage(error.message, "error");
+    } finally {
+        setShowDeleteConfirmation(false);
+        setDeleteId(null);
     }
   };
 
@@ -174,6 +216,35 @@ export default function InvoicesManagement() {
         invoice={selectedInvoice}
         onClose={closeModal}
         onInvoiceSaved={onInvoiceSaved}
+        showMessage={showMessage}
+      />
+
+       <ConfirmationDialog
+        isOpen={showDeleteConfirmation}
+        onClose={() => setShowDeleteConfirmation(false)}
+        onConfirm={confirmDelete}
+        title="Delete Invoice"
+        message="Are you sure you want to delete this invoice? This action cannot be undone."
+      />
+
+       <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        confirmText="OK"
+        type="success"
+      />
+
+       <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        confirmText="OK"
+        type="danger"
       />
     </div>
   );

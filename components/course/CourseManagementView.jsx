@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import CoursesTable from "./CourseTable";
 import CourseModal from "./CourseModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
-import Notification from "@/components/Notification";
+
 
 export default function CourseManagementView() {
   const [courses, setCourses] = useState([]);

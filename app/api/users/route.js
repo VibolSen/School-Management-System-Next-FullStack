@@ -293,7 +293,7 @@ export async function DELETE(request) {
       await prisma.enrollment.deleteMany({ where: { studentId: userId } });
       await prisma.attendance.deleteMany({ where: { studentId: userId } });
       await prisma.staffAttendance.deleteMany({ where: { userId } });
-      await prisma.notification.deleteMany({ where: { userId } });
+      
       await prisma.profile.deleteMany({ where: { userId } });
 
       // Disassociate nullable relations

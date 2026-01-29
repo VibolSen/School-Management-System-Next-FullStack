@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import Notification from "@/components/Notification";
+
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const StatusBadge = ({ status }) => {
@@ -25,24 +25,12 @@ export default function SubmissionView({ initialSubmission }) {
   const [submission, setSubmission] = useState(initialSubmission);
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
 
-  const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!content.trim()) {
-      showMessage("You cannot submit an empty assignment.", "error");
+      console.error("You cannot submit an empty assignment.");
       return;
     }
     setIsLoading(true);
@@ -58,9 +46,9 @@ export default function SubmissionView({ initialSubmission }) {
       }
       const updatedSubmissionData = await res.json();
       setSubmission(updatedSubmissionData); // Update the page with the new submission data
-      showMessage("Assignment submitted successfully!");
+      console.log("Assignment submitted successfully!");
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -70,10 +58,6 @@ export default function SubmissionView({ initialSubmission }) {
 
   return (
     <div className="space-y-4">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-slate-800">
           {assignment.title}

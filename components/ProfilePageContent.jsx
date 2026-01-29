@@ -429,14 +429,6 @@ export default function ProfilePageContent({
             </span>
           </button>
 
-          <button className="bg-white/80 backdrop-blur-sm border border-white/60 rounded-xl shadow-lg p-4 text-center hover:bg-white transition-colors">
-            <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-2">
-              <Mail className="w-4 h-4 text-indigo-600" />
-            </div>
-            <span className="text-xs font-medium text-gray-700">
-              Notifications
-            </span>
-          </button>
         </div>
       </div>
     </div>

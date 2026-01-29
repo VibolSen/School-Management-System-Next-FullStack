@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import AssignmentModal from "./AssignmentModal";
-import Notification from "@/components/Notification";
+
 import AssignmentCard from "./assignment/AssignmentCard";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
@@ -17,22 +17,10 @@ export default function AssignmentsView({ loggedInUser }) {
   const [assignmentToEdit, setAssignmentToEdit] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [assignmentToDelete, setAssignmentToDelete] = useState(null);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
   const router = useRouter();
   const teacherId = loggedInUser?.id;
 
   // HELPER FUNCTIONS
-  const showMessage = useCallback((message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  }, []);
 
   // DATA FETCHING LOGIC
   const fetchData = useCallback(async () => {
@@ -48,11 +36,11 @@ export default function AssignmentsView({ loggedInUser }) {
       setAssignments(await assignmentsRes.json());
       setTeacherGroups(await groupsRes.json());
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
-  }, [teacherId, showMessage]);
+  }, [teacherId]);
 
   useEffect(() => {
     fetchData();
@@ -71,11 +59,11 @@ export default function AssignmentsView({ loggedInUser }) {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to create assignment");
       }
-      showMessage("Assignment created successfully!");
+      console.log("Assignment created successfully!");
       setIsAddModalOpen(false);
       await fetchData();
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -102,12 +90,12 @@ export default function AssignmentsView({ loggedInUser }) {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to update assignment");
       }
-      showMessage("Assignment updated successfully!");
+      console.log("Assignment updated successfully!");
       setIsEditModalOpen(false);
       setAssignmentToEdit(null);
       await fetchData();
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -132,10 +120,10 @@ export default function AssignmentsView({ loggedInUser }) {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to delete assignment");
       }
-      showMessage("Assignment deleted successfully!");
+      console.log("Assignment deleted successfully!");
       await fetchData();
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
       setShowConfirmation(false);
@@ -147,10 +135,6 @@ export default function AssignmentsView({ loggedInUser }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-4">
       <div className="max-w-7xl mx-auto space-y-6">
-        <Notification
-          {...notification}
-          onClose={() => setNotification({ ...notification, show: false })}
-        />
 
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">

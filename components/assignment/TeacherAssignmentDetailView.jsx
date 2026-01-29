@@ -2,22 +2,10 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import Notification from "@/components/Notification";
+
 
 const TeacherAssignmentDetailView = ({ assignment }) => {
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
 
-  const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  };
 
   if (!assignment) {
     return <p className="text-center py-10">Assignment not found.</p>;
@@ -25,11 +13,6 @@ const TeacherAssignmentDetailView = ({ assignment }) => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <Notification
-        show={notification.show}
-        message={notification.message}
-        type={notification.type}
-      />
       <div className="bg-white shadow-lg rounded-lg p-8">
         <div className="border-b pb-4 mb-6">
           <h1 className="text-3xl font-bold text-slate-800">

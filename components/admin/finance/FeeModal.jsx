@@ -6,7 +6,7 @@ import { X, DollarSign, FileText, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-export default function FeeModal({ isOpen, fee, onClose, onFeeSaved }) {
+export default function FeeModal({ isOpen, fee, onClose, onFeeSaved, showMessage }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -50,13 +50,14 @@ export default function FeeModal({ isOpen, fee, onClose, onFeeSaved }) {
       });
 
       if (response.ok) {
+        showMessage(`Fee ${fee ? "updated" : "created"} successfully!`, "success");
         onFeeSaved();
       } else {
-        // Handle errors
-        console.error("Failed to save fee");
+        const data = await response.json();
+        showMessage(data.error || "Failed to save fee", "error");
       }
     } catch (error) {
-      console.error("Error saving fee:", error);
+       showMessage(error.message, "error");
     } finally {
       setIsLoading(false);
     }

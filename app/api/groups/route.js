@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { createNotification } from "@/lib/notification";
 import { getLoggedInUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 

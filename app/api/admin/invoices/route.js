@@ -79,17 +79,6 @@ export async function POST(request) {
       }
     });
 
-    // Create a notification for the student
-    await prisma.notification.create({
-      data: {
-        userId: studentId,
-        type: "NEW_INVOICE",
-        message: `A new invoice #${newInvoice.id.substring(newInvoice.id.length - 8)} has been issued for you.`,
-        link: `/student/invoices/${newInvoice.id}`, // This page needs to be created for students
-        isRead: false,
-        targetRoles: ["STUDENT"],
-      },
-    });
 
     return NextResponse.json(newInvoice, { status: 201 });
   } catch (error) {

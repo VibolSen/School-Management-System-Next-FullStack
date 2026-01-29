@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import AssignmentModal from "../AssignmentModal";
-import Notification from "@/components/Notification";
+
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import AssignmentCard from "./AssignmentCard";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
@@ -18,21 +18,34 @@ export default function AssignmentManagement() {
   const [assignmentToEdit, setAssignmentToEdit] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [assignmentToDelete, setAssignmentToDelete] = useState(null);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
   const router = useRouter();
   const { user, loading: userLoading } = useUser();
 
-  const showMessage = useCallback((message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  }, []);
+  // Confirmation States
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showMessage = (message, type = "success") => {
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -48,11 +61,11 @@ export default function AssignmentManagement() {
       setAssignments(await assignmentsRes.json());
       setGroups(await groupsRes.json());
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
-  }, [showMessage]);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -70,7 +83,7 @@ export default function AssignmentManagement() {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to create assignment");
       }
-      showMessage("Assignment created successfully!");
+      showMessage("Assignment created successfully!", "success");
       setIsAddModalOpen(false);
       await fetchData();
     } catch (err) {
@@ -101,7 +114,7 @@ export default function AssignmentManagement() {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to update assignment");
       }
-      showMessage("Assignment updated successfully!");
+      showMessage("Assignment updated successfully!", "success");
       setIsEditModalOpen(false);
       setAssignmentToEdit(null);
       await fetchData();
@@ -131,7 +144,7 @@ export default function AssignmentManagement() {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to delete assignment");
       }
-      showMessage("Assignment deleted successfully!");
+      showMessage("Assignment deleted successfully!", "success");
       await fetchData();
     } catch (err) {
       showMessage(err.message, "error");
@@ -145,10 +158,6 @@ export default function AssignmentManagement() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-4">
       <div className="max-w-7xl mx-auto space-y-4">
-        <Notification
-          {...notification}
-          onClose={() => setNotification({ ...notification, show: false })}
-        />
 
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -378,6 +387,28 @@ export default function AssignmentManagement() {
         title="Delete Assignment"
         message="Are you sure you want to delete this assignment? This will also remove all student submissions. This action cannot be undone."
         isLoading={isLoading}
+      />
+
+      <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="success"
+      />
+
+      <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="danger"
       />
 
       <style jsx>{`

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import Link from "next/link";
-import Notification from "@/components/Notification";
+
 
 // Helper component for status badges
 const StatusBadge = ({ status }) => {
@@ -77,19 +77,7 @@ const SubmissionRow = ({ submission, onGrade }) => {
 // The main view component for the entire page
 export default function GradingView({ initialAssignment }) {
   const [assignment, setAssignment] = useState(initialAssignment);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
 
-  const showMessage = useCallback((message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  }, []);
 
   const handleGradeSubmission = async (submissionId, grade, feedback) => {
     try {
@@ -111,18 +99,14 @@ export default function GradingView({ initialAssignment }) {
           sub.id === submissionId ? { ...sub, ...updatedSubmission } : sub
         ),
       }));
-      showMessage("Grade saved successfully!");
+      console.log("Grade saved successfully!");
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     }
   };
 
   return (
     <div className="space-y-4 p-4">
-      <Notification
-        {...notification}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-800">
           {assignment.title}

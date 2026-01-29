@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import Notification from "@/components/Notification";
+
 import { useUser } from "@/context/UserContext";
 
 export default function AdminManageAttendancePage() {
@@ -12,19 +12,7 @@ export default function AdminManageAttendancePage() {
   );
   const [attendanceRecords, setAttendanceRecords] = useState({}); // {userId: {status: 'PRESENT', date: '...'}}
   const [isLoading, setIsLoading] = useState(true);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
 
-  const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  };
 
   const fetchStaffUsers = useCallback(async () => {
     setIsLoading(true);
@@ -37,7 +25,7 @@ export default function AdminManageAttendancePage() {
       setStaffUsers(data);
     } catch (error) {
       console.error("Error fetching staff users:", error);
-      showMessage(error.message, "error");
+      console.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +50,7 @@ export default function AdminManageAttendancePage() {
       setAttendanceRecords(data); // {userId: {status, date}}
     } catch (error) {
       console.error("Error fetching attendance records:", error);
-      showMessage(error.message, "error");
+      console.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -103,10 +91,10 @@ export default function AdminManageAttendancePage() {
         ...prev,
         [userId]: { status: newStatus, date: new Date().toISOString() },
       }));
-      showMessage("Attendance updated successfully!");
+      console.log("Attendance updated successfully!");
     } catch (error) {
       console.error("Error updating attendance:", error);
-      showMessage(error.message, "error");
+      console.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -114,12 +102,6 @@ export default function AdminManageAttendancePage() {
 
   return (
     <div className="space-y-6">
-      <Notification
-        show={notification.show}
-        message={notification.message}
-        type={notification.type}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
       <h1 className="text-3xl font-bold text-slate-800">Manage Staff Attendance (Admin)</h1> {/* Changed title */}
 
       <div className="bg-white p-6 rounded-lg shadow-md">

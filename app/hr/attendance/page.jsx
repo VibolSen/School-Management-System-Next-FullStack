@@ -2,31 +2,45 @@
 
 import React, { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
-import Notification from "@/components/Notification";
+import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 export default function HRAttendancePage() {
   const { user } = useUser();
   const [attendanceRecord, setAttendanceRecord] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Confirmation States
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showMessage = (message, type = "success") => {
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000); // Update every minute
     return () => clearInterval(timer);
   }, []);
 
-  const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  };
 
   const fetchAttendanceStatus = async () => {
     if (!user) return;
@@ -70,7 +84,7 @@ export default function HRAttendancePage() {
 
       const updatedRecord = await response.json();
       setAttendanceRecord(updatedRecord);
-      showMessage(`Successfully ${actionType.replace("_", " ").toLowerCase()}!`);
+      showMessage(`Successfully ${actionType.replace("_", " ").toLowerCase()}!`, "success");
     } catch (error) {
       console.error(`Error during ${actionType}:`, error);
       showMessage(error.message, "error");
@@ -84,12 +98,6 @@ export default function HRAttendancePage() {
 
   return (
     <div className="space-y-6">
-      <Notification
-        show={notification.show}
-        message={notification.message}
-        type={notification.type}
-        onClose={() => setNotification({ ...notification, show: false })}
-      />
       <h1 className="text-3xl font-bold text-slate-800">Staff Attendance</h1>
 
       <div className="bg-white p-6 rounded-lg shadow-md">
@@ -137,6 +145,28 @@ export default function HRAttendancePage() {
           )}
         </div>
       </div>
+
+      <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="success"
+      />
+
+      <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="danger"
+      />
     </div>
   );
 }

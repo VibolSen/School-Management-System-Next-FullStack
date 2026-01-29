@@ -6,7 +6,7 @@ import { X, TrendingDown, FileText, Calendar, DollarSign, Info } from "lucide-re
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-export default function ExpenseModal({ isOpen, expense, onClose, onExpenseSaved }) {
+export default function ExpenseModal({ isOpen, expense, onClose, onExpenseSaved, showMessage }) {
   const [formData, setFormData] = useState({
     category: "",
     description: "",
@@ -53,15 +53,14 @@ export default function ExpenseModal({ isOpen, expense, onClose, onExpenseSaved 
       });
 
       if (response.ok) {
+        showMessage(`Expense ${expense ? "updated" : "created"} successfully!`, "success");
         onExpenseSaved();
       } else {
         const errorData = await response.json();
-        console.error("Failed to save expense:", errorData.message);
-        alert(`Error: ${errorData.message}`);
+        showMessage(errorData.message || "Failed to save expense", "error");
       }
     } catch (error) {
-      console.error("Error saving expense:", error);
-      alert("An unexpected error occurred.");
+      showMessage(error.message, "error");
     } finally {
       setIsLoading(false);
     }

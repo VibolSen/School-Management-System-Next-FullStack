@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import AddExamModal from "./AddExamModal";
 import EditExamModal from "./EditExamModal";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import Notification from "@/components/Notification";
+
 import ExamCard from "./ExamCard";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 
@@ -19,24 +19,38 @@ export default function ExamManagement({ loggedInUser }) {
   const [examToEdit, setExamToEdit] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [examToDelete, setExamToDelete] = useState(null);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
   const router = useRouter();
   const userRole = loggedInUser?.role?.toLowerCase(); // Ensure it's lowercase at definition
   const teacherId = loggedInUser?.id;
 
-  const showMessage = useCallback((message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  }, []);
 
   const [isUnauthorized, setIsUnauthorized] = useState(false); // New state variable
+
+  // Confirmation States
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showMessage = (message, type = "success") => {
+    if (type === "error") {
+      setErrorMessage(message);
+      setIsErrorModalOpen(true);
+    } else {
+      setSuccessMessage(message);
+      setIsSuccessModalOpen(true);
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+    setSuccessMessage("");
+  };
+
+  const handleCloseErrorModal = () => {
+    setIsErrorModalOpen(false);
+    setErrorMessage("");
+  };
 
   const fetchData = useCallback(async () => {
     console.log("fetchData called. loggedInUser:", loggedInUser, "userRole:", userRole); // Debug log
@@ -80,11 +94,11 @@ export default function ExamManagement({ loggedInUser }) {
 
       setExams(await examsRes.json());
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
-  }, [loggedInUser, teacherId, showMessage]);
+  }, [loggedInUser, teacherId]);
 
   useEffect(() => {
     fetchData();
@@ -119,7 +133,7 @@ export default function ExamManagement({ loggedInUser }) {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to create exam");
       }
-      showMessage("Exam created successfully!");
+      showMessage("Exam created successfully!", "success");
       setIsAddModalOpen(false);
       await fetchData();
     } catch (err) {
@@ -150,7 +164,7 @@ export default function ExamManagement({ loggedInUser }) {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to update exam");
       }
-      showMessage("Exam updated successfully!");
+      showMessage("Exam updated successfully!", "success");
       setIsEditModalOpen(false);
       setExamToEdit(null);
       await fetchData();
@@ -180,7 +194,7 @@ export default function ExamManagement({ loggedInUser }) {
         const errData = await res.json();
         throw new Error(errData.error || "Failed to delete exam");
       }
-      showMessage("Exam deleted successfully!");
+      showMessage("Exam deleted successfully!", "success");
       await fetchData();
     } catch (err) {
       showMessage(err.message, "error");
@@ -202,10 +216,6 @@ export default function ExamManagement({ loggedInUser }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-4">
       <div className="max-w-6xl mx-auto space-y-4">
-        <Notification
-          {...notification}
-          onClose={() => setNotification({ ...notification, show: false })}
-        />
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
@@ -449,6 +459,28 @@ export default function ExamManagement({ loggedInUser }) {
         title="Delete Exam"
         message="Are you sure you want to delete this exam? This will also remove all student submissions. This action cannot be undone."
         isLoading={isLoading}
+      />
+      
+      <ConfirmationDialog
+        isOpen={isSuccessModalOpen}
+        title="Success"
+        message={successMessage}
+        onConfirm={handleCloseSuccessModal}
+        onCancel={handleCloseSuccessModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="success"
+      />
+
+      <ConfirmationDialog
+        isOpen={isErrorModalOpen}
+        title="Error"
+        message={errorMessage}
+        onConfirm={handleCloseErrorModal}
+        onCancel={handleCloseErrorModal}
+        isLoading={isLoading}
+        confirmText="OK"
+        type="danger"
       />
     </div>
   );

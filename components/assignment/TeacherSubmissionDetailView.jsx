@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Notification from "@/components/Notification";
+
 import { useRouter } from "next/navigation";
 
 const TeacherSubmissionDetailView = ({ submission: initialSubmission }) => {
@@ -11,11 +11,6 @@ const TeacherSubmissionDetailView = ({ submission: initialSubmission }) => {
   const [statusId, setStatusId] = useState(initialSubmission.statusId);
   const [statuses, setStatuses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [notification, setNotification] = useState({
-    show: false,
-    message: "",
-    type: "",
-  });
   const router = useRouter();
 
   useEffect(() => {
@@ -26,19 +21,12 @@ const TeacherSubmissionDetailView = ({ submission: initialSubmission }) => {
         const data = await res.json();
         setStatuses(data);
       } catch (err) {
-        showMessage(err.message, "error");
+      console.error(err.message);
       }
     };
     fetchStatuses();
   }, []);
 
-  const showMessage = (message, type = "success") => {
-    setNotification({ show: true, message, type });
-    setTimeout(
-      () => setNotification({ show: false, message: "", type: "" }),
-      3000
-    );
-  };
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -57,9 +45,9 @@ const TeacherSubmissionDetailView = ({ submission: initialSubmission }) => {
       }
       const updated = await res.json();
       setSubmission(updated);
-      showMessage("Submission updated successfully!");
+      console.log("Submission updated successfully!");
     } catch (err) {
-      showMessage(err.message, "error");
+      console.error(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -71,11 +59,6 @@ const TeacherSubmissionDetailView = ({ submission: initialSubmission }) => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <Notification
-        show={notification.show}
-        message={notification.message}
-        type={notification.type}
-      />
       <div className="bg-white shadow-lg rounded-lg p-8">
         <div className="border-b pb-4 mb-6">
           <h1 className="text-3xl font-bold text-slate-800">
