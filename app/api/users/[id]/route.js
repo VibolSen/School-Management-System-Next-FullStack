@@ -28,10 +28,11 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Authorization: ADMIN can get any user, HR can get any non-student, FACULTY can get STUDENTs
+    // Authorization: ADMIN can get any user, HR can get any non-student, TEACHER can get STUDENTs
     if (
       loggedInUser.role === "ADMIN" ||
       (loggedInUser.role === "HR" && user.role !== "STUDENT") ||
+      (loggedInUser.role === "TEACHER" && user.role === "STUDENT") ||
       (loggedInUser.role === "STUDY_OFFICE") ||
       (loggedInUser.id === id)
     ) {
