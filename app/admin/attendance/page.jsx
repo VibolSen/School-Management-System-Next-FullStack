@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 
 import { useUser } from "@/context/UserContext";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function AdminManageAttendancePage() {
   const { user: currentUser } = useUser();
@@ -120,7 +121,10 @@ export default function AdminManageAttendancePage() {
         </div>
 
         {isLoading ? (
-          <p>Loading staff attendance...</p>
+          <div className="py-12 flex flex-col items-center justify-center">
+            <LoadingSpinner size="lg" />
+            <p className="mt-4 text-slate-500 font-medium animate-pulse">Syncing staff attendance records...</p>
+          </div>
         ) : staffUsers.length === 0 ? (
           <p>No staff users found.</p>
         ) : (

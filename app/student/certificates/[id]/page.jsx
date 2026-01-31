@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import { Award } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const CertificateDetailPage = () => {
   const { id } = useParams();
@@ -51,8 +51,8 @@ const CertificateDetailPage = () => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center min-h-screen text-gray-500">
-        Loading certificate details...
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+        <LoadingSpinner size="lg" message="Loading certificate..." />
       </div>
     );
 

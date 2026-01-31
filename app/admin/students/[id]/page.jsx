@@ -5,6 +5,7 @@ import { useUser } from "@/context/UserContext";
 import { useParams } from "next/navigation";
 import ProfilePageContent from "@/components/ProfilePageContent";
 import Link from "next/link";
+import FullPageLoading from "@/components/ui/FullPageLoading";
 
 export default function StudentProfilePage() {
   const { user, loading: userLoading } = useUser();
@@ -35,7 +36,7 @@ export default function StudentProfilePage() {
   }, [id]);
 
   if (isLoading || userLoading) {
-    return <div>Loading...</div>;
+    return <FullPageLoading message="Loading student records..." />;
   }
 
   if (error) {

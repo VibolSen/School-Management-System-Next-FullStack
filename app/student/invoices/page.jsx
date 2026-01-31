@@ -1,8 +1,8 @@
 "use client";
 import Link from 'next/link';
-// app/student/invoices/page.jsx
 import React, { useState, useEffect } from 'react';
-import { FiDollarSign, FiCalendar, FiCreditCard, FiAlertCircle } from 'react-icons/fi'; // Import icons
+import { FiDollarSign, FiCalendar, FiCreditCard, FiAlertCircle } from 'react-icons/fi';
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const InvoiceCard = ({ invoice }) => {
   const statusColors = {
@@ -75,8 +75,9 @@ const StudentInvoicesPage = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6 text-center">
-        <p className="text-gray-600">Loading invoices...</p>
+      <div className="container mx-auto p-12 flex flex-col items-center justify-center min-h-[400px]">
+        <LoadingSpinner size="lg" />
+        <p className="mt-4 text-slate-500 font-medium animate-pulse">Loading your invoices...</p>
       </div>
     );
   }

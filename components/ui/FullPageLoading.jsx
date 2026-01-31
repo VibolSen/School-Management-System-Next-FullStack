@@ -12,8 +12,8 @@ const FullPageLoading = ({ message = "Loading Management System..." }) => {
   // Brand colors for the shutter panels
   const panels = [
     { color: "bg-blue-600", delay: 0 },
-    { color: "bg-indigo-700", delay: 0.1 },
-    { color: "bg-slate-900", delay: 0.2 },
+    { color: "bg-blue-800", delay: 0.1 },
+    { color: "bg-indigo-900", delay: 0.2 },
   ];
 
   return (
@@ -27,7 +27,7 @@ const FullPageLoading = ({ message = "Loading Management System..." }) => {
             animate={{ scaleY: 1 }}
             exit={{ scaleY: 0 }}
             transition={{
-              duration: 0.8,
+              duration: 0.6,
               ease: [0.77, 0, 0.175, 1],
               delay: panel.delay,
             }}

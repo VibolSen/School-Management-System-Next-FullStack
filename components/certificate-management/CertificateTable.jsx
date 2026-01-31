@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { ChevronUp, ChevronDown, Eye, Edit, Trash2 } from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const SortIndicator = ({ direction }) => {
   if (!direction) return null;
@@ -97,8 +98,11 @@ export default function CertificateTable({
           <tbody className="bg-white divide-y divide-gray-200">
             {isLoading ? (
               <tr>
-                <td colSpan="3" className="text-center py-8 text-slate-500">
-                  Loading certificates...
+                <td colSpan="3" className="py-12">
+                  <div className="flex flex-col items-center justify-center space-y-3">
+                    <LoadingSpinner size="md" />
+                    <p className="text-slate-400 font-medium animate-pulse">Fetching certificates...</p>
+                  </div>
                 </td>
               </tr>
             ) : certificates.length === 0 ? (

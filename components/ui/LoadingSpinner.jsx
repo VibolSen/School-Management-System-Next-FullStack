@@ -11,16 +11,16 @@ const LoadingSpinner = ({ size = "md", color = "blue", className = "" }) => {
   const sizeClasses = {
     xs: "w-4 h-4",
     sm: "w-6 h-6 border-2",
-    md: "w-10 h-10 border-4",
+    md: "w-12 h-12 border-4",
     lg: "w-16 h-16 border-[6px]",
     xl: "w-24 h-24 border-[8px]",
   };
 
   const colorClasses = {
-    blue: "border-blue-500/20 border-t-blue-600",
-    indigo: "border-indigo-500/20 border-t-indigo-600",
-    white: "border-white/20 border-t-white",
-    gray: "border-gray-300/20 border-t-gray-500",
+    blue: "border-blue-500/10 border-t-blue-600",
+    indigo: "border-indigo-500/10 border-t-indigo-600",
+    white: "border-white/10 border-t-white",
+    gray: "border-gray-200/20 border-t-gray-400",
   };
 
   const spinnerSize = sizeClasses[size] || sizeClasses.md;
@@ -28,27 +28,27 @@ const LoadingSpinner = ({ size = "md", color = "blue", className = "" }) => {
 
   return (
     <div className={`relative flex items-center justify-center ${className}`}>
-      {/* Outer Ring - Pulsing */}
+      {/* Outer Pulse Glow */}
       <div
         className={`absolute rounded-full animate-pulse opacity-20 ${spinnerSize} ${
-          color === "white" ? "bg-white" : "bg-blue-500"
-        }`}
+          color === "white" ? "bg-white" : "bg-blue-400"
+        } blur-md`}
       />
       
-      {/* Middle Ring - Slow Rotation */}
+      {/* Middle Decorative Ring */}
       <div
-        className={`absolute rounded-full border-dashed border-2 opacity-30 animate-[spin_3s_linear_infinite] ${spinnerSize} ${
-          color === "white" ? "border-white" : "border-blue-400"
+        className={`absolute rounded-full border-2 border-dotted opacity-20 animate-[spin_4s_linear_infinite] ${spinnerSize} ${
+          color === "white" ? "border-white" : "border-blue-300"
         }`}
       />
 
-      {/* Main Spinner - Fast Rotation */}
+      {/* Main Core Spinner */}
       <div
         className={`rounded-full animate-spin ${spinnerSize} ${spinnerColor} border-solid`}
       />
       
-      {/* Subtle Inner Glow */}
-      <div className="absolute w-1/4 h-1/4 rounded-full bg-white/10 blur-[1px]" />
+      {/* Inner Highlight */}
+      <div className={`absolute w-1/3 h-1/3 rounded-full ${color === 'white' ? 'bg-white/10' : 'bg-blue-400/10'} blur-[2px]`} />
     </div>
   );
 };

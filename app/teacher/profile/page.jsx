@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/context/UserContext";
-import ProfilePageContent from "@/components/ProfilePageContent";
+import FullPageLoading from "@/components/ui/FullPageLoading";
 
 export default function ProfilePage() {
   const { user, loading } = useUser();
@@ -28,7 +28,7 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <FullPageLoading message="Authenticating teacher profile..." />;
   }
 
   return (

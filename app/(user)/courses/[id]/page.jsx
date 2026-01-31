@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
+import FullPageLoading from "@/components/ui/FullPageLoading";
 
 export default function CourseDetailPage({ params }) {
   // ✅ unwrap params (Next.js 15+)
@@ -34,11 +35,7 @@ export default function CourseDetailPage({ params }) {
   }, [id]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-xl">Loading course details...</p>
-      </div>
-    );
+    return <FullPageLoading message="Retrieving course details..." />;
   }
 
   if (error) {

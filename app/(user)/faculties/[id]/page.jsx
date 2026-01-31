@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import FullPageLoading from '@/components/ui/FullPageLoading';
 
 export default function FacultyPage() {
   const { id } = useParams();
@@ -30,7 +31,7 @@ export default function FacultyPage() {
   }, [id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <FullPageLoading message="Connecting to faculty database..." />;
   }
 
   if (error) {

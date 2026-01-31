@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { Briefcase, MapPin, DollarSign, Clock, Calendar, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
+import FullPageLoading from "@/components/ui/FullPageLoading";
 import JobApplicationModal from "@/components/careers/JobApplicationModal"; // Import the modal
 
 export default function JobDetailPage() {
@@ -38,11 +39,7 @@ export default function JobDetailPage() {
   }, [id]);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <p className="text-lg text-gray-600">Loading job details...</p>
-      </div>
-    );
+    return <FullPageLoading message="Fetching job posting details..." />;
   }
 
   if (error) {

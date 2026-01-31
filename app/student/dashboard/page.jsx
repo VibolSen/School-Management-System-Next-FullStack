@@ -4,11 +4,13 @@ import React from "react";
 import StudentDashboard from "@/components/dashboard/StudentDashboard";
 import { useUser } from "@/context/UserContext";
 
+import FullPageLoading from "@/components/ui/FullPageLoading";
+
 const StudentDashboardPage = () => {
   const { user: loggedInUser, loading } = useUser();
 
   if (loading) {
-    return <p>Loading user data...</p>;
+    return <FullPageLoading message="Preparing your dashboard..." />;
   }
 
   if (!loggedInUser) {

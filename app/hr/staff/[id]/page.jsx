@@ -6,6 +6,7 @@ import { useUser } from "@/context/UserContext";
 import { useParams } from "next/navigation";
 import ProfilePageContent from "@/components/ProfilePageContent";
 import Link from "next/link";
+import FullPageLoading from "@/components/ui/FullPageLoading";
 
 export default function StaffProfilePage() {
   const { user, loading: userLoading } = useUser();
@@ -36,7 +37,7 @@ export default function StaffProfilePage() {
   }, [id]);
 
   if (isLoading || userLoading) {
-    return <div>Loading...</div>;
+    return <FullPageLoading message="Verifying staff identity..." />;
   }
 
   if (error) {
