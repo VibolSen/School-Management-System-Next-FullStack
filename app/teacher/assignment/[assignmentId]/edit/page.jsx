@@ -34,7 +34,7 @@ async function getAssignmentData(assignmentId) {
 }
 
 export default async function EditAssignmentPage({ params }) {
-  const { assignmentId } = params;
+  const { assignmentId } = await params;
   const assignment = await getAssignmentData(assignmentId);
   const loggedInUser = await getLoggedInUser();
 

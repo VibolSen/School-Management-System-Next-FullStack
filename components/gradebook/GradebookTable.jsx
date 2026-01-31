@@ -2,10 +2,8 @@
 import React from 'react';
 import { FiBookOpen } from 'react-icons/fi';
 
-const GradebookTable = ({ gradebookData }) => {
-  const { courses, assignments, exams, submissions, examSubmissions } = gradebookData;
-
-  const allAssignments = [...(assignments || []), ...(exams || [])];
+const GradebookTable = ({ students, assignments, gradebookData }) => {
+  const { submissions, examSubmissions } = gradebookData;
 
   const getStudentGrade = (studentId, itemId, isExam) => {
     const submission = isExam
@@ -24,18 +22,12 @@ const GradebookTable = ({ gradebookData }) => {
     return 'text-red-600 font-semibold';
   };
 
-  const students = courses.flatMap(course => course.groups.flatMap(group => group.students));
-  const uniqueStudents = Array.from(new Set(students.map(s => s.id)))
-    .map(id => {
-      return students.find(s => s.id === id);
-    });
-
-  if (uniqueStudents.length === 0 || allAssignments.length === 0) {
+  if ((!students || students.length === 0) || (!assignments || assignments.length === 0)) {
     return (
       <div className="text-center py-16 bg-white rounded-lg shadow">
         <FiBookOpen className="mx-auto h-12 w-12 text-gray-400" />
         <h3 className="mt-2 text-sm font-medium text-gray-900">No Gradebook Data</h3>
-        <p className="mt-1 text-sm text-gray-500">There are no students or assignments to display.</p>
+        <p className="mt-1 text-sm text-gray-500">There are no students or assignments to display found matching your filters.</p>
       </div>
     );
   }
@@ -48,7 +40,7 @@ const GradebookTable = ({ gradebookData }) => {
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Student
             </th>
-            {allAssignments.map(item => (
+            {assignments.map(item => (
               <th key={item.id} scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {item.title}
               </th>
@@ -56,12 +48,12 @@ const GradebookTable = ({ gradebookData }) => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {uniqueStudents.map((student, studentIdx) => (
+          {students.map((student, studentIdx) => (
             <tr key={student.id} className={studentIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50 hover:bg-gray-100'}>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">
                 {`${student.firstName} ${student.lastName}`}
               </td>
-              {allAssignments.map(item => {
+              {assignments.map(item => {
                 const grade = getStudentGrade(student.id, item.id, !!item.examDate);
                 return (
                   <td key={item.id} className={`px-6 py-4 whitespace-nowrap text-sm ${getGradeColor(grade)}`}>

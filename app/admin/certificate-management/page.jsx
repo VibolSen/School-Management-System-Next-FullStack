@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import CertificateModal from '@/components/certificate-management/CertificateModal';
+import BulkCertificateModal from '@/components/certificate-management/BulkCertificateModal';
 import CertificateTable from '@/components/certificate-management/CertificateTable';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
 
@@ -15,6 +16,7 @@ import {
 
 const CertificateManagementPage = () => {
   const [showForm, setShowForm] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
   const [certificates, setCertificates] = useState([]);
   const [editingCertificate, setEditingCertificate] = useState(null);
   const [courses, setCourses] = useState([]); // To map course IDs to names
@@ -84,9 +86,10 @@ const CertificateManagementPage = () => {
         return course ? course.name : 'Unknown Course';
       };
     
-      const handleAddCertificate = () => {
-        setEditingCertificate(null);
-        setShowForm(true);
+
+
+      const handleBulkIssue = () => {
+        setShowBulkModal(true);
       };
     
       const handleEditCertificate = (certificate) => {
@@ -131,7 +134,7 @@ const CertificateManagementPage = () => {
         setIsConfirmModalOpen(false);
         setCertificateToDelete(null);
       };
-
+ 
       const handleCloseSuccessModal = () => {
         setIsSuccessModalOpen(false);
         setSuccessMessage("");
@@ -153,6 +156,7 @@ const CertificateManagementPage = () => {
             courseId: formData.course, // Map 'course' from form to 'courseId' for API
             issueDate: formData.issueDate,
             expiryDate: formData.expiryDate,
+            studentId: formData.studentId, // Pass studentId to API
           };
     
           if (editingCertificate) {
@@ -223,15 +227,19 @@ const CertificateManagementPage = () => {
             Certificate Management
           </h1>
 
-
-
-
           <CertificateModal
             isOpen={showForm}
             onClose={handleCancel}
             onSubmit={handleSubmit}
             editingCertificate={editingCertificate}
             isLoading={isLoading}
+          />
+
+          <BulkCertificateModal
+            isOpen={showBulkModal}
+            onClose={() => setShowBulkModal(false)}
+            onCertificatesIssued={fetchCertificates}
+            showMessage={showMessage}
           />
 
             <CertificateTable
@@ -242,7 +250,8 @@ const CertificateManagementPage = () => {
               sortField={sortField}
               sortOrder={sortOrder}
               handleSort={handleSort}
-              onAddCertificateClick={handleAddCertificate} // Pass the add handler
+
+              onBulkIssueClick={handleBulkIssue}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               filterCourse={filterCourse}
@@ -278,8 +287,6 @@ const CertificateManagementPage = () => {
             confirmText="OK"
             type="danger"
           />
-
-
         </div>
       );
           };

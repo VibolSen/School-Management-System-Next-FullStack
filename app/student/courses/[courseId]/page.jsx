@@ -28,7 +28,7 @@ async function getLoggedInUser() {
 
 export default async function CourseDetailsPage({ params }) {
   const loggedInUser = await getLoggedInUser();
-  const { courseId } = params;
+  const { courseId } = await params;
 
   if (!loggedInUser) {
     return (

@@ -12,6 +12,14 @@ const GradebookView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [selectedCourseId, setSelectedCourseId] = useState('ALL');
+  const [selectedGroupId, setSelectedGroupId] = useState('ALL');
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState('ALL');
+
+  const [filteredStudents, setFilteredStudents] = useState([]);
+  const [filteredAssignments, setFilteredAssignments] = useState([]);
+  const [availableGroups, setAvailableGroups] = useState([]);
+
   useEffect(() => {
     const fetchGradebookData = async () => {
       try {
@@ -30,6 +38,51 @@ const GradebookView = () => {
 
     fetchGradebookData();
   }, []);
+
+  useEffect(() => {
+    if (!gradebookData) return;
+
+    const { courses, assignments, exams } = gradebookData;
+    let students = [];
+    
+    // 1. Filter Students based on Course and Group
+    if (selectedCourseId === 'ALL') {
+      students = courses.flatMap(course => course.groups.flatMap(group => group.students));
+      setAvailableGroups([]); // Reset groups if ALL courses selected (optional choice, or show all groups)
+    } else {
+      const course = courses.find(c => c.id === selectedCourseId);
+      if (course) {
+        setAvailableGroups(course.groups || []);
+        if (selectedGroupId === 'ALL') {
+           students = course.groups.flatMap(group => group.students);
+        } else {
+           const group = course.groups.find(g => g.id === selectedGroupId);
+           students = group ? group.students : [];
+        }
+      }
+    }
+
+    // Deduplicate students
+    const uniqueStudents = Array.from(new Set(students.map(s => s.id)))
+    .map(id => students.find(s => s.id === id));
+    
+    setFilteredStudents(uniqueStudents);
+
+    // 2. Filter Assignments/Exams (Columns)
+    const allItems = [...(assignments || []), ...(exams || [])];
+    if (selectedAssignmentId === 'ALL') {
+      setFilteredAssignments(allItems);
+    } else {
+      setFilteredAssignments(allItems.filter(item => item.id === selectedAssignmentId));
+    }
+
+  }, [gradebookData, selectedCourseId, selectedGroupId, selectedAssignmentId]);
+
+  // Reset group when course changes
+  const handleCourseChange = (courseId) => {
+    setSelectedCourseId(courseId);
+    setSelectedGroupId('ALL');
+  };
 
   if (loading) {
     return (
@@ -54,8 +107,22 @@ const GradebookView = () => {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Gradebook</h1>
         <p className="text-sm text-gray-500 mb-6">An overview of all student grades and performance.</p>
-        <GradebookToolbar courses={gradebookData.courses} assignments={gradebookData.assignments} exams={gradebookData.exams} />
-        <GradebookTable gradebookData={gradebookData} />
+        <GradebookToolbar 
+            courses={gradebookData.courses} 
+            assignments={[...(gradebookData.assignments || []), ...(gradebookData.exams || [])]}
+            groups={availableGroups}
+            selectedCourse={selectedCourseId}
+            selectedGroup={selectedGroupId}
+            selectedAssignment={selectedAssignmentId}
+            onCourseChange={handleCourseChange}
+            onGroupChange={setSelectedGroupId}
+            onAssignmentChange={setSelectedAssignmentId}
+        />
+        <GradebookTable 
+            students={filteredStudents} 
+            assignments={filteredAssignments} 
+            gradebookData={gradebookData} // Still needed for lookup of grades
+        />
       </div>
     </div>
   );

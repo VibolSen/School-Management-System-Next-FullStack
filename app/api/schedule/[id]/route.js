@@ -4,6 +4,7 @@ import { getLoggedInUser } from '@/lib/auth';
 
 export async function GET(request, { params }) {
   try {
+    const { id } = await params;
     const session = await getLoggedInUser();
 
     if (!session) {
@@ -11,7 +12,7 @@ export async function GET(request, { params }) {
     }
 
     const schedule = await prisma.schedule.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       include: {
         creator: true,
         assignedToTeacher: true,
@@ -33,6 +34,7 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
+    const { id } = await params;
     const session = await getLoggedInUser();
 
     if (!session || (session.role !== 'ADMIN' && session.role !== 'STUDY_OFFICE')) {
@@ -40,7 +42,7 @@ export async function PUT(request, { params }) {
     }
 
     const existingSchedule = await prisma.schedule.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       select: { creatorId: true },
     });
 
@@ -62,12 +64,12 @@ export async function PUT(request, { params }) {
 
     // Delete existing sessions for this schedule
     await prisma.session.deleteMany({
-      where: { scheduleId: params.id },
+      where: { scheduleId: id },
     });
 
     // Update the schedule and create new sessions
     const updatedSchedule = await prisma.schedule.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         title,
         isRecurring,
@@ -97,6 +99,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
+    const { id } = await params;
     const session = await getLoggedInUser();
 
     if (!session) {
@@ -104,7 +107,7 @@ export async function DELETE(request, { params }) {
     }
 
     const schedule = await prisma.schedule.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       select: { creatorId: true },
     });
 
@@ -117,7 +120,7 @@ export async function DELETE(request, { params }) {
     }
 
     await prisma.schedule.delete({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     return NextResponse.json({ message: 'Schedule deleted successfully' });

@@ -10,12 +10,14 @@ export async function GET(request) {
   try {
     let certificates;
     if (userId) {
+      console.log("Fetching certificates for userId:", userId);
       certificates = await prisma.certificate.findMany({
         where: {
-          recipient: userId,
+          studentId: userId,
         },
         include: { course: true, template: true },
       });
+      console.log("Found certificates count:", certificates.length);
     } else {
       certificates = await prisma.certificate.findMany({
         include: { course: true, template: true },
@@ -39,7 +41,8 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const { recipient, courseId, issueDate, expiryDate, templateId } = await request.json();
+    const { recipient, courseId, issueDate, expiryDate, templateId, studentId } = await request.json();
+    console.log("Creating certificate with payload:", { recipient, courseId, studentId });
     const newCertificate = await prisma.certificate.create({
       data: {
         recipient,
@@ -47,6 +50,7 @@ export async function POST(request) {
         issueDate: new Date(issueDate),
         expiryDate: expiryDate ? new Date(expiryDate) : null,
         templateId,
+        student: studentId ? { connect: { id: studentId } } : undefined,
       },
     });
     return NextResponse.json(newCertificate, { status: 201 });
@@ -58,7 +62,7 @@ export async function POST(request) {
 
 export async function PUT(request) {
   try {
-    const { id, recipient, courseId, issueDate, expiryDate, templateId } = await request.json();
+    const { id, recipient, courseId, issueDate, expiryDate, templateId, studentId } = await request.json();
     const updatedCertificate = await prisma.certificate.update({
       where: { id },
       data: {
@@ -67,6 +71,7 @@ export async function PUT(request) {
         issueDate: new Date(issueDate),
         expiryDate: expiryDate ? new Date(expiryDate) : null,
         templateId,
+        student: studentId ? { connect: { id: studentId } } : { disconnect: true },
       },
     });
     return NextResponse.json(updatedCertificate);

@@ -84,6 +84,7 @@ model User {
 
   // Financial Management
   invoices    Invoice[]
+  certificates Certificate[]
 }
 
 model StaffAttendance {
@@ -168,6 +169,9 @@ model Certificate {
   updatedAt   DateTime  @updatedAt
   template    Template? @relation(fields: [templateId], references: [id])
   templateId  String?   @db.ObjectId
+
+  student     User?     @relation(fields: [studentId], references: [id])
+  studentId   String?   @db.ObjectId
 }
 
 model Template {

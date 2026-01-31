@@ -34,7 +34,7 @@ async function getExamData(examId) {
 }
 
 export default async function EditExamPage({ params }) {
-  const { examId } = params;
+  const { examId } = await params;
   const exam = await getExamData(examId);
   const loggedInUser = await getLoggedInUser();
 

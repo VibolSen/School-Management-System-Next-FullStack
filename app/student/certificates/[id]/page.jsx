@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import { Award } from "lucide-react";
 
 const CertificateDetailPage = () => {
@@ -8,7 +9,6 @@ const CertificateDetailPage = () => {
   const [certificate, setCertificate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [courses, setCourses] = useState([]);
 
   useEffect(() => {
     const fetchCertificate = async () => {
@@ -25,28 +25,10 @@ const CertificateDetailPage = () => {
       }
     };
 
-    const fetchCourses = async () => {
-      try {
-        const response = await fetch("/api/courses");
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        setCourses(data);
-      } catch (error) {
-        console.error("Failed to fetch courses:", error);
-      }
-    };
-
     if (id) {
       fetchCertificate();
-      fetchCourses();
     }
   }, [id]);
-
-  const getCourseName = (courseId) => {
-    const course = courses.find((c) => c.id === courseId);
-    return course ? course.name : "Unknown Course";
-  };
 
   const handleDownload = async () => {
     try {
@@ -93,7 +75,15 @@ const CertificateDetailPage = () => {
       <div className="relative bg-white w-full max-w-4xl aspect-[1.414/1] rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.05)] p-12 border border-gray-200 text-center">
         {/* Header */}
         <div className="mb-8">
-          <Award className="w-10 h-10 mx-auto text-blue-500 mb-3" />
+          <div className="relative w-32 h-16 mx-auto mb-4">
+            <Image 
+              src="/logo/STEP.png" 
+              alt="STEP Logo" 
+              fill 
+              className="object-contain"
+              priority
+            />
+          </div>
           <h1 className="text-3xl font-semibold text-gray-800 tracking-tight">
             Certificate of Completion
           </h1>
@@ -113,7 +103,7 @@ const CertificateDetailPage = () => {
         {/* Course */}
         <div className="my-8">
           <h3 className="text-2xl font-medium text-blue-600">
-            {getCourseName(certificate.course.id)}
+            {certificate.course?.name || "No Course Info"}
           </h3>
           <p className="text-gray-500 mt-2">
             Issued on {new Date(certificate.issueDate).toLocaleDateString()}

@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, Eye, Edit, Trash2 } from "lucide-react";
 
 const SortIndicator = ({ direction }) => {
   if (!direction) return null;
@@ -19,13 +19,14 @@ export default function CertificateTable({
   sortField,
   sortOrder,
   handleSort,
-  onAddCertificateClick, // New prop for add button
+
   searchTerm,
   setSearchTerm,
   filterCourse,
   setFilterCourse,
   courses, // All available courses for the filter dropdown
   isLoading,
+  onBulkIssueClick, // New prop for bulk issue
 }) {
   const renderSortIcon = (field) => {
     if (sortField === field) {
@@ -61,11 +62,12 @@ export default function CertificateTable({
             ))}
           </select>
           <button
-            onClick={onAddCertificateClick}
-            className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
+            onClick={onBulkIssueClick}
+            className="w-full md:w-auto bg-green-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
           >
-            Add New Certificate
+            Issue to Group
           </button>
+
         </div>
       </div>
 
@@ -117,24 +119,29 @@ export default function CertificateTable({
                   <td className="px-6 py-4 text-slate-600">
                     {getCourseName(certificate.course.id)}
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium space-x-2">
+                  <td className="px-6 py-4 text-sm font-medium space-x-3 text-center">
                     <Link
                       href={`/admin/certificate-management/${certificate.id}`}
-                      className="text-blue-600 hover:text-blue-900 hover:scale-105 transition-all duration-200"
+                      className="inline-block"
+                      title="View Certificate"
                     >
-                      View
+                      <button className="text-blue-600 hover:text-blue-800 transition-all duration-200">
+                        <Eye className="w-5 h-5" />
+                      </button>
                     </Link>
                     <button
                       onClick={() => handleEditCertificate(certificate)}
-                      className="text-indigo-600 hover:text-indigo-900 hover:scale-105 transition-all duration-200"
+                      className="text-indigo-600 hover:text-indigo-900 transition-all duration-200"
+                      title="Edit Certificate"
                     >
-                      Edit
+                      <Edit className="w-5 h-5" />
                     </button>
                     <button
                       onClick={() => handleDeleteCertificate(certificate)}
-                      className="text-red-600 hover:text-red-800 hover:scale-105 transition-all duration-200"
+                      className="text-red-600 hover:text-red-800 transition-all duration-200"
+                      title="Delete Certificate"
                     >
-                      Delete
+                      <Trash2 className="w-5 h-5" />
                     </button>
                   </td>
                 </tr>

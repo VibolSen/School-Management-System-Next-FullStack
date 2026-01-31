@@ -24,7 +24,7 @@ async function getGroupData(groupId) {
 }
 
 export default async function GroupDetailPageRoute({ params }) {
-  const { groupId } = params; // params is directly available here
+  const { groupId } = await params; // params must be awaited in Next.js 15
 
   const { group, allStudents } = await getGroupData(groupId);
 
