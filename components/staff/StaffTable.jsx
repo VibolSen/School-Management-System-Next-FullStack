@@ -237,7 +237,7 @@ export default function StaffTable({
                     )}
                     {currentUserRole && (
                       <Link 
-                        href={`/${currentUserRole.toLowerCase()}/users/${staff.id}`}
+                        href={`/${currentUserRole.toLowerCase()}/staff/${staff.id}`}
                         className="inline-block"
                         title="View Profile"
                       >

@@ -25,7 +25,7 @@ export default function StaffManagementView() {
       return ALL_ROLES;
     }
     if (user?.role === "HR") {
-      return ALL_ROLES.filter((role) => role !== "ADMIN" && role !== "STUDENT");
+      return ALL_ROLES;
     }
     return [];
   }, [user?.role]);
