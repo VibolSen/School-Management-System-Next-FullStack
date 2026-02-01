@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import ExpenseModal from "./ExpenseModal";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function ExpensesManagement() {
   const [expenses, setExpenses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
 
@@ -43,6 +45,7 @@ export default function ExpensesManagement() {
   }, []);
 
   const fetchExpenses = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch("/api/admin/expenses");
       if (response.ok) {
@@ -53,6 +56,8 @@ export default function ExpensesManagement() {
       }
     } catch (error) {
       console.error("Error fetching expenses:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -139,38 +144,55 @@ export default function ExpensesManagement() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {expenses.map((expense) => (
-                <tr key={expense.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200 uppercase">
-                      {expense.category}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">{expense.description}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${expense.amount.toFixed(2)}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">
-                    {new Date(expense.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-right">
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => handleEditExpense(expense)}
-                        className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                        title="Edit Expense"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteExpense(expense.id)}
-                        className="p-1 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                        title="Delete Expense"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center">
+                    <LoadingSpinner size="md" color="blue" className="mx-auto" />
+                    <p className="mt-2 text-xs font-semibold text-slate-400 uppercase tracking-widest animate-pulse">
+                      Retrieving Expenditures...
+                    </p>
                   </td>
                 </tr>
-              ))}
+              ) : expenses.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-slate-500 font-medium">
+                    No expenses found.
+                  </td>
+                </tr>
+              ) : (
+                expenses.map((expense) => (
+                  <tr key={expense.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200 uppercase">
+                        {expense.category}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">{expense.description}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${expense.amount.toFixed(2)}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">
+                      {new Date(expense.date).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleEditExpense(expense)}
+                          className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                          title="Edit Expense"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteExpense(expense.id)}
+                          className="p-1 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                          title="Delete Expense"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import FeeModal from "./FeeModal";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function FeesManagement() {
   const [fees, setFees] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFee, setSelectedFee] = useState(null);
 
@@ -43,18 +45,19 @@ export default function FeesManagement() {
   }, []);
 
   const fetchFees = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch("/api/admin/fees");
       if (response.ok) {
         const data = await response.json();
         setFees(data);
       } else {
-         // Silently fail or log for now regarding fetch list? Or show error?
-         // Usually list fetch error is less critical to modal, but good to know.
          console.error("Failed to fetch fees");
       }
     } catch (error) {
       console.error("Error fetching fees:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -140,31 +143,48 @@ export default function FeesManagement() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {fees.map((fee) => (
-                <tr key={fee.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-700">{fee.name}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">{fee.description}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${fee.amount.toFixed(2)}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-right">
-                    <div className="flex justify-end gap-2">
-                       <button
-                        onClick={() => handleEditFee(fee)}
-                        className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                        title="Edit Fee"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteFee(fee.id)}
-                        className="p-1 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                        title="Delete Fee"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={4} className="py-12 text-center">
+                    <LoadingSpinner size="md" color="blue" className="mx-auto" />
+                    <p className="mt-2 text-xs font-semibold text-slate-400 uppercase tracking-widest animate-pulse">
+                      Retrieving Fee Structures...
+                    </p>
                   </td>
                 </tr>
-              ))}
+              ) : fees.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-12 text-center text-slate-500 font-medium">
+                    No fees found.
+                  </td>
+                </tr>
+              ) : (
+                fees.map((fee) => (
+                  <tr key={fee.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-700">{fee.name}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">{fee.description}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${fee.amount.toFixed(2)}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-right">
+                      <div className="flex justify-end gap-2">
+                         <button
+                          onClick={() => handleEditFee(fee)}
+                          className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                          title="Edit Fee"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteFee(fee.id)}
+                          className="p-1 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                          title="Delete Fee"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

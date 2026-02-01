@@ -5,9 +5,11 @@ import PaymentModal from "./PaymentModal";
 import Link from "next/link";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function PaymentsManagement() {
   const [payments, setPayments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
 
@@ -44,6 +46,7 @@ export default function PaymentsManagement() {
   }, []);
 
   const fetchPayments = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch("/api/admin/payments");
       if (response.ok) {
@@ -54,6 +57,8 @@ export default function PaymentsManagement() {
       }
     } catch (error) {
        console.error("Error fetching payments:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -143,45 +148,62 @@ export default function PaymentsManagement() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {payments.map((payment) => (
-                <tr key={payment.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-4 py-3 whitespace-nowrap text-xs font-bold text-slate-400">
-                    {payment.id.substring(payment.id.length - 8)}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <Link href={`/admin/finance/invoices/${payment.invoiceId}`} className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors uppercase">
-                      {payment.invoiceId.substring(payment.invoiceId.length - 8)}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${payment.amount.toFixed(2)}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">
-                    {new Date(payment.paymentDate).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200 uppercase">
-                      {payment.paymentMethod}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-right">
-                    <div className="flex justify-end gap-2">
-                       <button
-                        onClick={() => handleEditPayment(payment)}
-                        className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                        title="Edit Payment"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeletePayment(payment.id)}
-                        className="p-1 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                        title="Delete Payment"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center">
+                    <LoadingSpinner size="md" color="blue" className="mx-auto" />
+                    <p className="mt-2 text-xs font-semibold text-slate-400 uppercase tracking-widest animate-pulse">
+                      Retrieving Transaction History...
+                    </p>
                   </td>
                 </tr>
-              ))}
+              ) : payments.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-slate-500 font-medium">
+                    No payments found.
+                  </td>
+                </tr>
+              ) : (
+                payments.map((payment) => (
+                  <tr key={payment.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-4 py-3 whitespace-nowrap text-xs font-bold text-slate-400">
+                      {payment.id.substring(payment.id.length - 8)}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <Link href={`/admin/finance/invoices/${payment.invoiceId}`} className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors uppercase">
+                        {payment.invoiceId.substring(payment.invoiceId.length - 8)}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${payment.amount.toFixed(2)}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">
+                      {new Date(payment.paymentDate).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200 uppercase">
+                        {payment.paymentMethod}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-right">
+                      <div className="flex justify-end gap-2">
+                         <button
+                          onClick={() => handleEditPayment(payment)}
+                          className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+                          title="Edit Payment"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeletePayment(payment.id)}
+                          className="p-1 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                          title="Delete Payment"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
