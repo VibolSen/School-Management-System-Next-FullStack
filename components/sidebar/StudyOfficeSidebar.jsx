@@ -215,6 +215,16 @@ export default function StudyOfficeSidebar({ initialOpen = true }) {
             ))}
           </ul>
         </nav>
+
+        <div className="px-2 py-4 border-t border-blue-800">
+          <NavLink
+            icon={<FiSettings className="w-5 h-5" />}
+            label="Settings"
+            href="/study-office/settings"
+            isActive={pathname === "/study-office/settings"}
+            isCollapsed={isCollapsed}
+          />
+        </div>
       </aside>
     </>
   );

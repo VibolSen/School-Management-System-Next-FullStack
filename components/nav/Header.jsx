@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useUser } from "@/context/UserContext";
@@ -7,8 +7,30 @@ export default function Header({ toggleSidebar }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState("");
   const router = useRouter();
+  const dropdownTimeoutRef = useRef(null);
 
   const { user, loading } = useUser();
+
+  const handleMouseEnter = () => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+    }
+    setDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setDropdownOpen(false);
+    }, 200);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (dropdownTimeoutRef.current) {
+        clearTimeout(dropdownTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const updateDate = () => {
@@ -33,7 +55,8 @@ export default function Header({ toggleSidebar }) {
 
   const handleProfileClick = () => {
     if (user?.role) {
-      router.push(`/${user.role.toLowerCase()}/profile`);
+      const roleSlug = user.role.toLowerCase().replace(/_/g, "-");
+      router.push(`/${roleSlug}/profile`);
     } else {
       console.warn("User role not found, cannot navigate to profile");
     }
@@ -82,7 +105,11 @@ export default function Header({ toggleSidebar }) {
         </div>
 
 
-        <div className="relative">
+        <div 
+          className="relative"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center space-x-2"

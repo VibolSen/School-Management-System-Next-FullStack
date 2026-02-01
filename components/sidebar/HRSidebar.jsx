@@ -154,7 +154,7 @@ const HRSidebar = ({ isOpen, setIsOpen }) => {
           <NavLink
             icon={<FiSettings className="w-5 h-5" />}
             label="Settings"
-            href="/settings"
+            href="/hr/settings"
             isActive={pathname === "/settings"}
             isCollapsed={isCollapsed}
           />

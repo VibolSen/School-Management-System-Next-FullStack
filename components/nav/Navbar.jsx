@@ -210,7 +210,7 @@ export default function Navbar() {
                   {profileDropdownOpen && (
                     <div className="absolute top-full right-0 mt-4 w-48 bg-white shadow-md rounded-xl py-1">
                       <Link
-                        href={`/${user.role.toLowerCase()}/profile`}
+                        href={`/${user.role.toLowerCase().replace(/_/g, "-")}/profile`}
                         className="block px-4 py-2 hover:bg-gray-100 text-black transition-colors"
                         onClick={() => setProfileDropdownOpen(false)}
                       >

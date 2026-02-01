@@ -2,6 +2,7 @@
 
 import { useUser } from "@/context/UserContext";
 import FullPageLoading from "@/components/ui/FullPageLoading";
+import ProfilePageContent from "@/components/ProfilePageContent";
 
 export default function ProfilePage() {
   const { user, loading, fetchUser } = useUser();

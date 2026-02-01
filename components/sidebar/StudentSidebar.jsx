@@ -179,7 +179,7 @@ const StudentSidebar = ({
           <NavLink
             icon={<FiSettings className="w-5 h-5" />}
             label="Settings"
-            href="@/student/settings"
+            href="/student/settings"
             isActive={pathname === "/student/settings"}
             isCollapsed={isCollapsed}
           />

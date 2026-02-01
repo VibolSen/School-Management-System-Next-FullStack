@@ -29,7 +29,7 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return <FullPageLoading message="Authenticating teacher profile..." />;
+    return <FullPageLoading message="Synchronizing portal data..." />;
   }
 
   return (
