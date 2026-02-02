@@ -6,7 +6,7 @@ import AnnouncementCard from "./AnnouncementCard";
 
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
-export default function AnnouncementsView({ courseId, loggedInUser }) {
+export default function AnnouncementsView({ courseId, loggedInUser, hideHeader = false }) {
   console.log("AnnouncementsView - loggedInUser:", loggedInUser);
   console.log("AnnouncementsView - loggedInUser.role:", loggedInUser?.role);
   const [announcements, setAnnouncements] = useState([]);
@@ -103,15 +103,17 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
   const canCreate = loggedInUser?.role === 'ADMIN';
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{courseId ? "Course Announcements" : "Announcements Management"}</h1>
-        {canCreate && (
-          <button onClick={() => setIsModalOpen(true)} className="bg-blue-600 text-white px-4 py-2 rounded-md">
-            New Announcement
-          </button>
-        )}
-      </div>
+    <div className={hideHeader ? "" : "p-6"}>
+      {!hideHeader && (
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">{courseId ? "Course Announcements" : "Announcements Management"}</h1>
+          {canCreate && (
+            <button onClick={() => setIsModalOpen(true)} className="bg-blue-600 text-white px-4 py-2 rounded-md">
+              New Announcement
+            </button>
+          )}
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
@@ -119,7 +121,7 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
           <p className="text-slate-500 font-medium animate-pulse">Loading announcements...</p>
         </div>
       ) : announcements.length === 0 ? (
-        <p>No announcements yet.</p>
+        <p className="text-slate-500 italic pb-8">No announcements yet.</p>
       ) : (
         <div className="space-y-4">
           {announcements.map((ann) => (
@@ -164,3 +166,4 @@ export default function AnnouncementsView({ courseId, loggedInUser }) {
     </div>
   );
 }
+

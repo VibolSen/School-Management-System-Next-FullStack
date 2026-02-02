@@ -20,6 +20,7 @@ export async function GET(req) {
     const user = await prisma.user.findUnique({
       where: { id: studentId },
       include: {
+        enrollments: true, // Fetch progress
         groups: {
           include: {
             courses: {
@@ -42,8 +43,15 @@ export async function GET(req) {
       );
     }
 
+    // Create a map for quick progress lookup
+    const progressMap = new Map(user.enrollments.map(e => [e.courseId, e.progress]));
+
     const coursesWithGroupInfo = user.groups.flatMap(group => 
-      group.courses.map(course => ({ ...course, groupName: group.name }))
+      group.courses.map(course => ({ 
+        ...course, 
+        groupName: group.name,
+        progress: progressMap.get(course.id) || 0 // Inject progress
+      }))
     ).filter(Boolean);
 
     const uniqueCourses = Array.from(new Map(coursesWithGroupInfo.map(course => [course.id, course])).values());
