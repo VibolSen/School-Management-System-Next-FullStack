@@ -248,7 +248,7 @@ export default function StudentModal({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-200 hover:shadow-xl hover:shadow-indigo-300 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
+                  className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
                 >
                   {isLoading ? "Saving..." : isEditMode ? "Update Profile" : "Enroll Student"}
                 </button>

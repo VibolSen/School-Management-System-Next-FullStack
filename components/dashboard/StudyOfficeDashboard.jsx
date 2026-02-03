@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import Link from "next/link";
 import DashboardCard from "@/components/dashboard/DashboardCard";
@@ -16,6 +17,7 @@ import {
   Activity,
   UserCheck,
   Users as Group,
+  ChevronRight,
 } from "lucide-react";
 import AnalyticsChart from "./AnalyticsChart";
 
@@ -35,11 +37,7 @@ export default function StudyOfficeDashboard() {
         const data = await response.json();
         setDashboardData(data);
       } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("An unknown error occurred");
-        }
+        setError(err instanceof Error ? err.message : "An unknown error occurred");
       }
     };
 
@@ -65,26 +63,40 @@ export default function StudyOfficeDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center space-y-3">
-          <LoadingSpinner size="md" color="blue" className="mx-auto" />
-          <p className="text-gray-600 font-medium">Loading dashboard...</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50/50">
+        <div className="text-center space-y-4">
+          <LoadingSpinner size="lg" color="blue" className="mx-auto" />
+          <p className="text-slate-500 font-bold tracking-tight animate-pulse">Accessing Academic Records...</p>
         </div>
       </div>
     );
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-6 text-center">
+        <div className="h-16 w-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mb-6 border border-rose-100">
+          <Activity size={32} />
+        </div>
+        <h2 className="text-xl font-black text-slate-900 mb-2">Service Offline</h2>
+        <p className="text-slate-500 max-w-sm mb-8 text-sm font-medium">{error}</p>
+        <button onClick={() => window.location.reload()} className="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-200">Retry Connection</button>
+      </div>
+    );
   }
 
-  if (!dashboardData) {
-    return <div>No data available</div>;
-  }
+  if (!dashboardData) return null;
 
   const welcomeName = currentUser
     ? `${currentUser.firstName} ${currentUser.lastName}`
-    : "Study Office Manager";
+    : "Study Lead";
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  };
 
   const chartData = [
     { name: "Students", count: dashboardData.studentCount || 0 },
@@ -92,147 +104,163 @@ export default function StudyOfficeDashboard() {
     { name: "Courses", count: dashboardData.courseCount || 0 },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 15, opacity: 0 },
+    show: { y: 0, opacity: 1, transition: { duration: 0.4 } },
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="max-w-7xl mx-auto p-6 space-y-8">
+    <div className="min-h-screen bg-slate-50/20 pb-10">
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="max-w-7xl mx-auto p-3 md:p-6 space-y-6"
+      >
         {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white/70 backdrop-blur-sm rounded-2xl p-5 shadow-sm border border-gray-200">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-              Study Office Dashboard
+        <motion.header variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-0.5">
+            <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+              {getGreeting()}, <span className="text-indigo-600">{welcomeName}</span>!
             </h1>
-            <p className="text-gray-600 mt-1">
-              Welcome back, <span className="font-semibold text-gray-800">{welcomeName}</span>
+            <p className="text-slate-500 font-medium text-sm">
+              Academic coordination, student performance, and curriculum monitoring.
             </p>
           </div>
-          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full border border-emerald-200 shadow-sm">
-            <Activity className="w-5 h-5" />
-            <span className="text-sm font-medium">All systems operational</span>
+          <div className="flex items-center gap-2.5 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-emerald-500">
+            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Academic Systems Live</span>
           </div>
-        </header>
+        </motion.header>
 
-        {/* Cards Section */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <DashboardCard
-            title="Total Students"
-            value={dashboardData.studentCount?.toString() || "N/A"}
-            icon={<Users className="w-6 h-6 text-blue-600" />}
-            description="All enrolled students"
-            href="/study-office/students"
-            bgColor="bg-blue-50"
-          />
-          <DashboardCard
-            title="Total Teachers"
-            value={dashboardData.teacherCount?.toString() || "N/A"}
-            icon={<UserCheck className="w-6 h-6 text-green-600" />}
-            description="All teaching staff"
-            href="/study-office/teachers"
-            bgColor="bg-green-50"
-          />
-          <DashboardCard
-            title="Total Courses"
-            value={dashboardData.courseCount?.toString() || "N/A"}
-            icon={<Library className="w-6 h-6 text-indigo-600" />}
-            description="All available courses"
-            href="/study-office/courses"
-            bgColor="bg-indigo-50"
-          />
-          <DashboardCard
-            title="Total Departments"
-            value={dashboardData.departmentCount?.toString() || "N/A"}
-            icon={<Building2 className="w-6 h-6 text-orange-600" />}
-            description="All academic departments"
-            href="/study-office/departments"
-            bgColor="bg-orange-50"
-          />
-          <DashboardCard
-            title="Total Faculties"
-            value={dashboardData.facultyCount?.toString() || "N/A"}
-            icon={<Briefcase className="w-6 h-6 text-purple-600" />}
-            description="All faculties"
-            href="/study-office/faculty"
-            bgColor="bg-purple-50"
-          />
-          <DashboardCard
-            title="Total Groups"
-            value={dashboardData.groupCount?.toString() || "N/A"}
-            icon={<Group className="w-6 h-6 text-pink-600" />}
-            description="All student groups"
-            href="/study-office/groups"
-            bgColor="bg-pink-50"
-          />
-        </section>
-
-        {/* Quick Actions */}
-        <section className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Quick Actions
-            </h3>
-            <TrendingUp className="w-5 h-5 text-gray-400" />
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
-            {[
-              {
-                label: "Manage Students",
-                icon: Users,
-                href: "/study-office/students",
-              },
-              {
-                label: "Manage Teachers",
-                icon: UserCheck,
-                href: "/study-office/teacher",
-              },
-              {
-                label: "Manage Courses",
-                icon: Library,
-                href: "/study-office/courses",
-              },
-              {
-                label: "Manage Schedules",
-                icon: Calendar,
-                href: "/study-office/schedule",
-              },
-              {
-                label: "Student Performance",
-                icon: TrendingUp,
-                href: "/study-office/student-performance",
-              },
-              {
-                label: "E-Library",
-                icon: BookOpen,
-                href: "/study-office/e-library",
-              },
-              {
-                label: "Reports & Analytics",
-                icon: BarChart3,
-                href: "/study-office/reports",
-              },
-            ].map((action, i) => (
-              <Link
-                href={action.href}
-                key={i}
-                className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer"
-              >
-                <div className="p-3 bg-gray-100 group-hover:bg-gray-200 rounded-xl transition-colors">
-                  <action.icon className="w-6 h-6 text-gray-700" />
+        {/* Stats Section */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {[
+            { title: "Total Students", val: dashboardData.studentCount, icon: Users, color: "blue", href: "/study-office/students" },
+            { title: "Total Teachers", val: dashboardData.teacherCount, icon: UserCheck, color: "indigo", href: "/study-office/teachers" },
+            { title: "Total Courses", val: dashboardData.courseCount, icon: Library, color: "violet", href: "/study-office/courses" },
+            { title: "Departments", val: dashboardData.departmentCount, icon: Building2, color: "sky", href: "/study-office/departments" },
+            { title: "Faculties", val: dashboardData.facultyCount, icon: Briefcase, color: "cyan", href: "/study-office/faculty" },
+            { title: "Groups", val: dashboardData.groupCount, icon: Group, color: "slate", href: "/study-office/groups" },
+          ].map((stat) => (
+            <motion.div variants={itemVariants} key={stat.title} whileHover={{ y: -3 }}>
+              <Link href={stat.href} className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-100 hover:shadow-md transition-all">
+                <div>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{stat.title}</p>
+                  <p className="text-xl font-black text-slate-900 leading-none">{stat.val || 0}</p>
                 </div>
-                <span className="text-sm font-medium text-gray-800 text-center">
-                    {action.label}
-                  </span>
+                <div className={`h-10 w-10 rounded-lg bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center`}>
+                  <stat.icon size={20} />
+                </div>
               </Link>
-            ))}
-          </div>
+            </motion.div>
+          ))}
         </section>
 
-        {/* Analytics Chart */}
-        <section className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Study Office Overview
-          </h3>
-          <AnalyticsChart data={chartData} />
-        </section>
-      </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Quick Actions */}
+            <motion.section variants={itemVariants} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-lg font-black text-slate-800 tracking-tight">Academic Controls</h3>
+                <TrendingUp size={16} className="text-slate-300" />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  { label: "Students", icon: Users, href: "/study-office/students", bg: "bg-blue-50", text: "text-blue-600" },
+                  { label: "Teachers", icon: UserCheck, href: "/study-office/teacher", bg: "bg-indigo-50", text: "text-indigo-600" },
+                  { label: "Courses", icon: Library, href: "/study-office/courses", bg: "bg-violet-50", text: "text-violet-600" },
+                  { label: "Schedules", icon: Calendar, href: "/study-office/schedule", bg: "bg-sky-50", text: "text-sky-600" },
+                  { label: "Performance", icon: TrendingUp, href: "/study-office/student-performance", bg: "bg-cyan-50", text: "text-cyan-600" },
+                  { label: "E-Library", icon: BookOpen, href: "/study-office/e-library", bg: "bg-slate-50", text: "text-slate-600" },
+                  { label: "Analytics", icon: BarChart3, href: "/study-office/reports", bg: "bg-blue-50", text: "text-blue-600" },
+                ].map((action) => (
+                  <Link
+                    href={action.href}
+                    key={action.label}
+                    className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-50 hover:border-blue-100 hover:bg-slate-50/50 transition-all active:scale-95"
+                  >
+                    <div className={`p-3.5 ${action.bg} ${action.text} rounded-xl group-hover:bg-white transition-all shadow-sm`}>
+                      <action.icon size={20} />
+                    </div>
+                    <span className="text-[11px] font-bold text-slate-700 text-center tracking-tight leading-none px-1">
+                      {action.label}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </motion.section>
+
+            {/* Analytics Chart */}
+            <motion.section variants={itemVariants} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <h3 className="text-lg font-black text-slate-800 tracking-tight mb-5">Academic Growth</h3>
+              <div className="h-[280px]">
+                <AnalyticsChart data={chartData} />
+              </div>
+            </motion.section>
+          </div>
+
+          <div className="space-y-6">
+            <motion.section variants={itemVariants} className="bg-gradient-to-br from-indigo-700 via-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg shadow-indigo-200/50 relative overflow-hidden">
+               <div className="relative z-10 space-y-4">
+                 <div className="flex items-center gap-2">
+                   <div className="p-1.5 bg-white/20 backdrop-blur-md rounded-lg">
+                     <TrendingUp size={14} className="text-white" />
+                   </div>
+                   <span className="text-[10px] font-black uppercase tracking-widest text-indigo-50">Academic Intelligence</span>
+                 </div>
+                 
+                 <h4 className="text-lg font-black leading-tight">
+                    Academy coordination is overseeing {dashboardData.studentCount} active students.
+                 </h4>
+                 <p className="text-xs text-indigo-100 font-medium leading-relaxed">
+                    With {dashboardData.courseCount} courses currently active, the academic workflow is operating at full capacity.
+                 </p>
+                 
+                 <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+                    <div className="space-y-0.5">
+                       <p className="text-[9px] font-black text-indigo-200 uppercase tracking-tighter">Student/Teacher Ratio</p>
+                       <p className="text-sm font-black">
+                         {(dashboardData.studentCount / (dashboardData.teacherCount || 1)).toFixed(1)} : 1
+                       </p>
+                    </div>
+                    <Link href="/study-office/reports" className="h-8 w-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                      <ChevronRight size={16} />
+                    </Link>
+                 </div>
+               </div>
+               <div className="absolute -right-6 -bottom-6 h-32 w-32 bg-white/10 rounded-full blur-2xl" />
+            </motion.section>
+
+            <motion.section variants={itemVariants} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+               <div className="h-14 w-14 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-white shadow-sm">
+                 <Group size={28} />
+               </div>
+               <h4 className="text-sm font-black text-slate-900 leading-none mb-1">{welcomeName}</h4>
+               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Academic Coordinator</p>
+               <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-center gap-6">
+                  <div className="text-center">
+                    <p className="text-[11px] font-black text-slate-900 leading-none">Global</p>
+                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter mt-1">Scope</p>
+                  </div>
+                  <div className="h-4 w-px bg-slate-100" />
+                  <div className="text-center">
+                    <p className="text-[11px] font-black text-slate-900 leading-none">Active</p>
+                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter mt-1">Status</p>
+                  </div>
+               </div>
+            </motion.section>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

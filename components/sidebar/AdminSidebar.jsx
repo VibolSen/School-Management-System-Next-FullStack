@@ -3,24 +3,26 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  FiHome,
-  FiUsers,
-  FiBook,
-  FiBarChart2,
-  FiBookOpen,
-  FiSettings,
-  FiChevronLeft,
-  FiChevronRight,
-  FiBriefcase,
-  FiUser,
-  FiGrid,
-  FiHash,
-  FiTrendingUp,
-  FiCalendar,
-  FiAward,
-  FiCreditCard,
-  FiDollarSign,
-} from "react-icons/fi";
+  Home,
+  Users,
+  Book,
+  BarChart3,
+  BookOpen,
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+  Briefcase,
+  User,
+  LayoutGrid,
+  Hash,
+  TrendingUp,
+  Calendar,
+  Award,
+  DollarSign,
+  FileText, // For Exam Management
+  Library, // For E-Library
+  ClipboardList // For Assignment Management
+} from "lucide-react";
 
 // -------------------------
 // Single Nav Item Component
@@ -29,30 +31,30 @@ const NavLink = ({ icon, label, href, isCollapsed, isActive }) => (
   <li>
     <Link
       href={href}
-      className={`group flex items-center gap-2.5 my-0.5 p-2 rounded-lg transition-all duration-300 relative
+      className={`group flex items-center gap-3 my-1 p-3 rounded-xl transition-all duration-300 relative overflow-hidden
         ${
           isActive
-            ? "bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-sm scale-[1.01]"
-            : "text-slate-300 hover:text-white hover:bg-blue-800/60 "
+            ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20 scale-[1.02]"
+            : "text-slate-500 hover:text-blue-700 hover:bg-white"
         }
       `}
       title={isCollapsed ? label : ""}
     >
       <span
-        className={`transition-all duration-300 ${
+        className={`transition-all duration-300 relative z-10 ${
           isActive
-            ? "text-yellow-300"
-            : "group-hover:text-blue-300 text-slate-300"
+            ? "text-white"
+            : "group-hover:text-blue-300"
         }`}
       >
-        {icon}
+        {React.cloneElement(icon, { size: 20 })}
       </span>
 
       <span
         className={`ml-1 font-medium transition-all duration-300 ease-in-out
           ${
             isCollapsed
-              ? "opacity-0 absolute left-full ml-2 bg-blue-900 text-white px-2 py-1 rounded text-sm invisible group-hover:visible group-hover:opacity-100 z-50 shadow-md"
+              ? "opacity-0 absolute left-full ml-2 bg-slate-800 text-white px-2 py-1 rounded text-sm invisible group-hover:visible group-hover:opacity-100 z-50 shadow-md"
               : "opacity-100"
           }`}
       >
@@ -68,107 +70,107 @@ const NavLink = ({ icon, label, href, isCollapsed, isActive }) => (
 const ADMIN_NAV_ITEMS = [
   {
     label: "Dashboard",
-    icon: <FiHome className="w-5 h-5" />,
+    icon: <Home />,
     href: "/admin/dashboard",
   },
   {
     label: "Users",
-    icon: <FiUsers className="w-5 h-5" />,
+    icon: <Users />,
     href: "/admin/users",
   },
   {
     label: "Staff",
-    icon: <FiBriefcase className="w-5 h-5" />,
+    icon: <Briefcase />,
     href: "/admin/staff",
   },
   {
     label: "Teachers",
-    icon: <FiUsers className="w-5 h-5" />,
+    icon: <Users />,
     href: "/admin/teachers",
   },
   {
     label: "Students",
-    icon: <FiUser className="w-5 h-5" />,
+    icon: <User />,
     href: "/admin/students",
   },
   {
     label: "Faculty",
-    icon: <FiBook className="w-5 h-5" />,
+    icon: <Book />,
     href: "/admin/faculty",
   },
   {
     label: "Departments",
-    icon: <FiGrid className="w-5 h-5" />,
+    icon: <LayoutGrid />,
     href: "/admin/departments",
   },
   {
     label: "Courses",
-    icon: <FiBook className="w-5 h-5" />,
+    icon: <Book />,
     href: "/admin/courses",
   },
   {
     label: "Groups",
-    icon: <FiHash className="w-5 h-5" />,
+    icon: <Hash />,
     href: "/admin/groups",
   },
   {
     label: "Assignment Management",
-    icon: <FiBookOpen className="w-5 h-5" />,
+    icon: <ClipboardList />,
     href: "/admin/assignment-management",
   },
   {
     label: "Exam Management",
-    icon: <FiBook className="w-5 h-5" />,
+    icon: <FileText />,
     href: "/admin/exam-management",
   },
   {
     label: "Course Analytics",
-    icon: <FiBarChart2 className="w-5 h-5" />,
+    icon: <BarChart3 />,
     href: "/admin/course-analytics",
   },
   {
     label: "E-Library",
-    icon: <FiBookOpen className="w-5 h-5" />,
+    icon: <Library />,
     href: "/admin/e-library",
   },
   {
     label: "Student Performance",
-    icon: <FiTrendingUp className="w-5 h-5" />,
+    icon: <TrendingUp />,
     href: "/admin/student-performance",
   },
   {
     label: "Gradebook",
-    icon: <FiBookOpen className="w-5 h-5" />,
+    icon: <BookOpen />,
     href: "/admin/gradebook",
   },
   {
     label: "Attendance",
-    icon: <FiCalendar className="w-5 h-5" />,
+    icon: <Calendar />,
     href: "/admin/attendance",
   },
   {
     label: "Financial Management",
-    icon: <FiDollarSign className="w-5 h-5" />,
+    icon: <DollarSign />,
     href: "/admin/finance",
   },
   {
-    label: "Schedule Management",
-    icon: <FiCalendar className="w-5 h-5" />,
+    label: "Schedule",
+    icon: <Calendar />,
     href: "/admin/schedule",
   },
   {
-    label: "Certificate Management",
-    icon: <FiBookOpen className="w-5 h-5" />,
+    label: "Certificates",
+    icon: <Award />,
     href: "/admin/certificate-management",
   },
   {
     label: "Job Postings",
-    icon: <FiBriefcase className="w-5 h-5" />,
+    icon: <Briefcase />,
     href: "/admin/job-postings",
   },
   {
     label: "Settings",
-    icon: <FiSettings className="w-5 h-5" />,
+    icon: <Settings />,
     href: "/admin/settings",
   },
 ];
@@ -204,52 +206,57 @@ export default function AdminSidebar({ initialOpen = true }) {
 
       {/* Sidebar */}
       <aside
-        className={`bg-gradient-to-b from-blue-950 via-blue-900 to-blue-800 text-white flex flex-col fixed md:relative transition-all duration-500 ease-in-out z-40 h-full shadow-2xl
-          ${isOpen ? "min-w-max" : "w-16"} overflow-hidden`}
+        className={`bg-[#EBF4F6] border-r border-slate-200 text-slate-800 flex flex-col fixed md:relative transition-all duration-500 ease-in-out z-40 h-full shadow-2xl
+          ${isOpen ? "min-w-max" : "w-20"} overflow-hidden`}
       >
         {/* Header */}
         <div
-          className={`flex items-center p-3 border-b border-blue-800 h-14 transition-all duration-300 ${
+          className={`flex items-center p-5 border-b border-slate-200 h-20 transition-all duration-300 ${
             isCollapsed ? "justify-center" : "justify-between"
           }`}
         >
           {!isCollapsed && (
-            <div className="flex items-center space-x-2 animate-fadeIn">
-              <svg
-                className="h-8 w-8 text-blue-300 animate-pulse"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6.253v11.494m-5.22-8.242l10.44 4.99m-10.44-4.99l10.44 4.99M3 10.519l9-4.266 9 4.266"
-                />
-              </svg>
-              <h1 className="text-lg font-bold text-white tracking-wide">
-                Admin Portal
-              </h1>
+            <div className="flex items-center space-x-3 animate-fadeIn">
+              <div className="h-10 w-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <svg
+                  className="h-6 w-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M12 6.253v11.494m-5.22-8.242l10.44 4.99m-10.44-4.99l10.44 4.99M3 10.519l9-4.266 9 4.266"
+                  />
+                </svg>
+              </div>
+              <div className="flex flex-col">
+                <h1 className="text-lg font-black text-slate-800 tracking-tight leading-none">
+                  Admin<span className="text-blue-600">Portal</span>
+                </h1>
+                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Workspace</span>
+              </div>
             </div>
           )}
 
           <button
             onClick={toggleSidebar}
-            className="p-2 rounded-full bg-blue-800 hover:bg-blue-700 transition-colors"
+            className="p-2 rounded-xl bg-white hover:bg-slate-100 text-slate-500 hover:text-blue-600 transition-all border border-slate-200 hover:border-slate-300"
             aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
             {isOpen ? (
-              <FiChevronLeft className="w-4 h-4 text-white" />
+              <ChevronLeft className="w-4 h-4" />
             ) : (
-              <FiChevronRight className="w-4 h-4 text-white" />
+              <ChevronRight className="w-4 h-4" />
             )}
           </button>
         </div>
 
         {/* Nav Links */}
-        <nav className="flex-1 px-2 py-4 overflow-y-auto">
-          <ul className="space-y-1">
+        <nav className="flex-1 px-3 py-6 overflow-y-auto custom-scrollbar">
+          <ul className="space-y-1.5">
             {ADMIN_NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.label}
@@ -264,7 +271,7 @@ export default function AdminSidebar({ initialOpen = true }) {
         </nav>
 
         {/* Bottom Accent Line */}
-        <div className="h-1 bg-gradient-to-r from-blue-500 via-blue-400 to-blue-600 animate-gradient-x" />
+        <div className="h-1 bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600 animate-gradient-x" />
       </aside>
     </>
   );

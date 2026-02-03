@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useUser } from "@/context/UserContext";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { Plus } from "lucide-react";
 import JobPostingForm from "@/components/admin/JobPostingForm";
 import JobPostingTable from "@/components/admin/JobPostingTable";
 
@@ -20,6 +21,8 @@ export default function JobPostingsManagementView() {
   const [errorMessage, setErrorMessage] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingJob, setEditingJob] = useState(null);
+
+  const canManage = currentUser?.role === 'ADMIN' || currentUser?.role === 'HR';
 
   const showMessage = (message, type = "success") => {
     if (type === "error") {
@@ -137,10 +140,26 @@ export default function JobPostingsManagementView() {
   }
 
   return (
-    <div className="container mx-auto p-6 animate-fadeIn duration-700">
-      <h1 className="text-4xl font-extrabold text-blue-700 animate-scale-in mb-6">
-        Job Postings Management
-      </h1>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Institutional Careers
+          </h1>
+          <p className="text-slate-500 font-medium text-sm">
+            Publish vacancies, coordinate talent acquisition, and oversee institutional recruitment drives.
+          </p>
+        </div>
+        {canManage && (
+          <button
+            onClick={handleAddJob}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
+          >
+            <Plus size={14} />
+            Publish Vacancy
+          </button>
+        )}
+      </div>
 
       <JobPostingTable
         jobPostings={jobPostings}

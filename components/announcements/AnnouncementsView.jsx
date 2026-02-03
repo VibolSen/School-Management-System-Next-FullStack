@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import AnnouncementModal from "./AnnouncementModal";
 import AnnouncementCard from "./AnnouncementCard";
+import { Plus, Bell } from "lucide-react";
 
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
@@ -105,10 +106,21 @@ export default function AnnouncementsView({ courseId, loggedInUser, hideHeader =
   return (
     <div className={hideHeader ? "" : "p-6"}>
       {!hideHeader && (
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">{courseId ? "Course Announcements" : "Announcements Management"}</h1>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div className="space-y-0.5">
+            <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+              {courseId ? "Course Announcements" : "Announcements Registry"}
+            </h1>
+            <p className="text-slate-500 font-medium text-sm">
+              Broadcast critical updates, academic notices, and institutional news.
+            </p>
+          </div>
           {canCreate && (
-            <button onClick={() => setIsModalOpen(true)} className="bg-blue-600 text-white px-4 py-2 rounded-md">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
+            >
+              <Plus size={14} />
               New Announcement
             </button>
           )}
@@ -116,12 +128,18 @@ export default function AnnouncementsView({ courseId, loggedInUser, hideHeader =
       )}
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <LoadingSpinner size="lg" />
-          <p className="text-slate-500 font-medium animate-pulse">Loading announcements...</p>
+        <div className="flex flex-col items-center justify-center py-24 gap-4">
+          <div className="relative">
+            <div className="absolute -inset-4 bg-blue-100/50 rounded-full blur-2xl animate-pulse" />
+            <LoadingSpinner size="lg" />
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Syncing Bulletins</p>
         </div>
       ) : announcements.length === 0 ? (
-        <p className="text-slate-500 italic pb-8">No announcements yet.</p>
+        <div className="flex flex-col items-center justify-center py-20 opacity-40">
+          <Bell size={40} className="mb-4 text-slate-300" />
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">No bulletins recorded yet</p>
+        </div>
       ) : (
         <div className="space-y-4">
           {announcements.map((ann) => (

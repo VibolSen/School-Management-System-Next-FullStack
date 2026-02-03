@@ -23,24 +23,57 @@ export default function AssignmentsView({ loggedInUser }) {
   // HELPER FUNCTIONS
 
   // DATA FETCHING LOGIC
+  // DATA FETCHING LOGIC
   const fetchData = useCallback(async () => {
-    if (!teacherId) return;
+    if (!loggedInUser) return;
     setIsLoading(true);
     try {
-      const [assignmentsRes, groupsRes] = await Promise.all([
-        fetch(`/api/teacher/assignments?teacherId=${teacherId}`),
-        fetch(`/api/teacher/my-groups?teacherId=${teacherId}`),
-      ]);
+      let assignmentsUrl = `/api/teacher/assignments?teacherId=${loggedInUser.id}`;
+      // For Admin/Study Office, use the general endpoint that returns ALL assignments
+      if (
+        loggedInUser.role === "ADMIN" ||
+        loggedInUser.role === "STUDY_OFFICE" ||
+        loggedInUser.role === "study_office"
+      ) {
+        assignmentsUrl = "/api/assignments";
+      }
+
+      // We still fetch groups for the teacher context or for potential dropdowns (though for admin/study office this might need adjustment if they want to assign to ANY group, but for now let's ensure they can at least VIEW assignments)
+      // Note: Admin/Study Office might not have "my-groups", so we might need to handle that or let it fail gracefully/return empty if the API restricts it.
+      // Ideally, for Admin, we might want to fetch ALL groups if we were building a full creation UI for them here.
+      // For now, let's keep the group fetch but only if it matches known teacher logic or just fetch it and ignore error if it's not critical for VIEWING.
+      // Actually, let's stick to the existing group fetch for teachers, and for others maybe skip or fetch all?
+      // The current UI requires `teacherGroups` for the "Add Assignment" button validation.
+      
+      const requests = [fetch(assignmentsUrl)];
+      
+      // Only fetch "my-groups" if it's a teacher, otherwise for Admin/Study Office we might technically want all groups, 
+      // but let's see if the existing /api/teacher/my-groups handles them or if we should skip group loading for the view-only case first.
+      // If we skip group loading, `teacherGroups` will be empty, disabling the "Add Assignment" button which is safer than breaking.
+      if (loggedInUser.role === "TEACHER") {
+         requests.push(fetch(`/api/teacher/my-groups?teacherId=${loggedInUser.id}`));
+      }
+
+      const responses = await Promise.all(requests);
+      const assignmentsRes = responses[0];
+      const groupsRes = responses[1]; // defined only if pushed
+
       if (!assignmentsRes.ok) throw new Error("Failed to fetch assignments");
-      if (!groupsRes.ok) throw new Error("Failed to fetch your groups");
+      
       setAssignments(await assignmentsRes.json());
-      setTeacherGroups(await groupsRes.json());
+
+      if (groupsRes && groupsRes.ok) {
+        setTeacherGroups(await groupsRes.json());
+      } else if (loggedInUser.role !== "TEACHER") {
+          // For non-teachers, we might not populate teacherGroups, disabling the "Add Assignment" button by default which is fine for now
+          setTeacherGroups([]); 
+      }
     } catch (err) {
       console.error(err.message);
     } finally {
       setIsLoading(false);
     }
-  }, [teacherId]);
+  }, [loggedInUser]);
 
   useEffect(() => {
     fetchData();

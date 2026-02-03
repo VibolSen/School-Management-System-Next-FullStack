@@ -1,9 +1,12 @@
 "use client";
 
+
 import React, { useState, useEffect, useCallback } from "react";
-import StudentModal from "./StudentModal";
 import StudentTable from "./StudentTable";
+import StudentModal from "./StudentModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import { Plus } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { useUser } from "@/context/UserContext";
 
@@ -136,22 +139,42 @@ export default function StudentManagementView() {
   };
 
   return (
-    <div className="space-y-4 animate-fadeIn duration-700">
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold text-blue-700 animate-scale-in">
-          Student Management
-        </h1>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Student Management
+          </h1>
+          <p className="text-slate-500 font-medium text-sm">
+            Maintain student records, enrollment status, and academic profiles.
+          </p>
+        </div>
+        {canManageStudents && (
+          <button
+            onClick={handleAddClick}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
+          >
+            <Plus size={14} />
+            Add New Student
+          </button>
+        )}
       </div>
 
-      <StudentTable
-        students={students}
-        onAddStudentClick={handleAddClick}
-        onEditClick={handleEditClick}
-        onDeleteClick={handleDeleteRequest}
-        isLoading={isLoading}
-        currentUserRole={currentUser?.role}
-        canManageStudents={canManageStudents}
-      />
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <StudentTable
+          students={students}
+          onAddStudentClick={handleAddClick}
+          onEditClick={handleEditClick}
+          onDeleteClick={handleDeleteRequest}
+          isLoading={isLoading}
+          currentUserRole={currentUser?.role}
+          canManageStudents={canManageStudents}
+        />
+      </motion.div>
 
       {canManageStudents && isModalOpen && (
         <StudentModal

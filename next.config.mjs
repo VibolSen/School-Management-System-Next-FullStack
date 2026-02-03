@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename);
 const nextConfig = {
     outputFileTracingRoot: __dirname,
     serverExternalPackages: ['puppeteer-core', 'chrome-aws-lambda'],
+    transpilePackages: ['framer-motion'],
 };
 
 export default nextConfig;

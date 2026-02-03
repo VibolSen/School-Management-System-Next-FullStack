@@ -6,6 +6,7 @@ import GradebookToolbar from './GradebookToolbar';
 import GradebookTable from './GradebookTable';
 import { FiAlertTriangle } from 'react-icons/fi';
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { motion } from "framer-motion";
 
 const GradebookView = () => {
   const [gradebookData, setGradebookData] = useState(null);
@@ -103,10 +104,23 @@ const GradebookView = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Gradebook</h1>
-        <p className="text-sm text-gray-500 mb-6">An overview of all student grades and performance.</p>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Gradebook
+          </h1>
+          <p className="text-slate-500 font-medium text-sm">
+            Monitor academic performance, track student progress, and manage grade distributions.
+          </p>
+        </div>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
         <GradebookToolbar 
             courses={gradebookData.courses} 
             assignments={[...(gradebookData.assignments || []), ...(gradebookData.exams || [])]}
@@ -118,12 +132,19 @@ const GradebookView = () => {
             onGroupChange={setSelectedGroupId}
             onAssignmentChange={setSelectedAssignmentId}
         />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
         <GradebookTable 
             students={filteredStudents} 
             assignments={filteredAssignments} 
-            gradebookData={gradebookData} // Still needed for lookup of grades
+            gradebookData={gradebookData} 
         />
-      </div>
+      </motion.div>
     </div>
   );
 };

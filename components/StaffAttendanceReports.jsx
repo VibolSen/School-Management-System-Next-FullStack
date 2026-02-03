@@ -35,8 +35,15 @@ const StaffAttendanceReports = () => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Staff Attendance Reports</h1>
+    <div className="space-y-6 container mx-auto px-4 py-8">
+      <div className="space-y-0.5">
+        <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+          Staff Attendance Insights
+        </h1>
+        <p className="text-slate-500 font-medium text-sm">
+          Analytics dashboard for institutional personnel presence and reliability.
+        </p>
+      </div>
       <div className="flex items-center mb-4">
         <input
           type="date"
@@ -52,9 +59,9 @@ const StaffAttendanceReports = () => {
         />
         <button
           onClick={fetchAttendanceData}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
         >
-          Filter
+          Generate Report
         </button>
       </div>
       {loading && (

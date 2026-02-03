@@ -2,17 +2,18 @@
 
 import { useState, useEffect } from "react";
 import ExpenseModal from "./ExpenseModal";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Receipt, Search, RefreshCcw } from "lucide-react";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ExpensesManagement() {
   const [expenses, setExpenses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // New states for ConfirmationDialog
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -50,12 +51,10 @@ export default function ExpensesManagement() {
       const response = await fetch("/api/admin/expenses");
       if (response.ok) {
         const data = await response.json();
-        setExpenses(data);
-      } else {
-        console.error("Failed to fetch expenses");
+        setExpenses(data || []);
       }
     } catch (error) {
-      console.error("Error fetching expenses:", error);
+       console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -79,9 +78,7 @@ export default function ExpensesManagement() {
   const confirmDelete = async () => {
     if (!deleteId) return;
     try {
-      const response = await fetch(`/api/admin/expenses/${deleteId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(`/api/admin/expenses/${deleteId}`, { method: "DELETE" });
       if (response.ok) {
         showMessage("Expense deleted successfully!", "success");
         fetchExpenses();
@@ -97,102 +94,140 @@ export default function ExpensesManagement() {
     }
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedExpense(null);
-  };
-
-  const onExpenseSaved = () => {
-    fetchExpenses();
-    closeModal();
-  };
+  const filteredExpenses = expenses.filter(e => 
+    e.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    e.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-4">
-      <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          Expenses Management
-        </h1>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Expenditure Tracker
+          </h1>
+          <p className="text-slate-500 font-medium text-sm">
+            Maintain institutional spending logs, categorize operational outflows, and monitor fiscal disbursements.
+          </p>
+        </div>
         <button
           onClick={handleAddExpense}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
         >
-          <Plus className="w-4 h-4" />
-          <span>Add Expense</span>
+          <Plus size={14} />
+          Record Expense
         </button>
       </div>
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+        <div className="p-4 border-b border-slate-100 bg-blue-50/30 flex flex-col md:flex-row justify-between items-center gap-3">
+           <div className="flex items-center gap-2">
+            <div className="h-8 w-1 bg-indigo-600 rounded-full" />
+            <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight">Outflow Register</h2>
+          </div>
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <div className="relative group flex-1 md:w-64">
+              <input
+                type="text"
+                placeholder="Find expenditure..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all text-slate-700 hover:border-slate-300 shadow-sm"
+              />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-slate-900 transition-colors" size={12} />
+            </div>
+            <button
+               onClick={fetchExpenses}
+               className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+               title="Update Feed"
+            >
+               <RefreshCcw size={14} className={isLoading ? "animate-spin" : ""} />
+            </button>
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
+          <table className="w-full border-collapse">
+            <thead className="bg-slate-50 border-b border-slate-100">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Description
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="px-5 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Classification</th>
+                <th className="px-5 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Description</th>
+                <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Amount Paid</th>
+                <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Value Date</th>
+                <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Management</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={5} className="py-12 text-center">
-                    <LoadingSpinner size="md" color="blue" className="mx-auto" />
-                    <p className="mt-2 text-xs font-semibold text-slate-400 uppercase tracking-widest animate-pulse">
-                      Retrieving Expenditures...
-                    </p>
-                  </td>
-                </tr>
-              ) : expenses.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="py-12 text-center text-slate-500 font-medium">
-                    No expenses found.
-                  </td>
-                </tr>
-              ) : (
-                expenses.map((expense) => (
-                  <tr key={expense.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200 uppercase">
-                        {expense.category}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">{expense.description}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${expense.amount.toFixed(2)}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">
-                      {new Date(expense.date).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-right">
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => handleEditExpense(expense)}
-                          className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                          title="Edit Expense"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteExpense(expense.id)}
-                          className="p-1 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                          title="Delete Expense"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+            <tbody className="divide-y divide-slate-50">
+              <AnimatePresence mode="popLayout">
+                {isLoading && filteredExpenses.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-20 text-center">
+                       <div className="flex flex-col items-center justify-center gap-3 opacity-50">
+                        <div className="h-6 w-6 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Retrieving Expenditures...</span>
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
+                ) : filteredExpenses.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-20 text-center">
+                       <Receipt size={32} className="mx-auto text-slate-200 mb-3" />
+                       <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">No Expenditures found</h3>
+                       <p className="text-slate-500 text-[10px] uppercase tracking-widest mt-1">Institutional overhead is currently unrecorded</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredExpenses.map((exp, index) => (
+                    <motion.tr
+                      key={exp.id}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ delay: Math.min(index * 0.02, 0.4) }}
+                      className="group hover:bg-slate-50/50 transition-colors"
+                    >
+                      <td className="px-5 py-3 whitespace-nowrap">
+                        <span className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 text-[9px] font-black uppercase tracking-widest border border-rose-100 shadow-sm">
+                           {exp.category}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 whitespace-nowrap">
+                        <span className="text-[11px] font-semibold text-slate-500 italic max-w-md truncate block">
+                          {exp.description || 'No description provided'}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 whitespace-nowrap text-center">
+                        <span className="text-xs font-black text-slate-900 tabular-nums">
+                          ${exp.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 whitespace-nowrap text-center">
+                        <span className="text-[10px] font-black text-slate-400 tabular-nums uppercase tracking-tight">
+                          {new Date(exp.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 whitespace-nowrap text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => handleEditExpense(exp)}
+                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                            title="Edit Record"
+                          >
+                            <Edit size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteExpense(exp.id)}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                            title="Purge Record"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))
+                )}
+              </AnimatePresence>
             </tbody>
           </table>
         </div>
@@ -200,8 +235,8 @@ export default function ExpensesManagement() {
       <ExpenseModal
         isOpen={isModalOpen}
         expense={selectedExpense}
-        onClose={closeModal}
-        onExpenseSaved={onExpenseSaved}
+        onClose={() => { setIsModalOpen(false); setSelectedExpense(null); }}
+        onExpenseSaved={() => { fetchExpenses(); setIsModalOpen(false); setSelectedExpense(null); }}
         showMessage={showMessage}
       />
 
@@ -209,13 +244,13 @@ export default function ExpensesManagement() {
         isOpen={showDeleteConfirmation}
         onClose={() => setShowDeleteConfirmation(false)}
         onConfirm={confirmDelete}
-        title="Delete Expense"
-        message="Are you sure you want to delete this expense? This action cannot be undone."
+        title="Purge Expenditure"
+        message="Are you sure you want to remove this expense record? This action will permanently delete the transaction from the registry."
       />
 
        <ConfirmationDialog
         isOpen={isSuccessModalOpen}
-        title="Success"
+        title="Auditing Sync Success"
         message={successMessage}
         onConfirm={handleCloseSuccessModal}
         onCancel={handleCloseSuccessModal}
@@ -225,7 +260,7 @@ export default function ExpensesManagement() {
 
        <ConfirmationDialog
         isOpen={isErrorModalOpen}
-        title="Error"
+        title="Auditing Procedural Error"
         message={errorMessage}
         onConfirm={handleCloseErrorModal}
         onCancel={handleCloseErrorModal}

@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import UserTable from "./UserTable";
 import UserModal from "./UserModal";
 import ConfirmationDialog from "../ConfirmationDialog";
-
+import { motion } from "framer-motion";
+import { Plus } from "lucide-react";
 
 // ✅ MODIFIED: Roles are now a static list based on your Prisma Enum
 import { useUser } from "@/context/UserContext";
@@ -35,8 +36,6 @@ export default function UserManagementView() {
     }
   };
 
-
-
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -50,8 +49,6 @@ export default function UserManagementView() {
       setIsLoading(false);
     }
   }, []);
-
-  // ✅ REMOVED: `fetchRoles` is no longer needed.
 
   useEffect(() => {
     fetchUsers();
@@ -74,7 +71,6 @@ export default function UserManagementView() {
 
   const handleSaveUser = async (userData) => {
     setIsLoading(true);
-    // ✅ MODIFIED: The endpoint is simplified based on your route file
     const isEditing = !!editingUser?.id;
     const endpoint = isEditing
       ? `/api/users?id=${editingUser.id}`
@@ -105,8 +101,6 @@ export default function UserManagementView() {
       setIsLoading(false);
     }
   };
-
-  // ✅ REMOVED: `handleToggleStatus` is no longer applicable.
 
   const handleDeleteClick = (userId) => {
     const user = users.find((u) => u.id === userId);
@@ -154,19 +148,42 @@ export default function UserManagementView() {
   };
 
   return (
-        <div className="space-y-6 animate-fadeIn duration-700">
-          <h1 className="text-4xl font-extrabold text-blue-700 animate-scale-in">
-            User Management
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Personnel Directory
           </h1>
-      <UserTable
-        users={users}
-        allRoles={ROLES} // ✅ MODIFIED: Pass the static roles array
-        onAddUserClick={handleAddClick}
-        onEditClick={handleEditClick}
-        onDeleteClick={handleDeleteClick}
-        isLoading={isLoading} // Simplified loading state
-        currentUserRole={currentUser?.role}
-      />
+          <p className="text-slate-500 font-medium text-sm">
+            Control system access, manage personnel roles, and monitor user account status.
+          </p>
+        </div>
+        {(currentUser?.role === "ADMIN" || currentUser?.role === "HR") && (
+          <button
+            onClick={handleAddClick}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
+          >
+            <Plus size={14} />
+            Register Personnel
+          </button>
+        )}
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.99 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        <UserTable
+          users={users}
+          allRoles={ROLES}
+          onAddUserClick={handleAddClick}
+          onEditClick={handleEditClick}
+          onDeleteClick={handleDeleteClick}
+          isLoading={isLoading}
+          currentUserRole={currentUser?.role}
+        />
+      </motion.div>
       {isModalOpen && (
         <UserModal
           isOpen={isModalOpen}

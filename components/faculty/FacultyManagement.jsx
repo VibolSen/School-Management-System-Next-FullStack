@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import FacultyTable from './FacultyTable';
 import FacultyModal from './FacultyModal';
 import ConfirmationDialog from '@/components/ConfirmationDialog';
+import { motion, AnimatePresence } from "framer-motion";
 
 
 export default function FacultyManagement() {
@@ -139,19 +140,38 @@ export default function FacultyManagement() {
   };
 
   return (
-    <div className="space-y-4 animate-fadeIn duration-700">
-
-          <h1 className="text-xl font-bold text-blue-700 animate-scale-in">
-            Faculty Management
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Academic Faculties
           </h1>
+          <p className="text-slate-500 font-medium text-sm">
+            Coordinate faculty structures, manage academic divisions, and oversee departmental associations.
+          </p>
+        </div>
+        <button
+          onClick={handleAddClick}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
+        >
+          Establish New Faculty
+        </button>
+      </div>
 
-      <FacultyTable
-        faculties={faculties}
-        onEditClick={handleEditClick}
-        onDeleteClick={handleDeleteRequest}
-        onAddFacultyClick={handleAddClick}
-        isLoading={isLoading}
-      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.99 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+
+        <FacultyTable
+          faculties={faculties}
+          onEditClick={handleEditClick}
+          onDeleteClick={handleDeleteRequest}
+          onAddFacultyClick={handleAddClick}
+          isLoading={isLoading}
+        />
+      </motion.div>
 
       {isModalOpen && (
         <FacultyModal

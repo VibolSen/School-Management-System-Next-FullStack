@@ -4,19 +4,16 @@ import React, { useState, useEffect, ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  FiHome,
-  FiCalendar,
-  FiBarChart2,
-  FiSend,
-  FiSettings,
-  FiBriefcase,
-  FiChevronLeft,
-  FiChevronRight,
-  FiUsers,
-  FiCode,
-  FiCreditCard,
-  FiClipboard,
-} from "react-icons/fi";
+  Home,
+  Calendar,
+  BarChart3,
+  Settings,
+  Briefcase,
+  ChevronLeft,
+  ChevronRight,
+  Users,
+  ClipboardList,
+} from "lucide-react";
 
 const NavLink = ({
   icon,
@@ -28,18 +25,18 @@ const NavLink = ({
   <li>
     <Link
       href={href}
-      className={`flex items-center p-2 my-0.5 rounded-lg transition-colors duration-200 w-full text-left group relative ${
+      className={`flex items-center gap-3 p-3 my-1 rounded-xl transition-all duration-200 w-full text-left group relative ${
         isActive
-          ? "bg-blue-600 text-white shadow-sm"
-          : "text-slate-200 hover:bg-blue-800 hover:text-white"
+          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/20"
+          : "text-slate-500 hover:bg-white hover:text-blue-700"
       }`}
       title={isCollapsed ? label : ""}
     >
       {icon}
       <span
-        className={`ml-3 transition-all duration-300 ${
+        className={`ml-3 transition-all duration-300 font-medium ${
           isCollapsed
-            ? "opacity-0 absolute left-full ml-2 bg-blue-900 text-white px-2 py-1 rounded text-sm invisible group-hover:visible group-hover:opacity-100 z-50"
+            ? "opacity-0 absolute left-full ml-2 bg-slate-800 text-white px-2 py-1 rounded text-sm invisible group-hover:visible group-hover:opacity-100 z-50 whitespace-nowrap shadow-xl"
             : "opacity-100 relative"
         }`}
       >
@@ -52,32 +49,32 @@ const NavLink = ({
 const HR_NAV_ITEMS = [
   {
     label: "Dashboard",
-    icon: <FiHome className="w-5 h-5" />,
+    icon: <Home size={20} />,
     href: "/hr/dashboard",
   },
   {
     label: "Staff",
-    icon: <FiBriefcase className="w-5 h-5" />,
+    icon: <Briefcase size={20} />,
     href: "/hr/staff",
   },
   {
     label: "Job Postings",
-    icon: <FiClipboard className="w-5 h-5" />,
+    icon: <ClipboardList size={20} />,
     href: "/hr/job-postings",
   },
   {
     label: "Attendance",
-    icon: <FiCalendar className="w-5 h-5" />,
+    icon: <Calendar size={20} />,
     href: "/hr/attendance",
   },
   {
     label: "Manage Attendance",
-    icon: <FiUsers className="w-5 h-5" />,
+    icon: <Users size={20} />,
     href: "/hr/manage-attendance",
   },
   {
     label: "Reports & Analytics",
-    icon: <FiBarChart2 className="w-5 h-5" />,
+    icon: <BarChart3 size={20} />,
     href: "/hr/reports",
   },
 ];
@@ -96,47 +93,38 @@ const HRSidebar = ({ isOpen, setIsOpen }) => {
       />
 
       <aside
-        className={`bg-blue-900 text-white flex flex-col fixed md:relative transition-all duration-300 ease-in-out z-40 h-full ${
-          isOpen ? "min-w-max" : "w-16"
-        } overflow-hidden`}
+        className={`bg-[#EBF4F6] border-r border-slate-200 text-slate-800 flex flex-col fixed md:relative transition-all duration-300 ease-in-out z-40 h-full ${
+          isOpen ? "min-w-max" : "w-20"
+        } overflow-hidden shadow-2xl`}
       >
-        <div className="flex items-center p-3 border-b border-blue-800 h-14 relative">
-          {!isCollapsed ? (
-            <div className="flex items-center">
-              <svg
-                className="h-8 w-8 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6.253v11.494m-5.22-8.242l10.44 4.99m-10.44-4.99l10.44 4.99M3 10.519l9-4.266 9 4.266"
-                />
-              </svg>
-              <h1 className="ml-2 text-lg font-bold">HR Portal</h1>
+        <div className="flex items-center p-5 border-b border-slate-200 h-20 relative">
+          {!isCollapsed && (
+            <div className="flex items-center space-x-3">
+              <div className="h-10 w-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <Users size={20} className="text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-black tracking-tight leading-none text-slate-800">HR Portal</h1>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Management</p>
+              </div>
             </div>
-          ) : (
-            <div className="w-8 h-8"></div>
           )}
           
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="p-1 rounded-full bg-blue-800 hover:bg-blue-700 transition-colors absolute right-2"
+            className="p-2 rounded-xl bg-white hover:bg-slate-100 text-slate-500 hover:text-blue-600 transition-all border border-slate-200 hover:border-slate-300 absolute right-4 top-1/2 -translate-y-1/2"
             aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
             {isOpen ? (
-              <FiChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4" />
             ) : (
-              <FiChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" />
             )}
           </button>
         </div>
 
-        <nav className="flex-1 px-2 py-4 overflow-y-auto">
-          <ul>
+        <nav className="flex-1 px-3 py-6 overflow-y-auto">
+          <ul className="space-y-1.5">
             {HR_NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.label}
@@ -150,9 +138,9 @@ const HRSidebar = ({ isOpen, setIsOpen }) => {
           </ul>
         </nav>
 
-        <div className="px-2 py-4 border-t border-blue-800">
+        <div className="px-3 py-4 border-t border-slate-200">
           <NavLink
-            icon={<FiSettings className="w-5 h-5" />}
+            icon={<Settings size={20} />}
             label="Settings"
             href="/hr/settings"
             isActive={pathname === "/settings"}

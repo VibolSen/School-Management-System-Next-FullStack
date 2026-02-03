@@ -1,14 +1,17 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
-import { ChevronUp, ChevronDown, Eye, Edit, Trash2 } from "lucide-react";
+import { ChevronUp, ChevronDown, Eye, Edit, Trash2, Search, Filter, Group, Award } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { motion, AnimatePresence } from "framer-motion";
 
 const SortIndicator = ({ direction }) => {
   if (!direction) return null;
   return direction === "asc" ? (
-    <ChevronUp className="w-4 h-4 inline ml-1" />
+    <ChevronUp className="w-3 h-3 text-blue-600" />
   ) : (
-    <ChevronDown className="w-4 h-4 inline ml-1" />
+    <ChevronDown className="w-3 h-3 text-blue-600" />
   );
 };
 
@@ -20,14 +23,13 @@ export default function CertificateTable({
   sortField,
   sortOrder,
   handleSort,
-
   searchTerm,
   setSearchTerm,
   filterCourse,
   setFilterCourse,
-  courses, // All available courses for the filter dropdown
+  courses,
   isLoading,
-  onBulkIssueClick, // New prop for bulk issue
+  onBulkIssueClick,
 }) {
   const renderSortIcon = (field) => {
     if (sortField === field) {
@@ -37,120 +39,147 @@ export default function CertificateTable({
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-xl border border-slate-200 transition-all duration-300 ease-in-out">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-        <h2 className="text-xl font-semibold text-blue-700 transition-colors duration-300">
-          Certificate Directory
-        </h2>
-        <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
-          <input
-            type="text"
-            placeholder="Search by recipient, course..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-48 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
-          />
-          <select
-            value={filterCourse}
-            onChange={(e) => setFilterCourse(e.target.value)}
-            className="w-full md:w-auto px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
-          >
-            <option value="">All Courses</option>
-            {courses.map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.name}
-              </option>
-            ))}
-          </select>
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+      <div className="p-4 border-b border-slate-100 bg-blue-50/30 flex flex-col md:flex-row justify-between items-center gap-3">
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-1 bg-indigo-600 rounded-full" />
+          <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight">Credential Registry</h2>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <div className="relative group flex-1 md:w-48">
+            <input
+              type="text"
+              placeholder="Find recipient..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-black uppercase tracking-tight focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 hover:border-slate-300 shadow-sm appearance-none"
+            />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-blue-600 transition-colors" size={12} />
+          </div>
+          
+          <div className="relative group flex-1 md:w-48">
+             <select
+              value={filterCourse}
+              onChange={(e) => setFilterCourse(e.target.value)}
+              className="w-full pl-8 pr-8 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-black uppercase tracking-tight focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 hover:border-slate-300 shadow-sm appearance-none cursor-pointer"
+            >
+              <option value="">All Courses</option>
+              {courses.map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.name}
+                </option>
+              ))}
+            </select>
+            <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-blue-600 transition-colors" size={12} />
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={12} />
+          </div>
+
           <button
             onClick={onBulkIssueClick}
-            className="w-full md:w-auto bg-green-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
           >
-            Issue to Group
+            <Group size={14} />
+            Group Issue
           </button>
-
         </div>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left text-slate-500">
-          <thead className="text-xs text-slate-700 uppercase bg-slate-100">
+        <table className="w-full border-collapse">
+          <thead className="bg-slate-50/50 border-b border-slate-100">
             <tr>
               <th
-                className="px-6 py-3 text-left cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                className="px-5 py-3 text-left cursor-pointer group hover:bg-slate-100/50 transition-colors"
                 onClick={() => handleSort("recipient")}
               >
-                <div className="flex items-center gap-1.5">
-                  Recipient {renderSortIcon("recipient")}
+                <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  Recipient Identity {renderSortIcon("recipient")}
                 </div>
               </th>
               <th
-                className="px-6 py-3 text-left cursor-pointer hover:bg-slate-200 transition-colors duration-200"
+                className="px-5 py-3 text-left cursor-pointer group hover:bg-slate-100/50 transition-colors"
                 onClick={() => handleSort("course")}
               >
-                <div className="flex items-center gap-1.5">
-                  Course {renderSortIcon("course")}
+                <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  Course Metadata {renderSortIcon("course")}
                 </div>
               </th>
-              <th className="px-6 py-3 text-center hover:bg-slate-200 transition-colors duration-200">Actions</th>
+              <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Administrative Control</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {isLoading ? (
-              <tr>
-                <td colSpan="3" className="py-12">
-                  <div className="flex flex-col items-center justify-center space-y-3">
-                    <LoadingSpinner size="md" />
-                    <p className="text-slate-400 font-medium animate-pulse">Fetching certificates...</p>
-                  </div>
-                </td>
-              </tr>
-            ) : certificates.length === 0 ? (
-              <tr>
-                <td colSpan="3" className="text-center py-8 text-slate-500">
-                  No certificates found.
-                </td>
-              </tr>
-            ) : (
-              certificates.map((certificate) => (
-                <tr
-                  key={certificate.id}
-                  className="hover:bg-blue-50 transition-all duration-200 ease-in-out transform hover:scale-[1.005]"
-                >
-                  <td className="px-6 py-4 font-medium text-slate-800">
-                    {certificate.recipient}
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">
-                    {getCourseName(certificate.course.id)}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium space-x-3 text-center">
-                    <Link
-                      href={`/admin/certificate-management/${certificate.id}`}
-                      className="inline-block"
-                      title="View Certificate"
-                    >
-                      <button className="text-blue-600 hover:text-blue-800 transition-all duration-200">
-                        <Eye className="w-5 h-5" />
-                      </button>
-                    </Link>
-                    <button
-                      onClick={() => handleEditCertificate(certificate)}
-                      className="text-indigo-600 hover:text-indigo-900 transition-all duration-200"
-                      title="Edit Certificate"
-                    >
-                      <Edit className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteCertificate(certificate)}
-                      className="text-red-600 hover:text-red-800 transition-all duration-200"
-                      title="Delete Certificate"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
+          <tbody className="divide-y divide-slate-50">
+            <AnimatePresence mode="popLayout">
+              {isLoading && certificates.length === 0 ? (
+                <tr>
+                  <td colSpan="3" className="py-20 text-center">
+                    <div className="flex flex-col items-center justify-center gap-3 opacity-50">
+                      <div className="h-6 w-6 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Scanning Records...</span>
+                    </div>
                   </td>
                 </tr>
-              ))
-            )}
+              ) : certificates.length === 0 ? (
+                <tr>
+                  <td colSpan="3" className="py-20 text-center">
+                    <Award size={32} className="mx-auto text-slate-200 mb-3" />
+                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">No Credentials found</h3>
+                    <p className="text-slate-500 text-[10px] uppercase tracking-widest mt-1">Institutional records are currently unpopulated</p>
+                  </td>
+                </tr>
+              ) : (
+                certificates.map((cert, index) => (
+                  <motion.tr
+                    key={cert.id}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: Math.min(index * 0.02, 0.4) }}
+                    className="group hover:bg-slate-50/50 transition-colors"
+                  >
+                    <td className="px-5 py-3 whitespace-nowrap">
+                       <div className="flex items-center gap-3">
+                          <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center font-black text-[10px] shrink-0 border border-slate-200 group-hover:bg-white group-hover:text-blue-600 group-hover:border-blue-200 transition-all">
+                            {cert.recipient.charAt(0)}
+                          </div>
+                          <span className="text-[13px] font-black text-slate-800 tracking-tight">
+                            {cert.recipient}
+                          </span>
+                       </div>
+                    </td>
+                    <td className="px-5 py-3 whitespace-nowrap">
+                       <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[9px] font-black uppercase tracking-widest border border-slate-200 shadow-sm group-hover:bg-blue-50 group-hover:text-blue-700 group-hover:border-blue-100 transition-all">
+                          {getCourseName(cert.course.id)}
+                       </span>
+                    </td>
+                    <td className="px-5 py-3 whitespace-nowrap text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <Link
+                          href={`/admin/certificate-management/${cert.id}`}
+                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                          title="View Document"
+                        >
+                          <Eye size={14} />
+                        </Link>
+                        <button
+                          onClick={() => handleEditCertificate(cert)}
+                          className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                          title="Edit Profile"
+                        >
+                          <Edit size={14} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCertificate(cert)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                          title="Purge Record"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))
+              )}
+            </AnimatePresence>
           </tbody>
         </table>
       </div>

@@ -1,4 +1,8 @@
-import { Edit, Trash2, Eye } from "lucide-react";
+"use client";
+
+import React from "react";
+import { Edit, Trash2, Eye, Calendar, ShieldCheck, ClipboardList, Clock, Layers, Users } from "lucide-react";
+import { motion } from "framer-motion";
 
 const ExamCard = ({
   exam,
@@ -8,112 +12,120 @@ const ExamCard = ({
   status,
   showActions = false,
 }) => {
-  const getStatusBadgeStyle = (statusName) => {
-    switch (statusName) {
+  // Premium status configuration
+  const getStatusTheme = (statusName) => {
+    switch (statusName?.toUpperCase()) {
       case "SUBMITTED":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return {
+          bg: "bg-blue-50",
+          text: "text-blue-700",
+          border: "border-blue-100",
+          icon: <ClipboardList size={10} />,
+          label: "Submitted"
+        };
       case "GRADED":
-        return "bg-green-100 text-green-800 border-green-200";
+        return {
+          bg: "bg-emerald-50",
+          text: "text-emerald-700",
+          border: "border-emerald-100",
+          icon: <ShieldCheck size={10} />,
+          label: "Graded"
+        };
       case "PENDING":
       default:
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return {
+          bg: "bg-amber-50",
+          text: "text-amber-700",
+          border: "border-amber-100",
+          icon: <Clock size={10} />,
+          label: status || "Pending"
+        };
     }
   };
 
+  const theme = getStatusTheme(status);
+
   return (
-    <div className="group relative">
-      {/* Main Card */}
-      <div className="relative bg-white rounded-xl shadow-sm hover:shadow-md border border-slate-100 overflow-hidden transition-all duration-300 transform hover:scale-[1.01] group-hover:border-blue-200 flex flex-col justify-between h-full">
-        {/* Top Gradient Bar */}
-        <div className="h-1 bg-gradient-to-r from-indigo-400 to-blue-400" />
-
-        <div className="p-3">
-          {/* Header Section */}
-          <div className="flex justify-between items-start mb-2.5">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 uppercase tracking-wide">
-              {exam.group?.name || "No Group"}
-            </span>
-
-            {status && (
-              <span
-                className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getStatusBadgeStyle(
-                  status
-                )}`}
-              >
-                {status}
-              </span>
-            )}
+    <motion.div
+      whileHover={{ y: -4 }}
+      className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md hover:border-indigo-300 transition-all group flex flex-col h-full"
+    >
+      {/* Decorative Top Bar */}
+      <div className="h-1 bg-gradient-to-r from-indigo-500 to-blue-500" />
+      
+      <div className="p-4 flex-1 flex flex-col">
+        {/* Header: Badges */}
+        <div className="flex justify-between items-start mb-3">
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-indigo-50 text-indigo-700 rounded-lg border border-indigo-100 text-[9px] font-black uppercase tracking-wider">
+            <Users size={10} />
+            {exam.group?.name || "Open Group"}
           </div>
-
-          {/* Exam Title */}
-          <div onClick={onNavigate} className="cursor-pointer mb-2 group/title">
-            <h3 className="text-sm font-bold text-slate-800 leading-tight line-clamp-2 group-hover/title:text-blue-600 transition-colors duration-200">
-              {exam.title || "Untitled Exam"}
-            </h3>
-          </div>
-
-          {/* Exam Date */}
-          <div className="flex items-center space-x-3 mb-2.5">
-            <div className="flex items-center text-[10px] text-slate-500">
-              <svg
-                className="w-3 h-3 mr-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              {exam.examDate
-                ? new Date(exam.examDate).toLocaleDateString()
-                : "No date"}
+          {status && (
+            <div className={`flex items-center gap-1 px-2 py-1 ${theme.bg} ${theme.text} ${theme.border} rounded-lg border text-[9px] font-black uppercase tracking-wider`}>
+              {theme.icon}
+              {theme.label}
             </div>
+          )}
+        </div>
+
+        {/* Title */}
+        <div className="flex-1">
+          <h3 
+            onClick={onNavigate}
+            className="text-sm font-black text-slate-800 tracking-tight leading-snug cursor-pointer group-hover:text-indigo-600 transition-colors line-clamp-2"
+          >
+            {exam.title || "Standard Assessment"}
+          </h3>
+        </div>
+
+        {/* Info & Footer */}
+        <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-[10px]">
+            <Calendar size={12} className="text-slate-400" />
+            <span className="font-black uppercase tracking-tight text-slate-600">
+              {exam.examDate ? new Date(exam.examDate).toLocaleDateString() : "TBD"}
+            </span>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-3 pt-2.5 border-t border-slate-100">
-            <button
+          <div className="flex items-center gap-1">
+            <button 
               onClick={(e) => {
                 e.stopPropagation();
                 onNavigate();
               }}
-              className="text-blue-600 hover:text-blue-800 transition-all duration-200"
-              title="View Exam"
+              className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+              title="View Results"
             >
-              <Eye className="w-4 h-4" />
+              <Eye className="w-3.5 h-3.5" />
             </button>
             {showActions && (
               <>
-                <button
+                <button 
                   onClick={(e) => {
                     e.stopPropagation();
                     onEdit();
                   }}
-                  className="text-indigo-600 hover:text-indigo-900 transition-all duration-200"
-                  title="Edit Exam"
+                  className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                  title="Modify"
                 >
-                  <Edit className="w-4 h-4" />
+                  <Edit className="w-3.5 h-3.5" />
                 </button>
-                <button
+                <button 
                   onClick={(e) => {
                     e.stopPropagation();
                     onDelete();
                   }}
-                  className="text-red-600 hover:text-red-800 transition-all duration-200"
-                  title="Delete Exam"
+                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                  title="Remove"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </>
             )}
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

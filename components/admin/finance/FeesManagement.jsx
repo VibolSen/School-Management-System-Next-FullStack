@@ -2,17 +2,18 @@
 
 import { useState, useEffect } from "react";
 import FeeModal from "./FeeModal";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, DollarSign, Search, RefreshCcw } from "lucide-react";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function FeesManagement() {
   const [fees, setFees] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFee, setSelectedFee] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // New states for ConfirmationDialog
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -51,11 +52,9 @@ export default function FeesManagement() {
       if (response.ok) {
         const data = await response.json();
         setFees(data);
-      } else {
-         console.error("Failed to fetch fees");
       }
     } catch (error) {
-      console.error("Error fetching fees:", error);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -79,9 +78,7 @@ export default function FeesManagement() {
   const confirmDelete = async () => {
     if (!deleteId) return;
     try {
-      const response = await fetch(`/api/admin/fees/${deleteId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(`/api/admin/fees/${deleteId}`, { method: "DELETE" });
       if (response.ok) {
         showMessage("Fee deleted successfully!", "success");
         fetchFees();
@@ -92,99 +89,142 @@ export default function FeesManagement() {
     } catch (error) {
       showMessage(error.message, "error");
     } finally {
-        setShowDeleteConfirmation(false);
-        setDeleteId(null);
+      setShowDeleteConfirmation(false);
+      setDeleteId(null);
     }
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedFee(null);
-  };
-
-  const onFeeSaved = () => {
-    fetchFees();
-    closeModal();
-  }
+  const filteredFees = fees.filter(f => 
+    f.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    f.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-4">
-      {/* ... Header ... */}
-      <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          Fees Management
-        </h1>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Fee Structures
+          </h1>
+          <p className="text-slate-500 font-medium text-sm">
+            Define institutional pricing, manage tuition components, and oversee academic fee configurations.
+          </p>
+        </div>
         <button
           onClick={handleAddFee}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
         >
-          <Plus className="w-4 h-4" />
-          <span>Add Fee</span>
+          <Plus size={14} />
+          Create Fee
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+        <div className="p-4 border-b border-slate-100 bg-blue-50/30 flex flex-col md:flex-row justify-between items-center gap-3">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-1 bg-indigo-600 rounded-full" />
+            <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight">Financial Catalog</h2>
+          </div>
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <div className="relative group flex-1 md:w-64">
+              <input
+                type="text"
+                placeholder="Find fee structure..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all text-slate-700 hover:border-slate-300 shadow-sm"
+              />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-slate-900 transition-colors" size={12} />
+            </div>
+            <button
+               onClick={fetchFees}
+               className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+               title="Refresh Feed"
+            >
+               <RefreshCcw size={14} className={isLoading ? "animate-spin" : ""} />
+            </button>
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
+          <table className="w-full border-collapse">
+            <thead className="bg-slate-50 border-b border-slate-100">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Description
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="px-5 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Fee Classification</th>
+                <th className="px-5 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Descriptive Narrative</th>
+                <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Pricing</th>
+                <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Admin Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={4} className="py-12 text-center">
-                    <LoadingSpinner size="md" color="blue" className="mx-auto" />
-                    <p className="mt-2 text-xs font-semibold text-slate-400 uppercase tracking-widest animate-pulse">
-                      Retrieving Fee Structures...
-                    </p>
-                  </td>
-                </tr>
-              ) : fees.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="py-12 text-center text-slate-500 font-medium">
-                    No fees found.
-                  </td>
-                </tr>
-              ) : (
-                fees.map((fee) => (
-                  <tr key={fee.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-700">{fee.name}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">{fee.description}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${fee.amount.toFixed(2)}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-right">
-                      <div className="flex justify-end gap-2">
-                         <button
-                          onClick={() => handleEditFee(fee)}
-                          className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                          title="Edit Fee"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteFee(fee.id)}
-                          className="p-1 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                          title="Delete Fee"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+            <tbody className="divide-y divide-slate-50">
+              <AnimatePresence mode="popLayout">
+                {isLoading && filteredFees.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-20 text-center">
+                      <div className="flex flex-col items-center justify-center gap-3 opacity-50">
+                        <div className="h-6 w-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Compiling Ledger...</span>
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
+                ) : filteredFees.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="py-20 text-center">
+                       <DollarSign size={32} className="mx-auto text-blue-200 mb-3" />
+                       <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">No Fees found</h3>
+                       <p className="text-slate-500 text-[10px] uppercase tracking-widest mt-1">The ledger is currently clear</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredFees.map((fee, index) => (
+                    <motion.tr
+                      key={fee.id}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ delay: Math.min(index * 0.02, 0.4) }}
+                      className="group hover:bg-slate-50/50 transition-colors"
+                    >
+                      <td className="px-5 py-3 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-blue-50 text-indigo-600 flex items-center justify-center font-black text-[10px] shrink-0 border border-blue-100">
+                             $
+                          </div>
+                          <span className="text-xs font-black text-slate-800 tracking-tight">{fee.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3 whitespace-nowrap">
+                        <span className="text-[11px] font-semibold text-slate-500 italic max-w-md truncate block">
+                          {fee.description || 'No description provided'}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 whitespace-nowrap text-center">
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[10px] font-black border border-emerald-100 shadow-sm">
+                           ${fee.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 whitespace-nowrap text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => handleEditFee(fee)}
+                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                            title="Edit Structure"
+                          >
+                            <Edit size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteFee(fee.id)}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                            title="Remove Entry"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))
+                )}
+              </AnimatePresence>
             </tbody>
           </table>
         </div>
@@ -193,8 +233,8 @@ export default function FeesManagement() {
       <FeeModal
         isOpen={isModalOpen}
         fee={selectedFee}
-        onClose={closeModal}
-        onFeeSaved={onFeeSaved}
+        onClose={() => { setIsModalOpen(false); setSelectedFee(null); }}
+        onFeeSaved={() => { fetchFees(); setIsModalOpen(false); setSelectedFee(null); }}
         showMessage={showMessage}
       />
 
@@ -202,13 +242,13 @@ export default function FeesManagement() {
         isOpen={showDeleteConfirmation}
         onClose={() => setShowDeleteConfirmation(false)}
         onConfirm={confirmDelete}
-        title="Delete Fee"
-        message="Are you sure you want to delete this fee? This action cannot be undone."
+        title="Delete Fee Structure"
+        message="Are you sure you want to remove this fee structure? This action cannot be undone and may affect pending invoices."
       />
 
-       <ConfirmationDialog
+      <ConfirmationDialog
         isOpen={isSuccessModalOpen}
-        title="Success"
+        title="Transmission Successful"
         message={successMessage}
         onConfirm={handleCloseSuccessModal}
         onCancel={handleCloseSuccessModal}
@@ -216,9 +256,9 @@ export default function FeesManagement() {
         type="success"
       />
 
-       <ConfirmationDialog
+      <ConfirmationDialog
         isOpen={isErrorModalOpen}
-        title="Error"
+        title="Transmission Error"
         message={errorMessage}
         onConfirm={handleCloseErrorModal}
         onCancel={handleCloseErrorModal}

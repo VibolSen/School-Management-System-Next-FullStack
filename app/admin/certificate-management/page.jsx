@@ -222,10 +222,17 @@ const CertificateManagementPage = () => {
       });
     
       return (
-        <div className="space-y-6 animate-fadeIn duration-700">
-          <h1 className="text-4xl font-extrabold text-blue-700 animate-scale-in">
-            Certificate Management
-          </h1>
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-0.5">
+            <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+              Institutional Certificates
+            </h1>
+            <p className="text-slate-500 font-medium text-sm">
+              Issue academic credentials, manage student certifications, and oversee professional qualifications.
+            </p>
+          </div>
+        </div>
 
           <CertificateModal
             isOpen={showForm}

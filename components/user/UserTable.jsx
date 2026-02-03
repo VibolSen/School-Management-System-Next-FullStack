@@ -1,44 +1,15 @@
-// UserTable.jsx
 "use client";
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Edit, Eye, Trash2, Search, ShieldCheck, Filter, UserPlus } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-// Helper component for sort direction arrows for a cleaner look
 const SortIndicator = ({ direction }) => {
   if (!direction) return null;
   return (
-    <span className="text-slate-500">
-      {direction === "ascending" ? (
-        <svg
-          className="w-3 h-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M5 15l7-7 7 7"
-          ></path>
-        </svg>
-      ) : (
-        <svg
-          className="w-3 h-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M19 9l-7 7-7-7"
-          ></path>
-        </svg>
-      )}
+    <span className="text-indigo-600 ml-1">
+      {direction === "ascending" ? "↑" : "↓"}
     </span>
   );
 };
@@ -89,181 +60,165 @@ export default function UserTable({
     setSortConfig({ key, direction });
   };
 
-  // Role color mapping
   const roleColors = {
-    ADMIN: "bg-purple-100 text-purple-800",
-    HR: "bg-blue-100 text-blue-800",
-    TEACHER: "bg-amber-100 text-amber-800",
-    STUDENT: "bg-indigo-100 text-indigo-800",
+    ADMIN: "bg-indigo-50 text-indigo-700 border-indigo-100",
+    HR: "bg-blue-50 text-blue-700 border-blue-100",
+    TEACHER: "bg-emerald-50 text-emerald-700 border-emerald-100",
+    STUDENT: "bg-indigo-50 text-indigo-700 border-indigo-100",
+    STUDY_OFFICE: "bg-amber-50 text-amber-700 border-amber-100",
   };
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow-md border border-slate-200 transition-all duration-300 ease-in-out">
-      {/* Header & Filters */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-3 gap-3">
-        <h2 className="text-lg font-semibold text-blue-700 transition-colors duration-300">
-          User Directory
-        </h2>
-        <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-44 px-2.5 py-1.5 border border-slate-300 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
-          />
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="w-full md:w-auto px-2.5 py-1.5 border border-slate-300 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
-          >
-            <option value="All">All Roles</option>
-            {allRoles
-              .filter((role) => role !== "ADMIN")
-              .map((role) => (
-                <option key={role} value={role}>
-                  {role}
-                </option>
-              ))}
-          </select>
-          {(currentUserRole === "ADMIN" || currentUserRole === "HR") && (
-            <button
-              onClick={onAddUserClick}
-              disabled={isLoading}
-              className="w-full md:w-auto bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-blue-700 focus:ring-1 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+      {/* Filters Area */}
+      <div className="p-4 border-b border-slate-100 bg-slate-50/30 space-y-3">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-3">
+           <div className="flex items-center gap-2">
+            <div className="h-8 w-1 bg-indigo-600 rounded-full" />
+            <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight">Active Personnel</h2>
+          </div>
+          <div className="w-full md:w-auto flex items-center gap-2">
+            <div className="relative group flex-1 md:w-64">
+              <input
+                type="text"
+                placeholder="Find personnel..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[13px] font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 hover:border-slate-300 transition-all text-slate-700"
+              />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-blue-500 transition-colors" size={12} />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-hide">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-lg shadow-sm shrink-0">
+            <Filter size={12} className="text-slate-400" />
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="bg-transparent text-[10px] font-black uppercase tracking-tight focus:outline-none cursor-pointer text-slate-600"
             >
-              Add User
-            </button>
-          )}
+              <option value="All">All Roles</option>
+              {allRoles
+                .filter((role) => role !== "ADMIN")
+                .map((role) => (
+                  <option key={role} value={role} className="normal-case font-medium">{role}</option>
+                ))}
+            </select>
+          </div>
+          <div className="px-3 py-1.5 bg-blue-50 text-indigo-700 text-[10px] font-black uppercase tracking-tight rounded-lg border border-blue-100 shrink-0">
+            {filteredUsers.length} Total Users
+          </div>
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left text-slate-500">
-          <thead className="text-xs text-slate-700 uppercase bg-slate-100">
+        <table className="w-full border-collapse">
+          <thead className="bg-slate-50/10 border-b border-slate-100">
             <tr>
-              <th
-                className="px-4 py-2.5 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
-                onClick={() => handleSort("firstName")}
-              >
-                <div className="flex items-center gap-1.5">
-                  Name{" "}
-                  <SortIndicator
-                    direction={
-                      sortConfig.key === "firstName"
-                        ? sortConfig.direction
-                        : null
-                    }
-                  />
+              <th className="px-5 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest cursor-pointer group" onClick={() => handleSort("firstName")}>
+                <div className="flex items-center gap-1">
+                  User Identity
+                  <SortIndicator direction={sortConfig.key === "firstName" ? sortConfig.direction : null} />
                 </div>
               </th>
-              <th
-                className="px-4 py-2.5 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
-                onClick={() => handleSort("email")}
-              >
-                Email{" "}
-                <SortIndicator
-                  direction={
-                    sortConfig.key === "email" ? sortConfig.direction : null
-                  }
-                />
-              </th>
-              <th
-                className="px-4 py-2.5 cursor-pointer hover:bg-slate-200 transition-colors duration-200"
-                onClick={() => handleSort("role")}
-              >
-                <div className="flex items-center gap-1.5">
-                  Role{" "}
-                  <SortIndicator
-                    direction={
-                      sortConfig.key === "role" ? sortConfig.direction : null
-                    }
-                  />
+              <th className="px-5 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:table-cell cursor-pointer" onClick={() => handleSort("email")}>
+                <div className="flex items-center gap-1">
+                  Access Point
+                  <SortIndicator direction={sortConfig.key === "email" ? sortConfig.direction : null} />
                 </div>
               </th>
-              <th className="px-4 py-2.5 text-center">Actions</th>
+              <th className="px-5 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest cursor-pointer" onClick={() => handleSort("role")}>
+                <div className="flex items-center gap-1">
+                  System Role
+                  <SortIndicator direction={sortConfig.key === "role" ? sortConfig.direction : null} />
+                </div>
+              </th>
+              <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Management</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="divide-y divide-slate-50">
             {isLoading && sortedUsers.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-8 text-gray-500">
-                  Loading users...
+                <td colSpan={4} className="py-12 border-none">
+                  <div className="flex flex-col items-center justify-center gap-3 opacity-50">
+                    <div className="h-5 w-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Authenticating Data...</span>
+                  </div>
                 </td>
               </tr>
             ) : sortedUsers.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-8 text-gray-500">
-                  No users found.
+                <td colSpan={4} className="py-12 text-center">
+                   <div className="flex flex-col items-center opacity-40">
+                     <ShieldCheck size={24} className="mb-2" />
+                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">No personnel records found</p>
+                   </div>
                 </td>
               </tr>
             ) : (
-              sortedUsers.map((user) => (
-                <tr
+              sortedUsers.map((user, index) => (
+                <motion.tr 
                   key={user.id}
-                  className="hover:bg-blue-50 transition-all duration-200 ease-in-out transform hover:scale-[1.005]"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(index * 0.02, 0.4) }}
+                  className="group hover:bg-blue-50/20 transition-colors"
                 >
-                  <td className="px-4 py-2.5">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600 text-[10px] mr-3">
-                        {user.firstName.charAt(0)}
-                        {user.lastName.charAt(0)}
+                  <td className="px-5 py-3 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-indigo-700 flex items-center justify-center font-black text-[10px] shrink-0 border border-blue-200 shadow-sm shadow-blue-100">
+                        {user.firstName.charAt(0)}{user.lastName.charAt(0)}
                       </div>
-                      <div>
-                        <div className="font-medium text-slate-800 text-xs">
-                          {`${user.firstName} ${user.lastName}`}
-                        </div>
+                      <div className="flex flex-col">
+                        <span className="text-[13px] font-black text-slate-800 tracking-tight">{user.firstName} {user.lastName}</span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">System Personnel</span>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-2.5 text-slate-600">{user.email}</td>
-                  <td className="px-4 py-2.5">
-                    <span
-                      className={`px-2 py-0.5 text-[10px] font-semibold rounded-full ${
-                        roleColors[user.role] || "bg-gray-100 text-gray-800"
-                      }`}
-                    >
+                  <td className="px-5 py-3 whitespace-nowrap hidden md:table-cell">
+                    <span className="text-[13px] font-semibold text-slate-600">{user.email}</span>
+                  </td>
+                  <td className="px-5 py-3 whitespace-nowrap">
+                    <span className={`px-2 py-0.5 text-[9px] font-black rounded-md border uppercase tracking-wide ${roleColors[user.role] || "bg-slate-50 text-slate-700 border-slate-100"}`}>
                       {user.role}
                     </span>
                   </td>
-                  <td className="px-4 py-2.5 text-sm font-medium space-x-3 text-center">
-                    {(currentUserRole === "ADMIN" || currentUserRole === "HR") && (
-                      <button
-                        onClick={() => onEditClick(user)}
-                        className="text-indigo-600 hover:text-indigo-900 transition-all duration-200"
-                        disabled={isLoading}
-                        title="Edit User"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                    )}
-                    {currentUserRole && (
-                      <Link 
-                        href={`/${currentUserRole.toLowerCase()}/users/${user.id}`}
-                        className="inline-block"
-                        title="View Profile"
-                      >
+                  <td className="px-5 py-3 whitespace-nowrap text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      {(currentUserRole === "ADMIN" || currentUserRole === "HR") && (
                         <button
-                          className="text-blue-600 hover:text-blue-800 transition-all duration-200"
+                          onClick={() => onEditClick(user)}
+                          className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
                           disabled={isLoading}
+                          title="Quick Edit"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Edit className="w-3.5 h-3.5" />
                         </button>
-                      </Link>
-                    )}
-                    {(currentUserRole === "ADMIN" || currentUserRole === "HR") && (
-                      <button
-                        onClick={() => onDeleteClick(user.id)}
-                        className="text-red-600 hover:text-red-800 transition-all duration-200"
-                        disabled={isLoading}
-                        title="Delete User"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
+                      )}
+                      {currentUserRole && (
+                        <Link 
+                          href={`/${currentUserRole.toLowerCase()}/users/${user.id}`}
+                          className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                          title="Full Profile"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                        </Link>
+                      )}
+                      {(currentUserRole === "ADMIN" || currentUserRole === "HR") && (
+                        <button
+                          onClick={() => onDeleteClick(user.id)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                          disabled={isLoading}
+                          title="Remove Account"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </td>
-                </tr>
+                </motion.tr>
               ))
             )}
           </tbody>

@@ -1,3 +1,4 @@
+// app/(auth)/register/page.jsx
 "use client";
 
 import { useState } from "react";
@@ -9,14 +10,14 @@ import {
   Star,
   CheckCircle,
   Lock,
+  Eye,
+  EyeOff,
+  User,
 } from "lucide-react";
-
-import { Eye, EyeOff } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function RegisterPage() {
   const router = useRouter();
-  // ✅ MODIFIED: State now uses firstName and lastName
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -47,7 +48,6 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // ✅ MODIFIED: Sending firstName and lastName to the API
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -67,7 +67,6 @@ export default function RegisterPage() {
         setSuccess(
           "Welcome to our learning community! Registration successful!"
         );
-        // ✅ MODIFIED: Clear the updated form fields
         setForm({
           firstName: "",
           lastName: "",
@@ -75,7 +74,6 @@ export default function RegisterPage() {
           password: "",
           confirmPassword: "",
         });
-        // Redirect to login page after 2 seconds
         setTimeout(() => {
           router.push("/login");
         }, 2000);
@@ -88,198 +86,209 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-6 items-center">
+    <div className="min-h-screen bg-[#EBF4F6] flex items-center justify-center p-4">
+      <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-8 items-center">
         {/* Left Side - Illustration */}
-        <div className="hidden lg:flex flex-col items-center justify-center text-center space-y-4">
-          <div className="space-y-3 text-slate-700 w-full flex flex-col items-center">
-            <h2 className="text-3xl font-bold text-balance max-w-md">
+        <div className="hidden lg:flex flex-col items-center justify-center text-center space-y-6 order-2 lg:order-1">
+          <div className="space-y-4 text-slate-700 w-full flex flex-col items-center">
+            <h2 className="text-3xl font-black text-balance max-w-md tracking-tight leading-tight">
               Welcome to Your Educational Journey!
             </h2>
-            <p className="text-lg text-slate-600 text-pretty max-w-md">
+            <p className="text-lg text-slate-500 text-pretty max-w-md font-medium">
               Join thousands of students who are already transforming their
               future through quality education.
             </p>
           </div>
-          <div className="relative flex justify-center">
+          <div className="relative flex justify-center transform hover:scale-105 transition-transform duration-500">
+            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-200 to-purple-200 rounded-full opacity-20 blur-3xl"></div>
             <img
               src="/illustration/signUp.png"
               alt="Students learning together"
-              className="w-80 h-80 object-contain drop-shadow-2xl"
+              className="w-80 h-80 object-contain drop-shadow-2xl relative z-10"
             />
           </div>
         </div>
 
         {/* Right Side - Registration Form */}
-        <div className="w-full max-w-sm mx-auto lg:mx-0">
-          <div className="bg-white/80 backdrop-blur-sm border border-white/60 rounded-xl shadow-lg p-6">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">
+        <div className="w-full max-w-md mx-auto lg:mx-0 order-1 lg:order-2">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-xl p-8 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-black text-slate-800 tracking-tight">
                 Create a New Account
               </h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-[13px] text-slate-500 mt-2 font-medium">
                 Enter your details to get started
               </p>
             </div>
-            {/* Status Messages */}
+
             {error && (
-              <div className="bg-red-100 border border-red-200 text-red-700 px-3 py-2 rounded-md mb-4 text-xs">
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-6 text-[13px] font-medium flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
                 {error}
               </div>
             )}
             {success && (
-              <div className="bg-green-100 border border-green-200 text-green-700 px-3 py-2 rounded-md mb-4 text-xs flex items-center gap-2">
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-600 px-4 py-3 rounded-xl mb-6 text-[13px] font-medium flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" />
                 <span>{success} Redirecting...</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* ✅ MODIFIED: Split name into two fields */}
               <div className="grid grid-cols-2 gap-4">
                 {/* First Name Field */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-indigo-600" />
+                  <label className="text-[13px] font-bold text-slate-700 flex items-center gap-1.5 ml-1">
                     First Name
                   </label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={form.firstName}
-                    onChange={handleChange}
-                    required
-                    placeholder="John"
-                    className="w-full bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-1.5 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder:text-gray-500 text-sm"
-                  />
+                  <div className="relative group">
+                    <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-blue-600 transition-colors" />
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={form.firstName}
+                      onChange={handleChange}
+                      required
+                      placeholder="John"
+                      className="w-full bg-slate-50 border border-slate-200 px-3 py-2.5 pl-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-800 placeholder:text-slate-400 text-[13px] font-medium"
+                    />
+                  </div>
                 </div>
                 {/* Last Name Field */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-indigo-600" />
+                  <label className="text-[13px] font-bold text-slate-700 flex items-center gap-1.5 ml-1">
                     Last Name
                   </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={form.lastName}
-                    onChange={handleChange}
-                    required
-                    placeholder="Doe"
-                    className="w-full bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-1.5 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder:text-gray-500 text-sm"
-                  />
+                  <div className="relative group">
+                    <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-blue-600 transition-colors" />
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={form.lastName}
+                      onChange={handleChange}
+                      required
+                      placeholder="Doe"
+                      className="w-full bg-slate-50 border border-slate-200 px-3 py-2.5 pl-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-800 placeholder:text-slate-400 text-[13px] font-medium"
+                    />
+                  </div>
                 </div>
               </div>
 
               {/* Email Field */}
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-indigo-600" />
+                <label className="text-[13px] font-bold text-slate-700 flex items-center gap-1.5 ml-1">
                   Email Address
                 </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter your email address"
-                  className="w-full bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-1.5 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder:text-gray-500 text-sm"
-                />
+                <div className="relative group">
+                  <BookOpen className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-blue-600 transition-colors" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter your email address"
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2.5 pl-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-800 placeholder:text-slate-400 text-[13px] font-medium"
+                  />
+                </div>
               </div>
 
               {/* Password Field */}
-              <div className="space-y-1.5 relative">
-                <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-indigo-600" />
+              <div className="space-y-1.5">
+                <label className="text-[13px] font-bold text-slate-700 flex items-center gap-1.5 ml-1">
                   Password
                 </label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                  placeholder="Create a strong password"
-                  className="w-full bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-1.5 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder:text-gray-500 text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 px-3 flex items-center text-sm leading-5"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
-                </button>
+                <div className="relative group">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-blue-600 transition-colors" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    required
+                    placeholder="Create a strong password"
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2.5 pl-10 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-800 placeholder:text-slate-400 text-[13px] font-medium"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-blue-600 transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               {/* Confirm Password Field */}
-              <div className="space-y-1.5 relative">
-                <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-indigo-600" />
+              <div className="space-y-1.5">
+                <label className="text-[13px] font-bold text-slate-700 flex items-center gap-1.5 ml-1">
                   Confirm Password
                 </label>
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  value={form.confirmPassword}
-                  onChange={handleChange}
-                  required
-                  placeholder="Confirm your password"
-                  className="w-full bg-white border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-1.5 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-gray-900 placeholder:text-gray-500 text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 px-3 flex items-center text-sm leading-5"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
-                </button>
+                <div className="relative group">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-blue-600 transition-colors" />
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    value={form.confirmPassword}
+                    onChange={handleChange}
+                    required
+                    placeholder="Confirm your password"
+                    className="w-full bg-slate-50 border border-slate-200 px-3 py-2.5 pl-10 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 text-slate-800 placeholder:text-slate-400 text-[13px] font-medium"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-blue-600 transition-colors"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading || !!success}
-                className={`w-full py-2.5 px-3 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-1.5 text-sm ${
+                className={`w-full py-3 px-4 rounded-xl font-bold transition-all duration-200 flex items-center justify-center gap-2 text-[13px] uppercase tracking-wide mt-2 ${
                   loading || success
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
+                    : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transform hover:-translate-y-0.5 active:translate-y-0"
                 }`}
               >
                 {loading ? (
                   <>
-                    <LoadingSpinner size="xs" color="white" className="mr-2" />
+                    <LoadingSpinner size="xs" color="slate" className="mr-2" />
                     Creating Account...
                   </>
                 ) : success ? (
                   <>
-                    <CheckCircle className="w-3.5 h-3.5" />
+                    <CheckCircle className="w-4 h-4" />
                     Success!
                   </>
                 ) : (
                   <>
-                    <GraduationCap className="w-3.5 h-3.5" />
+                    <GraduationCap className="w-4 h-4" />
                     Register
                   </>
                 )}
               </button>
             </form>
 
-            {/* Footer */}
-            <div className="mt-4 pt-4 border-t border-gray-200 text-center">
-              <p className="text-xs text-gray-600">
+            <div className="mt-8 pt-6 border-t border-slate-200 text-center">
+              <p className="text-[13px] text-slate-500 font-medium">
                 Already have an account?{" "}
                 <a
                   href="/login"
-                  className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+                  className="text-blue-600 hover:text-blue-800 font-bold transition-colors hover:underline"
                 >
                   Login here
                 </a>

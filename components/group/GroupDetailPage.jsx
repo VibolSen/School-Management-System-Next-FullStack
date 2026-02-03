@@ -4,7 +4,15 @@ import React, { useState } from "react";
 import Link from "next/link";
 import ManageGroupMembersModal from "./ManageGroupMembersModal";
 import GroupModal from "./GroupModal";
-
+import { 
+  ArrowLeft, 
+  Users, 
+  BookOpen, 
+  Edit3, 
+  UserPlus, 
+  MoreVertical 
+} from "lucide-react";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function GroupDetailPage({ initialGroup, allStudents, role }) {
   const [group, setGroup] = useState(initialGroup);
@@ -70,137 +78,169 @@ export default function GroupDetailPage({ initialGroup, allStudents, role }) {
   const handleCloseEditGroupModal = () => setIsEditGroupModalOpen(false);
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-
-      {/* Back Button */}
-      <div className="mb-6">
-          <Link
-            href={`/${role}/groups`}
-            className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-200"
-          >
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+    <div className="min-h-screen bg-[#EBF4F6] p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto space-y-6">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="space-y-1">
+            <Link
+              href={`/${role}/groups`}
+              className="inline-flex items-center px-3 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm text-[13px] font-bold mb-4"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              ></path>
-            </svg>
-            Back to Groups
-          </Link>
-      </div>
-
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <h1 className="text-3xl font-bold text-slate-800 mb-4 md:mb-0">
-          Group Details
-        </h1>
-      </div>
-
-      {/* ============================
-          2-COLUMN LAYOUT STARTS HERE
-      ============================ */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* LEFT COLUMN — Group Info */}
-        <div className="bg-white shadow-md rounded-xl p-6 border border-slate-100">
-          <h2 className="text-2xl font-semibold text-slate-800 mb-4">
-            {group.name}
-          </h2>
-
-          <div className="space-y-3 text-slate-700">
-
-            <p>
-              <span className="font-semibold">Courses:</span>{" "}
-              {group.courses?.length
-                ? group.courses.map((c) => c.name).join(", ")
-                : "N/A"}
-            </p>
-
-            <p>
-              <span className="font-semibold">Total Members:</span>{" "}
-              {group.students?.length || 0}
-            </p>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Groups
+            </Link>
+            <h1 className="text-2xl font-black text-slate-800 tracking-tight">
+              Group Details
+            </h1>
           </div>
 
-          {/* Buttons */}
-          <div className="mt-6 flex space-x-3">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setIsEditGroupModalOpen(true)}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow transition"
+              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:text-blue-600 hover:border-blue-200 rounded-xl text-[13px] font-bold shadow-sm transition-all flex items-center gap-2"
             >
+              <Edit3 className="w-3.5 h-3.5" />
               Edit Group
             </button>
-
             <button
               onClick={() => setIsManageMembersModalOpen(true)}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow transition"
+              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-[13px] font-bold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2"
             >
+              <UserPlus className="w-3.5 h-3.5" />
               Manage Members
             </button>
           </div>
         </div>
 
-        {/* RIGHT COLUMN — Students */}
-        <div className="bg-white shadow-md rounded-xl p-6 border border-slate-100">
-          <h3 className="text-xl font-semibold text-slate-800 mb-4">
-            Enrolled Students
-          </h3>
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Left Column - Group Info */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800">
+                    {group.name}
+                  </h2>
+                  <span className="text-[12px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                    Active Group
+                  </span>
+                </div>
+              </div>
 
-          {group.students?.length ? (
-            <ul className="divide-y divide-slate-200 max-h-[500px] overflow-y-auto pr-2">
-              {group.students.map((student) => (
-                <li
-                  key={student.id}
-                  className="py-3 flex justify-between items-center"
-                >
-                  <div>
-                    <p className="font-medium text-slate-800">
-                      {student.firstName} {student.lastName}
-                    </p>
-                    <p className="text-sm text-slate-500">{student.email}</p>
+              <div className="space-y-4">
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-2 text-[13px] font-bold text-slate-700 mb-1">
+                    <BookOpen className="w-3.5 h-3.5 text-indigo-500" />
+                    Courses
                   </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-slate-600">
-              No students enrolled in this group.
-            </p>
-          )}
+                  <p className="text-[13px] text-slate-600 leading-relaxed pl-6">
+                    {group.courses?.length
+                      ? group.courses.map((c) => c.name).join(", ")
+                      : "No courses assigned"}
+                  </p>
+                </div>
+
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-2 text-[13px] font-bold text-slate-700 mb-1">
+                    <Users className="w-3.5 h-3.5 text-emerald-500" />
+                    Total Members
+                  </div>
+                  <p className="text-[13px] text-slate-600 pl-6">
+                    {group.students?.length || 0} students enrolled
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Student List */}
+          <div className="lg:col-span-2">
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col h-[600px]">
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-indigo-500" />
+                  Enrolled Students
+                </h3>
+                <span className="text-[12px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
+                  {group.students?.length || 0} Students
+                </span>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-2">
+                {group.students?.length ? (
+                  <div className="space-y-1">
+                    {group.students.map((student) => (
+                      <div
+                        key={student.id}
+                        className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600 flex items-center justify-center text-[12px] font-black border border-white shadow-sm">
+                            {student.firstName.charAt(0)}
+                            {student.lastName.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="text-[13px] font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
+                              {student.firstName} {student.lastName}
+                            </p>
+                            <p className="text-[12px] text-slate-500">
+                              {student.email}
+                            </p>
+                          </div>
+                        </div>
+                        <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-white rounded-lg transition-all opacity-0 group-hover:opacity-100">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center p-8">
+                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                      <Users className="w-8 h-8 text-slate-300" />
+                    </div>
+                    <p className="text-slate-500 font-medium">No students enrolled yet</p>
+                    <p className="text-[12px] text-slate-400 mt-1">
+                      Add students to this group to get started
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
         </div>
+
+        {/* Modals */}
+        {isManageMembersModalOpen && (
+          <ManageGroupMembersModal
+            isOpen={isManageMembersModalOpen}
+            onClose={handleCloseManageMembersModal}
+            group={group}
+            allStudents={allStudents}
+            onSaveChanges={handleSaveMembers}
+            isLoading={isLoading}
+          />
+        )}
+
+        {isEditGroupModalOpen && (
+          <GroupModal
+            isOpen={isEditGroupModalOpen}
+            onClose={handleCloseEditGroupModal}
+            onSave={handleSaveGroupDetails}
+            groupToEdit={group}
+            courses={group.courses}
+            isLoading={isLoading}
+          />
+        )}
       </div>
-      {/* ============================
-          END 2-COLUMN LAYOUT
-      ============================ */}
-
-      {/* Modals */}
-      {isManageMembersModalOpen && (
-        <ManageGroupMembersModal
-          isOpen={isManageMembersModalOpen}
-          onClose={handleCloseManageMembersModal}
-          group={group}
-          allStudents={allStudents}
-          onSaveChanges={handleSaveMembers}
-          isLoading={isLoading}
-        />
-      )}
-
-      {isEditGroupModalOpen && (
-        <GroupModal
-          isOpen={isEditGroupModalOpen}
-          onClose={handleCloseEditGroupModal}
-          onSave={handleSaveGroupDetails}
-          groupToEdit={group}
-          courses={group.courses}
-          isLoading={isLoading}
-        />
-      )}
     </div>
   );
 }

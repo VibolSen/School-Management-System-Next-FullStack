@@ -1,7 +1,10 @@
+"use client";
+
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import { Edit, Eye, Trash2 } from "lucide-react";
+import { Edit, Eye, Trash2, Search, Users } from "lucide-react";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function TeacherTable({
   teachers = [],
@@ -26,108 +29,115 @@ export default function TeacherTable({
   }, [teachers, searchTerm]);
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow-md border border-slate-200 transition-all duration-300 ease-in-out">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-3 gap-3">
-        <h2 className="text-lg font-semibold text-blue-700 transition-colors duration-300">Teacher Roster</h2>
-        <div className="w-full md:w-auto flex flex-col md:flex-row items-center gap-2">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full md:w-44 px-2.5 py-1.5 border border-slate-300 rounded-md text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 hover:border-blue-400 hover:ring-blue-200 transition-all duration-200"
-          />
-          <button
-            onClick={onAddTeacherClick}
-            className="w-full md:w-auto bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-blue-700 focus:ring-1 focus:ring-blue-500 focus:ring-offset-1 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
-          >
-            Add Teacher
-          </button>
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+      {/* Header & Filters */}
+      <div className="p-4 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-3 bg-slate-50/30">
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-1 bg-indigo-600 rounded-full" />
+          <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight">Department Faculty List</h2>
+        </div>
+        <div className="w-full md:w-auto flex items-center gap-2">
+          <div className="relative w-full md:w-64 group">
+            <input
+              type="text"
+              placeholder="Search by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[13px] font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 hover:border-slate-300 transition-all"
+            />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-blue-500 transition-colors" size={12} />
+          </div>
         </div>
       </div>
+
+      {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left text-slate-500">
-          <thead className="text-xs text-slate-700 uppercase bg-slate-100">
+        <table className="w-full border-collapse">
+          <thead className="bg-slate-50/50 border-b border-slate-100">
             <tr>
-              <th className="px-4 py-2.5">Name</th>
-              <th className="px-4 py-2.5">Email</th>
-              <th className="px-4 py-2.5 text-center">Assigned Courses</th>
-              {canManageTeachers && <th className="px-4 py-2.5 text-center">Actions</th>}
+              <th className="px-5 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Instructor Profile</th>
+              <th className="px-5 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:table-cell">Contact Information</th>
+              <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Assignments</th>
+              {canManageTeachers && <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Actions</th>}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="divide-y divide-slate-50">
             {isLoading && teachers.length === 0 ? (
               <tr>
                 <td colSpan={canManageTeachers ? 4 : 3} className="py-12">
-                  <div className="flex flex-col items-center justify-center gap-3">
-                    <LoadingSpinner size="md" color="blue" />
-                    <span className="text-sm font-medium text-slate-500 animate-pulse">
-                      Retrieving teacher records...
-                    </span>
+                   <div className="flex flex-col items-center justify-center gap-3 opacity-50">
+                    <div className="h-5 w-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Retrieving Records...</span>
                   </div>
                 </td>
               </tr>
             ) : filteredTeachers.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-8 text-gray-500">
-                  No teachers found.
+                <td colSpan={4} className="text-center py-10">
+                   <div className="flex flex-col items-center opacity-40">
+                     <Users size={24} className="mb-2" />
+                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">No matching faculty found</p>
+                   </div>
                 </td>
               </tr>
             ) : (
-              filteredTeachers.map((teacher) => (
-                <tr key={teacher.id} className="hover:bg-blue-50 transition-all duration-200 ease-in-out transform hover:scale-[1.005]">
-                  <td className="px-4 py-2.5">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600 text-[10px] mr-3">
-                        {teacher.firstName.charAt(0)}
-                        {teacher.lastName.charAt(0)}
+              filteredTeachers.map((teacher, index) => (
+                <motion.tr 
+                  key={teacher.id}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(index * 0.03, 0.4) }}
+                  className="group hover:bg-slate-50/50 transition-colors"
+                >
+                  <td className="px-5 py-3 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-indigo-600 flex items-center justify-center font-black text-[10px] shrink-0 border border-blue-100">
+                        {teacher.firstName.charAt(0)}{teacher.lastName.charAt(0)}
                       </div>
-                      <div>
-                        <div className="font-medium text-slate-800 text-xs">
-                          {`${teacher.firstName} ${teacher.lastName}`}
-                        </div>
+                      <div className="flex flex-col">
+                        <span className="text-[13px] font-black text-slate-800 tracking-tight">{teacher.firstName} {teacher.lastName}</span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Academic Instructor</span>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-2.5 text-slate-600">{teacher.email}</td>
-                  <td className="px-4 py-2.5 text-center">
-                    <span className="px-2 py-1 text-xs font-semibold text-sky-800 bg-sky-100 rounded-full">
-                      {teacher._count?.ledCourses ?? 0}
+                  <td className="px-5 py-3 whitespace-nowrap hidden md:table-cell">
+                    <span className="text-[13px] font-semibold text-slate-600">{teacher.email}</span>
+                  </td>
+                  <td className="px-5 py-3 whitespace-nowrap text-center">
+                    <span className="px-2 py-0.5 text-[10px] font-black text-amber-700 bg-amber-50 rounded-md border border-amber-100 uppercase tracking-wide">
+                      {teacher._count?.ledCourses ?? 0} Courses
                     </span>
                   </td>
                   {canManageTeachers && (
-                    <td className="px-4 py-2.5 text-sm font-medium space-x-3 text-center">
-                      <button
-                        onClick={() => onEditClick(teacher)}
-                        className="text-indigo-600 hover:text-indigo-900 transition-all duration-200"
-                        title="Edit Teacher"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      {currentUserRole && (
-                        <Link 
-                          href={`/${currentUserRole.toLowerCase()}/users/${teacher.id}`}
-                          className="inline-block"
-                          title="View Profile"
+                    <td className="px-5 py-3 whitespace-nowrap text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          onClick={() => onEditClick(teacher)}
+                          className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                          title="Quick Edit"
                         >
-                          <button
-                            className="text-blue-600 hover:text-blue-800 transition-all duration-200"
-                            disabled={isLoading}
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                        {currentUserRole && (
+                          <Link 
+                            href={`/${currentUserRole.toLowerCase()}/users/${teacher.id}`}
+                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                            title="Full Profile"
                           >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                        </Link>
-                      )}
-                      <button
-                        onClick={() => onDeleteClick(teacher)}
-                        className="text-red-600 hover:text-red-900 transition-all duration-200"
-                        title="Delete Teacher"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                            <Eye className="w-3.5 h-3.5" />
+                          </Link>
+                        )}
+                        <button
+                          onClick={() => onDeleteClick(teacher)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                          title="Remove Record"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   )}
-                </tr>
+                </motion.tr>
               ))
             )}
           </tbody>

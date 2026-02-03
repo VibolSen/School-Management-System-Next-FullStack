@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { Plus } from "lucide-react";
+import { motion } from "framer-motion";
 import TeacherModal from "./TeacherModal";
 import TeacherTable from "./TeacherTable";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
@@ -128,21 +130,42 @@ export default function TeacherManagementView() {
   };
 
   return (
-    <div className="space-y-4 animate-fadeIn duration-700">
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold text-blue-700 animate-scale-in">
-          Teacher Management
-        </h1>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Academic Faculty
+          </h1>
+          <p className="text-slate-500 font-medium text-sm">
+            Manage your teaching staff, department assignments, and instructor roles.
+          </p>
+        </div>
+        {canManageTeachers && (
+          <button
+            onClick={handleAddClick}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
+          >
+            <Plus size={14} />
+            Register Instructor
+          </button>
+        )}
       </div>
-      <TeacherTable
-        teachers={teachers}
-        onAddTeacherClick={handleAddClick}
-        onEditClick={handleEditClick}
-        onDeleteClick={handleDeleteRequest}
-        isLoading={isLoading}
-        canManageTeachers={canManageTeachers}
-        currentUserRole={currentUser?.role}
-      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <TeacherTable
+          teachers={teachers}
+          onAddTeacherClick={handleAddClick}
+          onEditClick={handleEditClick}
+          onDeleteClick={handleDeleteRequest}
+          isLoading={isLoading}
+          canManageTeachers={canManageTeachers}
+          currentUserRole={currentUser?.role}
+        />
+      </motion.div>
       {isModalOpen && (
         <TeacherModal
           isOpen={isModalOpen}

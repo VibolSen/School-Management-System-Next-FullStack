@@ -5,6 +5,8 @@ import { useUser } from "@/context/UserContext";
 import StaffTable from "./StaffTable";
 import StaffModal from "./StaffModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import { Plus } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ALL_ROLES = ["ADMIN", "HR", "TEACHER", "STUDY_OFFICE"];
 
@@ -143,22 +145,43 @@ export default function StaffManagementView() {
   };
 
   return (
-    <div className="space-y-4 animate-fadeIn duration-700">
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold text-blue-700 animate-scale-in">
-          Staff Management
-        </h1>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Academic & Support Staff
+          </h1>
+          <p className="text-slate-500 font-medium text-sm">
+            Manage administrative personnel, support departments, and coordinate academic staff roles.
+          </p>
+        </div>
+        {(user?.role === "ADMIN" || user?.role === "HR") && (
+          <button
+            onClick={handleAddClick}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
+          >
+            <Plus size={14} />
+            Register Staff Member
+          </button>
+        )}
       </div>
 
-      <StaffTable
-        staffList={staffList}
-        allRoles={availableStaffRoles}
-        onAddStaffClick={handleAddClick}
-        onEditClick={handleEditClick}
-        onDeleteClick={handleDeleteRequest}
-        isLoading={isLoading || userLoading}
-        currentUserRole={user?.role}
-      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.99 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+
+        <StaffTable
+          staffList={staffList}
+          allRoles={availableStaffRoles}
+          onAddStaffClick={handleAddClick}
+          onEditClick={handleEditClick}
+          onDeleteClick={handleDeleteRequest}
+          isLoading={isLoading || userLoading}
+          currentUserRole={user?.role}
+        />
+      </motion.div>
 
       {isModalOpen && (
         <StaffModal

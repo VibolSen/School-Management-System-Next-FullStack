@@ -5,6 +5,8 @@ import GroupsTable from "./GroupTable";
 import GroupModal from "./GroupModal";
 import ManageGroupMembersModal from "./ManageGroupMembersModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import { Plus } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 
 export default function GroupManagementView({ role }) {
@@ -173,20 +175,41 @@ export default function GroupManagementView({ role }) {
   };
 
   return (
-    <div className="space-y-4 animate-fadeIn duration-700">
-        <h1 className="text-xl font-bold text-blue-700 animate-scale-in">
-          Group Directory
-        </h1>
-      <GroupsTable
-        groups={groups}
-        courses={courses}
-        onAddGroupClick={handleAddClick}
-        onEdit={handleEditClick}
-        onDelete={handleDeleteRequest}
-        onManageMembers={handleManageMembersClick}
-        isLoading={isLoading}
-        role={role}
-      />
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Academic Groups
+          </h1>
+          <p className="text-slate-500 font-medium text-sm">
+            Organize student cohorts, manage course assignments, and coordinate group-based academic activities.
+          </p>
+        </div>
+        <button
+          onClick={handleAddClick}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
+        >
+          <Plus size={14} />
+          Create New Group
+        </button>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.99 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        <GroupsTable
+          groups={groups}
+          courses={courses}
+          onAddGroupClick={handleAddClick}
+          onEdit={handleEditClick}
+          onDelete={handleDeleteRequest}
+          onManageMembers={handleManageMembersClick}
+          isLoading={isLoading}
+          role={role}
+        />
+      </motion.div>
       {isModalOpen && (
         <GroupModal
           isOpen={isModalOpen}

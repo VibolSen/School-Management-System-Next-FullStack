@@ -128,13 +128,12 @@ export default function AttendanceView() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            Attendance Management
+        <div className="space-y-0.5 mb-8">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Attendance Registry
           </h1>
-          <p className="text-gray-600 text-lg">
-            Track and manage student attendance with ease
+          <p className="text-slate-500 font-medium text-sm">
+            Track student presence, manage academic participation, and maintain institutional records.
           </p>
         </div>
 
@@ -160,14 +159,12 @@ export default function AttendanceView() {
         />
 
         {/* Students Table */}
-        {isLoading ? (
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <div className="flex justify-center mb-4">
+          <div className="bg-white rounded-2xl border border-slate-200 border-dashed p-12 text-center">
+            <div className="flex justify-center mb-4 relative">
+              <div className="absolute -inset-4 bg-blue-100/50 rounded-full blur-2xl animate-pulse" />
               <LoadingSpinner size="lg" color="blue" />
             </div>
-            <p className="text-gray-600 text-lg font-medium">
-              Loading students...
-            </p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Syncing Enrollment...</p>
           </div>
         ) : selectedGroup && students.length > 0 ? (
           <StudentList
@@ -176,29 +173,14 @@ export default function AttendanceView() {
             handleAttendanceChange={handleAttendanceChange}
             getStatusColor={getStatusColor}
           />
-        ) : selectedGroup ? (
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-10 h-10 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-                />
+          <div className="bg-white rounded-2xl border border-slate-200 border-dashed p-12 text-center opacity-60">
+            <div className="w-16 h-16 mx-auto mb-4 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100">
+              <svg className="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              No Students Found
-            </h3>
-            <p className="text-gray-500">
-              There are no students in this group yet.
-            </p>
+            <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight mb-1">No Students Found</h3>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">No participants registered in this group yet</p>
           </div>
         ) : (
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center">

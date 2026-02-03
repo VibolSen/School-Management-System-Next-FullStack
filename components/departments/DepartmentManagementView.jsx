@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import DepartmentsTable from "./DepartmentsTable";
 import DepartmentModal from "./DepartmentModal";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import { motion } from "framer-motion";
+import { Plus } from "lucide-react";
 
 export default function DepartmentManagementView() {
   const [departments, setDepartments] = useState([]);
@@ -148,20 +150,38 @@ export default function DepartmentManagementView() {
   };
 
   return (
-    <div className="space-y-4 animate-fadeIn duration-700">
-      <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold text-blue-700 animate-scale-in">
-          Department Management
-        </h1>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Departmental Matrix
+          </h1>
+          <p className="text-slate-500 font-medium text-sm">
+            Oversee academic units, manage faculty associations, and track course distributions.
+          </p>
+        </div>
+        <button
+          onClick={handleAddClick}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
+        >
+          <Plus size={14} />
+          Add Department
+        </button>
       </div>
 
-      <DepartmentsTable
-        departments={departments}
-        onAddDepartmentClick={handleAddClick}
-        onEditClick={handleEditClick}
-        onDeleteClick={handleDeleteRequest}
-        isLoading={isLoading}
-      />
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <DepartmentsTable
+          departments={departments}
+          onAddDepartmentClick={handleAddClick}
+          onEditClick={handleEditClick}
+          onDeleteClick={handleDeleteRequest}
+          isLoading={isLoading}
+        />
+      </motion.div>
 
       {isModalOpen && (
         <DepartmentModal

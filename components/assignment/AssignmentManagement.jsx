@@ -8,6 +8,8 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import AssignmentCard from "./AssignmentCard";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import { useUser } from "@/context/UserContext";
+import { motion, AnimatePresence } from "framer-motion";
+import { ClipboardList, Users, Calendar, Plus, RefreshCcw } from "lucide-react";
 
 export default function AssignmentManagement() {
   const [assignments, setAssignments] = useState([]);
@@ -156,198 +158,100 @@ export default function AssignmentManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 p-4">
-      <div className="max-w-7xl mx-auto space-y-4">
-
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              {user?.role === "TEACHER" ? "Assignments" : "Assignment Management"}
-            </h1>
-            <p className="text-slate-600 text-xs mt-0.5">
-              {user?.role === "TEACHER" ? "View and manage your assigned tasks" : "Manage all assignments across the school"}
-            </p>
-          </div>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Activity & Assignments
+          </h1>
+          <p className="text-slate-500 font-medium text-sm">
+            Coordinate student tasks, monitor submission progress, and manage academic activity timelines.
+          </p>
+        </div>
+        {(user?.role === "ADMIN" || user?.role === "TEACHER") && (
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="group relative bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow hover:shadow-md transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            disabled={userLoading || (!user || (user.role !== "ADMIN" && user.role !== "TEACHER"))}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
           >
-            <span className="flex items-center gap-1">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Add New Assignment
-            </span>
+            <Plus size={14} />
+            Dispatch Assignment
+          </button>
+        )}
+      </div>
+
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-4">
+          <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl border border-blue-100">
+            <ClipboardList size={20} />
+          </div>
+          <div>
+            <p className="text-xl font-black text-slate-900 leading-none">{assignments.length}</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Assignments</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-4">
+          <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
+            <Users size={20} />
+          </div>
+          <div>
+            <p className="text-xl font-black text-slate-900 leading-none">{groups.length}</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Active Groups</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-4">
+          <div className="p-2.5 bg-purple-50 text-purple-600 rounded-xl border border-purple-100">
+            <Calendar size={20} />
+          </div>
+          <div>
+            <p className="text-xl font-black text-slate-900 leading-none">
+              {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+            </p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Calendar Today</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-1 bg-indigo-600 rounded-full" />
+            <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight">Assignment Roll</h2>
+          </div>
+          <button
+            onClick={fetchData}
+            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+            title="Refresh Feed"
+          >
+            <RefreshCcw size={14} className={isLoading ? "animate-spin" : ""} />
           </button>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-white">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <svg
-                  className="w-5 h-5 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-xl font-bold text-slate-800">
-                  {assignments.length}
-                </p>
-                <p className="text-slate-600 text-xs">Total Assignments</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-white">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <svg
-                  className="w-5 h-5 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-xl font-bold text-slate-800">
-                  {groups.length}
-                </p>
-                <p className="text-slate-600 text-xs">Total Groups</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-white">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <svg
-                  className="w-5 h-5 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-xl font-bold text-slate-800">
-                  {new Date().toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </p>
-                <p className="text-slate-600 text-xs">Today's Date</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Assignments Grid */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-white p-3">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-800">
-              All Assignments
-            </h2>
-            <button
-              onClick={fetchData}
-              className="flex items-center gap-1 text-slate-600 hover:text-slate-800 transition-colors"
-            >
-              <svg
-                className="w-3 h-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              Refresh
-            </button>
-          </div>
-
+        <div className="p-4">
           {isLoading ? (
-            <div className="flex justify-center items-center py-10">
-              <LoadingSpinner size="lg" color="blue" />
+            <div className="flex flex-col items-center justify-center py-20 gap-3 opacity-50">
+              <div className="h-6 w-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Syncing Feed...</span>
             </div>
           ) : assignments.length === 0 ? (
-            <div className="text-center py-10">
-              <div className="max-w-sm mx-auto">
-                <div className="w-20 h-20 mx-auto mb-3 bg-blue-100 rounded-full flex items-center justify-center">
-                  <svg
-                    className="w-10 h-10 text-blue-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-base font-semibold text-slate-700 mb-2">
-                  No Assignments Yet
-                </h3>
-                <p className="text-slate-500 text-sm mb-4">
-                  Create your first assignment to get started.
-                </p>
-                <button
-                  onClick={() => setIsAddModalOpen(true)}
-                  className="bg-blue-600 text-white px-4 py-1.5 rounded-lg font-normal hover:bg-blue-700 transition-colors disabled:opacity-50"
-                  disabled={userLoading || (!user || (user.role !== "ADMIN" && user.role !== "TEACHER"))}
-                >
-                  Create New Assignment
-                </button>
-              </div>
+            <div className="text-center py-20">
+              <ClipboardList className="w-12 h-12 text-slate-200 mx-auto mb-3" />
+              <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">No Active Assignments</h3>
+              <p className="text-slate-500 text-xs mt-1">The activity feed is currently empty.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <motion.div 
+              layout
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            >
               {assignments.map((assignment, index) => (
-                <div
+                <motion.div
                   key={assignment.id}
-                  className="transform hover:scale-105 transition-transform duration-200"
-                  style={{ animationDelay: `${index * 100}ms` }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(index * 0.05, 0.4) }}
                 >
                   <AssignmentCard
                     assignment={assignment}
@@ -358,9 +262,9 @@ export default function AssignmentManagement() {
                     onDelete={() => handleDelete(assignment.id)}
                     userRole={user?.role}
                   />
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
@@ -411,32 +315,6 @@ export default function AssignmentManagement() {
         type="danger"
       />
 
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        @keyframes scaleIn {
-          from {
-            transform: scale(0.9);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.2s ease-out;
-        }
-        .animate-scaleIn {
-          animation: scaleIn 0.2s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

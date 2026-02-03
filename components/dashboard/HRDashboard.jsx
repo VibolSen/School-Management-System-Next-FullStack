@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import DashboardCard from "@/components/dashboard/DashboardCard";
 import FullPageLoading from "@/components/ui/FullPageLoading";
 import {
@@ -17,6 +18,7 @@ import {
   Send,
   UserPlus,
   DollarSign,
+  ChevronRight,
 } from "lucide-react";
 import {
   BarChart,
@@ -32,7 +34,7 @@ import {
   Cell,
 } from "recharts";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
+const COLORS = ["#3b82f6", "#6366f1", "#8b5cf6", "#0ea5e9", "#64748b"];
 
 const HRDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -50,11 +52,7 @@ const HRDashboard = () => {
         const data = await response.json();
         setDashboardData(data);
       } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("An unknown error occurred");
-        }
+        setError(err instanceof Error ? err.message : "An unknown error occurred");
       }
     };
 
@@ -79,16 +77,27 @@ const HRDashboard = () => {
   }, []);
 
   if (loading) {
-    return <FullPageLoading message="Synchronizing dashboard data..." />;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50/50">
+        <FullPageLoading message="Synchronizing HR Intel..." />
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-6 text-center">
+        <div className="h-16 w-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mb-6 border border-rose-100">
+          <Activity size={32} />
+        </div>
+        <h2 className="text-xl font-black text-slate-900 mb-2">Access Denied</h2>
+        <p className="text-slate-500 max-w-sm mb-8 text-sm font-medium">{error}</p>
+        <button onClick={() => window.location.reload()} className="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-200">Retry Connection</button>
+      </div>
+    );
   }
 
-  if (!dashboardData) {
-    return <div>No data available</div>;
-  }
+  if (!dashboardData) return null;
 
   const {
     totalStaff,
@@ -97,166 +106,183 @@ const HRDashboard = () => {
     coursesByDepartment,
     studentsPerGroup,
   } = dashboardData;
+
   const welcomeName = currentUser
     ? `${currentUser.firstName} ${currentUser.lastName}`
-    : "HR Manager";
+    : "HR Lead";
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 15, opacity: 0 },
+    show: { y: 0, opacity: 1, transition: { duration: 0.4 } },
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="max-w-7xl mx-auto p-4 space-y-5">
+    <div className="min-h-screen bg-slate-50/20 pb-10">
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="max-w-7xl mx-auto p-3 md:p-6 space-y-6"
+      >
         {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white/70 backdrop-blur-sm rounded-2xl p-5 shadow-sm border border-gray-200">
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-              HR Dashboard
+        <motion.header variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-0.5">
+            <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+              {getGreeting()}, <span className="text-indigo-600">{welcomeName}</span>!
             </h1>
-            <p className="text-sm text-gray-600 mt-1">
-              Welcome back, <span className="font-semibold text-gray-800">{welcomeName}</span>
+            <p className="text-slate-500 font-medium text-sm">
+              Overview of academy staff, departments, and resource allocation.
             </p>
           </div>
-          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full border border-emerald-200 shadow-sm">
-            <Activity className="w-5 h-5" />
-            <span className="text-sm font-medium">All systems operational</span>
+          <div className="flex items-center gap-2.5 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm border-l-4 border-l-emerald-500">
+            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">HR Systems Connected</span>
           </div>
-        </header>
+        </motion.header>
 
-        {/* Cards Section */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <DashboardCard
-            title="Total Staff"
-            value={totalStaff.toString()}
-            icon={<Briefcase className="w-5 h-5 text-purple-500" />}
-            description="All staff members"
-            href="/hr/staff"
-          />
-          <DashboardCard
-            title="Total Departments"
-            value={totalDepartments.toString()}
-            icon={<Building2 className="w-5 h-5 text-orange-500" />}
-            description="All departments"
-            href="/hr/reports"
-          />
-          <DashboardCard
-            title="Total Teachers"
-            value={dashboardData.totalTeachers?.toString() || "N/A"}
-            icon={<Users className="w-5 h-5 text-blue-500" />}
-            description="Total teaching staff"
-            href="/hr/staff"
-          />
+        {/* Stats Grid */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { title: "Total Staff", val: totalStaff, icon: Briefcase, color: "blue", href: "/hr/staff" },
+            { title: "Departments", val: totalDepartments, icon: Building2, color: "indigo", href: "/hr/reports" },
+            { title: "Teachers", val: dashboardData.totalTeachers || 0, icon: Users, color: "violet", href: "/hr/staff" },
+            { title: "Open Roles", val: 0, icon: UserPlus, color: "sky", href: "/hr/job-postings" },
+          ].map((stat) => (
+            <motion.div variants={itemVariants} key={stat.title} whileHover={{ y: -3 }}>
+              <Link href={stat.href} className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200 shadow-sm hover:border-blue-100 hover:shadow-md transition-all">
+                <div>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{stat.title}</p>
+                  <p className="text-xl font-black text-slate-900 leading-none">{stat.val}</p>
+                </div>
+                <div className={`h-10 w-10 rounded-lg bg-${stat.color}-50 text-${stat.color}-600 flex items-center justify-center`}>
+                  <stat.icon size={20} />
+                </div>
+              </Link>
+            </motion.div>
+          ))}
         </section>
 
         {/* Quick Actions */}
-        <section className="bg-white/70 backdrop-blur-sm rounded-2xl border border-gray-200 p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-semibold text-gray-900">
-              Quick Actions
-            </h3>
-            <TrendingUp className="w-4 h-4 text-gray-400" />
+        <motion.section variants={itemVariants} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-lg font-black text-slate-800 tracking-tight">HR Operations</h3>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Strategic Management</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {[
-              { label: "Manage Staff", icon: Users, href: "/hr/staff" },
-              { label: "Attendance", icon: CalendarCheck, href: "/hr/attendance" },
-              { label: "Reports", icon: BarChart3, href: "/hr/reports" },
-              { label: "Settings", icon: Settings, href: "/hr/settings" },
-              { label: "Job Postings", icon: ClipboardList, href: "/hr/job-postings" },
-              { label: "Manage Attendance", icon: UserPlus, href: "/hr/manage-attendance" },
-            ].map((action, i) => (
+              { label: "Staff", icon: Users, href: "/hr/staff", bg: "bg-blue-50", text: "text-blue-600" },
+              { label: "Attendance", icon: CalendarCheck, href: "/hr/attendance", bg: "bg-indigo-50", text: "text-indigo-600" },
+              { label: "Analytics", icon: BarChart3, href: "/hr/reports", bg: "bg-violet-50", text: "text-violet-600" },
+              { label: "Careers", icon: ClipboardList, href: "/hr/job-postings", bg: "bg-sky-50", text: "text-sky-600" },
+              { label: "Hire", icon: UserPlus, href: "/hr/manage-attendance", bg: "bg-cyan-50", text: "text-cyan-600" },
+              { label: "Portal", icon: Settings, href: "/hr/settings", bg: "bg-slate-50", text: "text-slate-600" },
+            ].map((action) => (
               <Link
                 href={action.href}
-                key={i}
-                className="group flex flex-col items-center gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 hover:shadow-md transition-all duration-200 cursor-pointer"
+                key={action.label}
+                className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-50 hover:border-blue-100 hover:bg-slate-50/50 transition-all active:scale-95"
               >
-                <div className="p-2 bg-gray-100 group-hover:bg-gray-200 rounded-xl transition-colors">
-                  <action.icon className="w-5 h-5 text-gray-700" />
+                <div className={`p-3.5 ${action.bg} ${action.text} rounded-xl group-hover:bg-white transition-all shadow-sm`}>
+                  <action.icon size={20} />
                 </div>
-                <span className="text-sm font-medium text-gray-800 text-center">
-                    {action.label}
-                  </span>
+                <span className="text-[11px] font-bold text-slate-700 text-center tracking-tight leading-none px-1">
+                  {action.label}
+                </span>
               </Link>
             ))}
           </div>
-        </section>
+        </motion.section>
 
         {/* Charts Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4 text-slate-800">
-              Staff by Role
-            </h2>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={staffByStatus}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  label
-                >
-                  {staffByStatus.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4 text-slate-800">
-              Courses by Department
-            </h2>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart
-                data={coursesByDepartment}
-                margin={{ top: 20, right: 30, left: -10, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="name"
-                  angle={-20}
-                  textAnchor="end"
-                  height={50}
-                  interval={0}
-                  fontSize={12}
-                />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="count" fill="#3b82f6" name="Number of Courses" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-sm border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4 text-slate-800">
-              Students per Group
-            </h2>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart
-                data={studentsPerGroup}
-                margin={{ top: 20, right: 30, left: -10, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="name"
-                  angle={-20}
-                  textAnchor="end"
-                  height={50}
-                  interval={0}
-                  fontSize={12}
-                />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="count" fill="#8884d8" name="Number of Students" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <motion.div variants={itemVariants} className="lg:col-span-1 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 className="text-sm font-black text-slate-800 mb-4 uppercase tracking-wider">Staffing Levels</h3>
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={staffByStatus}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={70}
+                    innerRadius={45}
+                    paddingAngle={5}
+                  >
+                    {staffByStatus.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '10px', fontWeight: '800', textTransform: 'uppercase' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+
+          <motion.div variants={itemVariants} className="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Curriculum Distribution</h3>
+              <p className="text-[10px] font-bold text-slate-400">Total Courses by Department</p>
+            </div>
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={coursesByDepartment}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis 
+                    dataKey="name" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    fontSize={10} 
+                    fontWeight={700}
+                    tick={{ fill: '#94a3b8' }}
+                  />
+                  <YAxis axisLine={false} tickLine={false} fontSize={10} fontWeight={700} tick={{ fill: '#94a3b8' }} />
+                  <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                  <Bar dataKey="count" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={24} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
         </section>
-      </div>
+
+        {/* Students per Group - Compact Bar Chart */}
+        <motion.section variants={itemVariants} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Group Density</h3>
+            <TrendingUp size={16} className="text-slate-300" />
+          </div>
+          <div className="h-[200px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={studentsPerGroup}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} fontWeight={700} tick={{ fill: '#94a3b8' }} />
+                <YAxis axisLine={false} tickLine={false} fontSize={10} fontWeight={700} tick={{ fill: '#94a3b8' }} />
+                <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                <Bar dataKey="count" fill="#8b5cf6" radius={[6, 6, 0, 0]} barSize={32} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.section>
+      </motion.div>
     </div>
   );
 };

@@ -3,17 +3,19 @@
 import { useState, useEffect } from "react";
 import InvoiceModal from "./InvoiceModal";
 import Link from "next/link";
-import { Plus, Eye, Edit, Trash2 } from "lucide-react";
+import { Plus, Eye, Edit, Trash2, FileText, Search, RefreshCcw, Filter } from "lucide-react";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function InvoicesManagement() {
   const [invoices, setInvoices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
-  // New states for ConfirmationDialog
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -51,12 +53,10 @@ export default function InvoicesManagement() {
       const response = await fetch("/api/admin/invoices");
       if (response.ok) {
         const data = await response.json();
-        setInvoices(data);
-      } else {
-        console.error("Failed to fetch invoices");
+        setInvoices(data || []);
       }
     } catch (error) {
-      console.error("Error fetching invoices:", error);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -80,9 +80,7 @@ export default function InvoicesManagement() {
   const confirmDelete = async () => {
     if (!deleteId) return;
     try {
-      const response = await fetch(`/api/admin/invoices/${deleteId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(`/api/admin/invoices/${deleteId}`, { method: "DELETE" });
       if (response.ok) {
         showMessage("Invoice deleted successfully!", "success");
         fetchInvoices();
@@ -98,137 +96,185 @@ export default function InvoicesManagement() {
     }
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedInvoice(null);
-  };
+  const filteredInvoices = invoices.filter(inv => {
+    const matchesSearch = (inv.student?.firstName + " " + inv.student?.lastName).toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         inv.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "ALL" || inv.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
-  const onInvoiceSaved = () => {
-    fetchInvoices();
-    closeModal();
-  };
-
-  const getStatusColor = (status) => {
+  const getStatusStyle = (status) => {
     switch (status) {
-      case "PAID":
-        return "text-green-600 font-medium";
-      case "OVERDUE":
-        return "text-red-600 font-medium";
-      case "SENT":
-        return "text-blue-600 font-medium";
-      case "DRAFT":
-        return "text-gray-600 font-medium";
-      default:
-        return "text-gray-800";
+      case "PAID": return "bg-emerald-50 text-emerald-700 border-emerald-100";
+      case "OVERDUE": return "bg-rose-50 text-rose-700 border-rose-100";
+      case "SENT": return "bg-blue-50 text-blue-700 border-blue-100";
+      case "DRAFT": return "bg-slate-50 text-slate-500 border-slate-100";
+      default: return "bg-slate-50 text-slate-400 border-slate-100";
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-4">
-      <div className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          Invoices Management
-        </h1>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="text-2xl md:text-3xl font-black text-blue-600 tracking-tight">
+            Accounts Receivable
+          </h1>
+          <p className="text-slate-500 font-medium text-sm">
+            Generate student billings, track payment cycles, and manage institutional revenue streams.
+          </p>
+        </div>
         <button
           onClick={handleAddInvoice}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-200 transition-all active:scale-95 whitespace-nowrap"
         >
-          <Plus className="w-4 h-4" />
-          <span>Create Invoice</span>
+          <Plus size={14} />
+          Create Invoice
         </button>
       </div>
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+        <div className="p-4 border-b border-slate-100 bg-blue-50/30 flex flex-col md:flex-row justify-between items-center gap-3">
+           <div className="flex items-center gap-2">
+            <div className="h-8 w-1 bg-indigo-600 rounded-full" />
+            <h2 className="text-sm font-black text-slate-800 uppercase tracking-tight">Invoice Registry</h2>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+             <div className="relative group flex-1 md:w-36">
+              <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-slate-900 transition-colors" size={12} />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-black uppercase tracking-tight focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all text-slate-700 cursor-pointer shadow-sm appearance-none"
+              >
+                <option value="ALL">All States</option>
+                <option value="PAID">Settled</option>
+                <option value="SENT">Issued</option>
+                <option value="OVERDUE">Defaulted</option>
+                <option value="DRAFT">Pending</option>
+              </select>
+            </div>
+            <div className="relative group flex-1 md:w-64">
+              <input
+                type="text"
+                placeholder="Find invoice or student..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all text-slate-700 hover:border-slate-300 shadow-sm"
+              />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-slate-900 transition-colors" size={12} />
+            </div>
+            <button
+               onClick={fetchInvoices}
+               className="p-1.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+               title="Update Feed"
+            >
+               <RefreshCcw size={14} className={isLoading ? "animate-spin" : ""} />
+            </button>
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
+          <table className="w-full border-collapse">
+            <thead className="bg-slate-50 border-b border-slate-100">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  # ID
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Student
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Due Date
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="px-5 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Doc ID</th>
+                <th className="px-5 py-3 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">Payee Details</th>
+                <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Valuation</th>
+                <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Maturity Date</th>
+                <th className="px-5 py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">Management</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center">
-                    <LoadingSpinner size="md" color="blue" className="mx-auto" />
-                    <p className="mt-2 text-xs font-semibold text-slate-400 uppercase tracking-widest animate-pulse">
-                      Retrieving Invoices...
-                    </p>
-                  </td>
-                </tr>
-              ) : invoices.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-500 font-medium">
-                    No invoices found.
-                  </td>
-                </tr>
-              ) : (
-                invoices.map((invoice) => (
-                  <tr key={invoice.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-4 py-3 whitespace-nowrap text-xs font-bold text-slate-400">
-                      {invoice.id.substring(invoice.id.length - 8)}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-700">
-                      {invoice.student?.firstName} {invoice.student?.lastName}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm font-semibold text-slate-900">${invoice.totalAmount.toFixed(2)}</td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                        invoice.status === 'PAID' ? 'bg-green-50 text-green-700 border-green-200' : 
-                        invoice.status === 'OVERDUE' ? 'bg-red-50 text-red-700 border-red-200' : 
-                        invoice.status === 'SENT' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
-                        'bg-slate-50 text-slate-600 border-slate-200'
-                      }`}>
-                        {invoice.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-500">
-                      {new Date(invoice.dueDate).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-right">
-                      <div className="flex justify-end gap-2">
-                        <Link
-                          href={`/admin/finance/invoices/${invoice.id}`}
-                          className="p-1 px-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all duration-200"
-                          title="View Invoice"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Link>
-                        <button
-                          onClick={() => handleEditInvoice(invoice)}
-                          className="p-1 px-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
-                          title="Edit Invoice"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteInvoice(invoice.id)}
-                          className="p-1 px-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                          title="Delete Invoice"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+            <tbody className="divide-y divide-slate-50">
+              <AnimatePresence mode="popLayout">
+                {isLoading && filteredInvoices.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-20 text-center">
+                       <div className="flex flex-col items-center justify-center gap-3 opacity-50">
+                        <div className="h-6 w-6 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Retrieving Accounts...</span>
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
+                ) : filteredInvoices.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-20 text-center">
+                       <FileText size={32} className="mx-auto text-blue-200 mb-3" />
+                       <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">No Invoices found</h3>
+                       <p className="text-slate-500 text-[10px] uppercase tracking-widest mt-1">Registry is complete but currently empty</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredInvoices.map((inv, index) => (
+                    <motion.tr
+                      key={inv.id}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ delay: Math.min(index * 0.02, 0.4) }}
+                      className="group hover:bg-slate-50/50 transition-colors"
+                    >
+                      <td className="px-5 py-3 whitespace-nowrap">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-tight tabular-nums">
+                          INV-{inv.id.substring(inv.id.length - 6)}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-lg bg-blue-50 text-indigo-600 flex items-center justify-center font-black text-[10px] shrink-0 border border-blue-100 uppercase">
+                             {inv.student?.firstName.charAt(0)}{inv.student?.lastName.charAt(0)}
+                           </div>
+                           <div className="flex flex-col">
+                              <span className="text-xs font-black text-slate-800 tracking-tight">{inv.student?.firstName} {inv.student?.lastName}</span>
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Student Account</span>
+                           </div>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3 whitespace-nowrap text-center">
+                        <span className="text-xs font-black text-slate-900 tabular-nums">
+                          ${inv.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 whitespace-nowrap text-center">
+                        <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm ${getStatusStyle(inv.status)}`}>
+                          {inv.status}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 whitespace-nowrap text-center">
+                        <span className="text-[11px] font-bold text-slate-500 tabular-nums uppercase">
+                          {new Date(inv.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3 whitespace-nowrap text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <Link
+                            href={`/admin/finance/invoices/${inv.id}`}
+                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                            title="Audit View"
+                          >
+                            <Eye size={14} />
+                          </Link>
+                          <button
+                            onClick={() => handleEditInvoice(inv)}
+                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                            title="Modify Invoice"
+                          >
+                            <Edit size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteInvoice(inv.id)}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                            title="Void Document"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))
+                )}
+              </AnimatePresence>
             </tbody>
           </table>
         </div>
@@ -236,8 +282,8 @@ export default function InvoicesManagement() {
       <InvoiceModal
         isOpen={isModalOpen}
         invoice={selectedInvoice}
-        onClose={closeModal}
-        onInvoiceSaved={onInvoiceSaved}
+        onClose={() => { setIsModalOpen(false); setSelectedInvoice(null); }}
+        onInvoiceSaved={() => { fetchInvoices(); setIsModalOpen(false); setSelectedInvoice(null); }}
         showMessage={showMessage}
       />
 
@@ -245,13 +291,13 @@ export default function InvoicesManagement() {
         isOpen={showDeleteConfirmation}
         onClose={() => setShowDeleteConfirmation(false)}
         onConfirm={confirmDelete}
-        title="Delete Invoice"
-        message="Are you sure you want to delete this invoice? This action cannot be undone."
+        title="Void Invoice"
+        message="Are you sure you want to void this invoice document? This action will permanently remove it from the financial registry."
       />
 
        <ConfirmationDialog
         isOpen={isSuccessModalOpen}
-        title="Success"
+        title="Transaction Finalized"
         message={successMessage}
         onConfirm={handleCloseSuccessModal}
         onCancel={handleCloseSuccessModal}
@@ -261,7 +307,7 @@ export default function InvoicesManagement() {
 
        <ConfirmationDialog
         isOpen={isErrorModalOpen}
-        title="Error"
+        title="Procedural Error"
         message={errorMessage}
         onConfirm={handleCloseErrorModal}
         onCancel={handleCloseErrorModal}
