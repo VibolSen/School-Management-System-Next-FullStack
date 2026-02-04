@@ -1,0 +1,143 @@
+/* ========================================
+   ACCESSIBILITY STYLES
+   ======================================== */
+
+/* Reduced Motion */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+    filter: contrast(1.2);
+}
+
+.high-contrast .bg-white {
+    background-color: #ffffff !important;
+}
+
+.high-contrast .text-slate-600,
+.high-contrast .text-slate-500,
+.high-contrast .text-slate-400 {
+    color: #000000 !important;
+}
+
+.high-contrast .border-slate-200,
+.high-contrast .border-slate-300 {
+    border-color: #000000 !important;
+    border-width: 2px !important;
+}
+
+.high-contrast button,
+.high-contrast a {
+    outline: 2px solid transparent;
+}
+
+.high-contrast button:focus,
+.high-contrast a:focus {
+    outline: 3px solid #0000ff !important;
+    outline-offset: 2px;
+}
+
+/* Dark mode high contrast */
+.dark.high-contrast .bg-white {
+    background-color: #000000 !important;
+}
+
+.dark.high-contrast .text-slate-600,
+.dark.high-contrast .text-slate-500,
+.dark.high-contrast .text-slate-400 {
+    color: #ffffff !important;
+}
+
+.dark.high-contrast .border-slate-200,
+.dark.high-contrast .border-slate-300 {
+    border-color: #ffffff !important;
+    border-width: 2px !important;
+}
+
+.dark.high-contrast button:focus,
+.dark.high-contrast a:focus {
+    outline: 3px solid #ffff00 !important;
+    outline-offset: 2px;
+}
+
+/* Font Size Adjustments */
+html {
+    font-size: 16px;
+    /* Default medium */
+}
+
+/* Small font size is handled by root font-size change */
+/* Medium is default 16px */
+/* Large and Extra Large are handled by root font-size change */
+
+/* Ensure relative sizing works properly */
+.text-xs {
+    font-size: 0.75rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.text-base {
+    font-size: 1rem;
+}
+
+.text-lg {
+    font-size: 1.125rem;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+}
+
+.text-2xl {
+    font-size: 1.5rem;
+}
+
+.text-3xl {
+    font-size: 1.875rem;
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Skip to main content link (for screen readers) */
+.skip-to-main {
+    position: absolute;
+    left: -9999px;
+    z-index: 999;
+    padding: 1rem;
+    background-color: #3b82f6;
+    color: white;
+    text-decoration: none;
+}
+
+.skip-to-main:focus {
+    left: 50%;
+    transform: translateX(-50%);
+    top: 1rem;
+}
+
+/* Screen Reader Optimization */
+.screen-reader-optimized *:focus-visible {
+    outline: 4px solid #fbbf24 !important;
+    /* Amber-400 */
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px #000000;
+}
+
+.screen-reader-optimized a {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}

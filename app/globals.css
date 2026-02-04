@@ -18,6 +18,17 @@
   background: #64748b;
 }
 
+/* Dark mode scrollbars */
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
 /* Home Page animations */
 /* Gradient background animation */
 @keyframes gradient-slow {

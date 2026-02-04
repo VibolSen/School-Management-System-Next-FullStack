@@ -1,6 +1,10 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "./darkmode.css";
+import "./accessibility.css";
 import { UserProvider } from "@/context/UserContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { AccessibilityProvider } from "@/context/AccessibilityContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +20,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className} suppressHydrationWarning={true}>
-        <UserProvider>{children}</UserProvider>
+        <AccessibilityProvider>
+          <ThemeProvider>
+            <UserProvider>{children}</UserProvider>
+          </ThemeProvider>
+        </AccessibilityProvider>
       </body>
     </html>
   );
